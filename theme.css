@@ -1,0 +1,16 @@
+body {
+    font-family: 'Prompt', sans-serif;
+    background-color: #f8f9fa;
+}
+
+.table th {
+    font-weight: 500;
+}
+
+/* เพิ่มสถานะเตือนสำหรับสารเคมีที่กำลังจะหมดอายุ (ใช้ร่วมกับ JS) */
+.exp-warning {
+    background-color: #fff3cd !important;
+}
+.exp-danger {
+    background-color: #f8d7da !important;
+}
