@@ -1,38 +1,68 @@
 <!DOCTYPE html>
+
 <html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ประวัติ รับ-จ่าย — ChemStock</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="css/theme.css">
 </head>
 <body>
 
 <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
+<!-- ===== SIDEBAR ===== -->
+
 <aside id="sidebar" class="sidebar">
   <div class="sidebar-brand">
-    <div class="sidebar-logo">🧪</div>
+    <div class="sidebar-logo-wrap">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M9 3h6M10 3v6.6L6.1 17.2A2 2 0 0 0 8 20h8a2 2 0 0 0 1.9-2.8L14 9.6V3"
+          stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M7.5 16h9" stroke="#7DD3FC" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="10" cy="15.5" r="1.1" fill="#38BDF8" opacity="0.9"/>
+        <circle cx="14.5" cy="17" r="0.75" fill="#93C5FD" opacity="0.8"/>
+      </svg>
+    </div>
     <div>
       <div class="sidebar-title">ChemStock</div>
       <div class="sidebar-subtitle">ระบบจัดการคลังสารเคมี</div>
     </div>
   </div>
+
   <nav class="sidebar-nav">
-    <div class="sidebar-section-label">เมนูหลัก</div>
-    <a class="nav-item" href="index.html"><i class="bi bi-box-seam"></i> จัดการสต็อก</a>
-    <a class="nav-item active" href="transaction.html"><i class="bi bi-arrow-left-right"></i> ประวัติ รับ-จ่าย</a>
-    <a class="nav-item" href="dashboard.html"><i class="bi bi-speedometer2"></i> แดชบอร์ด</a>
-    <div class="sidebar-section-label">ระบบ</div>
-    <a class="nav-item" href="admin.html">
-      <i class="bi bi-shield-lock"></i> Admin Panel
-      <span class="nav-badge admin-indicator" style="display:none">ON</span>
+    <div class="nav-section-label">เมนูหลัก</div>
+    <a class="nav-link" href="index.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+      </svg>
+      จัดการสต็อก
+    </a>
+    <a class="nav-link active" href="transaction.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/>
+      </svg>
+      ประวัติ รับ-จ่าย
+    </a>
+    <a class="nav-link" href="dashboard.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+      </svg>
+      แดชบอร์ด
+    </a>
+    <div class="nav-section-label">ระบบ</div>
+    <a class="nav-link" href="admin.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      Admin Panel
+      <span class="nav-pill admin-indicator" style="display:none">ADMIN</span>
     </a>
   </nav>
+
   <div class="sidebar-footer">
     <div class="sidebar-user">
-      <div class="user-avatar">C</div>
+      <div class="user-ava">C</div>
       <div>
         <div class="user-name">ChemStock</div>
         <div class="user-role" id="sidebarRole">ผู้ใช้ทั่วไป</div>
@@ -41,92 +71,154 @@
   </div>
 </aside>
 
+<!-- ===== TOP BAR (Mobile) ===== -->
+
 <div class="top-bar">
-  <button id="sidebarOpenBtn" class="btn btn-ghost btn-icon" style="color:var(--text-primary)">
-    <i class="bi bi-list" style="font-size:22px;"></i>
+  <button id="sidebarOpenBtn" class="btn btn-ghost btn-icon">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
   </button>
-  <div style="flex:1;display:flex;justify-content:center;" class="top-bar-logo">🧪 ChemStock</div>
-  <div style="width:40px;"></div>
+  <div class="top-bar-brand">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+      <path d="M9 3h6M10 3v6.6L6.1 17.2A2 2 0 0 0 8 20h8a2 2 0 0 0 1.9-2.8L14 9.6V3"
+        stroke="#0EA5E9" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    ChemStock
+  </div>
+  <div style="width:36px;"></div>
 </div>
+
+<!-- ===== MAIN CONTENT ===== -->
 
 <div class="main-content">
   <div class="page-wrapper">
 
-    <div class="page-header">
-      <div>
-        <div class="page-title">ประวัติการ รับ-จ่าย สารเคมี</div>
-        <div class="page-subtitle">บันทึกการรับเข้าและเบิกจ่ายทั้งหมด</div>
+```
+<!-- Header -->
+<div class="page-header">
+  <div>
+    <div class="page-title">ประวัติการ รับ-จ่าย สารเคมี</div>
+    <div class="page-subtitle" id="transCountLabel">บันทึกการรับเข้าและเบิกจ่ายทั้งหมด</div>
+  </div>
+</div>
+
+<!-- Filter + Search Bar -->
+<div class="filter-card">
+  <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;">
+    <!-- Type filter chips -->
+    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+      <div class="filter-label" style="margin-bottom:0; white-space:nowrap;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        กรอง
+      </div>
+      <div class="filter-row" id="typeFilterBar">
+        <button class="filter-chip active" onclick="filterTrans('ALL',this)">ทั้งหมด</button>
+        <button class="filter-chip" onclick="filterTrans('IN',this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+          รับเข้า
+        </button>
+        <button class="filter-chip" onclick="filterTrans('OUT',this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+          เบิกจ่าย
+        </button>
       </div>
     </div>
-
-    <!-- Filter Row -->
-    <div class="card" style="padding:16px 20px;margin-bottom:20px;">
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
-        <div class="filter-bar">
-          <button class="filter-chip active" onclick="filterTrans('ALL', this)">ทั้งหมด</button>
-          <button class="filter-chip" onclick="filterTrans('IN', this)">
-            <i class="bi bi-arrow-down-short" style="color:var(--success);"></i> รับเข้า
-          </button>
-          <button class="filter-chip" onclick="filterTrans('OUT', this)">
-            <i class="bi bi-arrow-up-short" style="color:var(--danger);"></i> เบิกจ่าย
-          </button>
-        </div>
-        <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
-          <input type="text" class="form-control" id="searchTrans" placeholder="🔍 ค้นหาสารเคมี..." style="max-width:200px;font-size:13px;" oninput="applyFilters()">
-        </div>
-      </div>
+    <!-- Search -->
+    <div style="position:relative; flex:1; max-width:260px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" class="form-control" id="searchTrans"
+        placeholder="ค้นหาสารเคมี หรือหมายเหตุ..."
+        oninput="applyFilters()"
+        style="padding-left:34px; font-size:13px;">
     </div>
+  </div>
+</div>
 
-    <!-- Desktop Table -->
-    <div class="card desktop-only">
-      <div class="table-wrapper">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th style="padding-left:20px;">วัน-เวลา</th>
-              <th>สารเคมี</th>
-              <th>ประเภท</th>
-              <th>จำนวน</th>
-              <th style="padding-right:20px;">ผู้ทำรายการ/หมายเหตุ</th>
-            </tr>
-          </thead>
-          <tbody id="transactionTableBody">
-            <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">กำลังโหลดข้อมูล...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+<!-- Desktop Table -->
+<div class="table-card desktop-only">
+  <div style="overflow-x:auto;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="padding-left:22px; min-width:140px;">วัน-เวลา</th>
+          <th style="min-width:200px;">สารเคมี</th>
+          <th>ประเภท</th>
+          <th>จำนวน</th>
+          <th style="padding-right:22px;">ผู้ทำรายการ / หมายเหตุ</th>
+        </tr>
+      </thead>
+      <tbody id="transactionTableBody">
+        <tr><td colspan="5">
+          <div class="empty-state" style="padding:40px;">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.3" stroke-linecap="round" style="margin:0 auto 10px;display:block;">
+              <rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/>
+              <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="11" y2="17"/>
+            </svg>
+            <div class="empty-title">กำลังโหลดข้อมูล...</div>
+          </div>
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
-    <!-- Mobile List -->
-    <div id="transCardsBody" class="mobile-only" style="display:flex;flex-direction:column;gap:10px;"></div>
-
-    <!-- Pagination -->
-    <div id="paginationBar" style="display:flex;justify-content:center;gap:8px;margin-top:20px;"></div>
+<!-- Mobile List -->
+<div id="transCardsBody" class="mobile-only" style="display:flex;flex-direction:column;gap:10px;"></div>
+```
 
   </div>
 </div>
 
+<!-- ===== BOTTOM NAV ===== -->
+
 <nav class="bottom-nav">
   <div class="bottom-nav-inner">
-    <a class="bottom-nav-item" href="index.html"><i class="bi bi-box-seam"></i> สต็อก</a>
-    <a class="bottom-nav-item active" href="transaction.html"><i class="bi bi-arrow-left-right"></i> รับ-จ่าย</a>
-    <a class="bottom-nav-item" href="dashboard.html"><i class="bi bi-speedometer2"></i> แดชบอร์ด</a>
-    <a class="bottom-nav-item" href="admin.html"><i class="bi bi-shield-lock"></i> Admin</a>
+    <a class="bottom-nav-item" href="index.html">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+      </svg>
+      สต็อก
+    </a>
+    <a class="bottom-nav-item active" href="transaction.html">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/>
+      </svg>
+      รับ-จ่าย
+    </a>
+    <a class="bottom-nav-item" href="dashboard.html">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+      </svg>
+      แดชบอร์ด
+    </a>
+    <a class="bottom-nav-item" href="admin.html">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      Admin
+    </a>
   </div>
 </nav>
 
 <div id="toastContainer" class="toast-container"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="js/ui.js"></script>
+
 <script src="js/transaction.js"></script>
+
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     if (isAdminLoggedIn()) {
-      document.getElementById('sidebarRole').textContent = '🔑 Admin';
+      document.getElementById('sidebarRole').textContent = '🔑 Admin Mode';
       document.querySelectorAll('.admin-indicator').forEach(el => el.style.display = '');
     }
   });
 </script>
+
 </body>
 </html>
