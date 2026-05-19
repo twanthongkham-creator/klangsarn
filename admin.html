@@ -1,404 +1,618 @@
 <!DOCTYPE html>
+
 <html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Panel — ChemStock</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="css/theme.css">
   <style>
-    /* Admin-specific extras */
-    .admin-panel-bg {
+    /* ===== LOGIN SCREEN ===== */
+    .login-screen {
       min-height: 100vh;
-      background: linear-gradient(135deg, #0D1117 0%, #1a2234 50%, #0f1a2e 100%);
       display: flex; align-items: center; justify-content: center;
       padding: 24px;
+      background: linear-gradient(160deg, #060D1E 0%, #0B1729 40%, #081524 70%, #0E2140 100%);
+      position: relative; overflow: hidden;
     }
-
+    /* ambient glow blobs */
+    .login-screen::before {
+      content: '';
+      position: absolute; left: -15%; top: -10%;
+      width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(14,165,233,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .login-screen::after {
+      content: '';
+      position: absolute; right: -10%; bottom: -10%;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(99,102,241,0.10) 0%, transparent 70%);
+      pointer-events: none;
+    }
     .login-box {
-      width: 100%;
-      max-width: 400px;
+      width: 100%; max-width: 400px;
       background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: var(--r-xl);
-      padding: 40px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
-      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 24px;
+      padding: 40px 36px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(14,165,233,0.08);
+      backdrop-filter: blur(12px);
+      position: relative; z-index: 1;
     }
-
     .login-logo {
-      width: 60px; height: 60px;
-      background: linear-gradient(135deg, #0EA5E9, #0284C7);
-      border-radius: var(--r-lg);
+      width: 64px; height: 64px; border-radius: 18px;
+      background: linear-gradient(135deg, #0EA5E9, #6366F1);
       display: flex; align-items: center; justify-content: center;
-      font-size: 28px;
-      margin: 0 auto 20px;
-      box-shadow: 0 8px 24px rgba(14,165,233,0.4);
+      margin: 0 auto 22px;
+      box-shadow: 0 8px 28px rgba(14,165,233,0.40), 0 0 0 1px rgba(255,255,255,0.12);
     }
-
-    .login-title { color: #F1F5F9; font-size: 22px; font-weight: 700; text-align: center; }
-    .login-subtitle { color: #64748B; font-size: 13px; text-align: center; margin-top: 4px; }
-
-    .login-box .form-label { color: #94A3B8; }
+    .login-title    { color: #EFF6FF; font-size: 22px; font-weight: 700; text-align: center; letter-spacing: -0.3px; }
+    .login-subtitle { color: rgba(255,255,255,0.35); font-size: 13px; text-align: center; margin-top: 4px; }
+    .login-box .form-label { color: rgba(255,255,255,0.55); }
     .login-box .form-control {
       background: rgba(255,255,255,0.06);
-      border-color: rgba(255,255,255,0.1);
-      color: #F1F5F9;
+      border-color: rgba(255,255,255,0.10);
+      color: #F0F7FF;
     }
-    .login-box .form-control::placeholder { color: #475569; }
+    .login-box .form-control::placeholder { color: rgba(255,255,255,0.18); }
     .login-box .form-control:focus {
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.09);
       border-color: var(--primary);
     }
-
-    .error-msg {
-      background: rgba(239,68,68,0.1);
-      border: 1px solid rgba(239,68,68,0.2);
-      color: #FCA5A5;
-      padding: 10px 14px;
+    .login-hint {
+      margin-top: 20px;
+      padding: 12px 14px;
+      background: rgba(14,165,233,0.08);
+      border: 1px solid rgba(14,165,233,0.18);
       border-radius: var(--r-md);
-      font-size: 13px;
-      display: none;
-      margin-top: 12px;
+      text-align: center;
     }
+    .login-hint-label { font-size: 11px; color: rgba(255,255,255,0.3); }
+    .login-hint-val   { font-size: 13.5px; color: #38BDF8; font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-top: 2px; }
 
-    /* Admin page tabs */
-    .admin-tabs {
-      display: flex; gap: 4px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 24px;
-    }
+```
+.login-err {
+  display: none; margin-top: 12px;
+  padding: 10px 14px; border-radius: var(--r-md);
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.22);
+  color: #FCA5A5; font-size: 13px;
+  display: none; align-items: center; gap: 8px;
+}
+.login-err.show { display: flex; }
 
-    .admin-tab {
-      padding: 10px 20px;
-      font-size: 14px; font-weight: 500;
-      color: var(--text-muted);
-      cursor: pointer;
-      border: none; background: none;
-      border-bottom: 2px solid transparent;
-      font-family: 'Kanit', sans-serif;
-      transition: all var(--t-fast);
-      margin-bottom: -1px;
-    }
+/* ===== ADMIN TABS ===== */
+.admin-tabs {
+  display: flex; gap: 2px;
+  border-bottom: 1px solid var(--border-soft);
+  padding: 0 20px;
+  overflow-x: auto;
+}
+.admin-tabs::-webkit-scrollbar { height: 0; }
+.admin-tab {
+  padding: 12px 18px; font-size: 13.5px; font-weight: 500;
+  color: var(--text-muted); cursor: pointer;
+  border: none; background: none;
+  border-bottom: 2px solid transparent;
+  font-family: 'Kanit', sans-serif;
+  transition: all var(--t-fast);
+  margin-bottom: -1px; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.admin-tab:hover { color: var(--text-body); }
+.admin-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.admin-tab svg { opacity: 0.7; }
+.admin-tab.active svg { opacity: 1; }
 
-    .admin-tab:hover { color: var(--text-primary); }
-    .admin-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
 
-    .tab-pane { display: none; }
-    .tab-pane.active { display: block; }
+/* ===== SETTINGS ROWS ===== */
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px; border-bottom: 1px solid var(--border-soft); gap: 16px;
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-label { font-size: 14px; font-weight: 600; color: var(--text-head); }
+.setting-desc  { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
 
-    /* Stat highlight */
-    .quick-stat {
-      display: flex; align-items: center; gap: 12px;
-      padding: 16px;
-      background: var(--bg-card);
-      border-radius: var(--r-lg);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-xs);
-    }
-    .quick-stat-val { font-size: 24px; font-weight: 700; color: var(--text-primary); }
-    .quick-stat-lbl { font-size: 12px; color: var(--text-muted); }
+/* ===== EXPORT CARDS ===== */
+.export-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 16px; padding: 20px; }
+.export-card {
+  background: var(--bg-hover); border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg); padding: 22px 20px;
+  text-align: center;
+}
+.export-card-icon {
+  width: 52px; height: 52px; border-radius: var(--r-md);
+  background: var(--grad-brand);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px;
+  box-shadow: 0 4px 12px rgba(14,165,233,0.28);
+}
+.export-card-title { font-size: 15px; font-weight: 700; color: var(--text-head); }
+.export-card-desc  { font-size: 12px; color: var(--text-muted); margin: 6px 0 16px; }
+```
 
-    /* Settings */
-    .settings-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .settings-row:last-child { border-bottom: none; }
-    .settings-label { font-size: 14px; font-weight: 500; }
-    .settings-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
   </style>
 </head>
 <body>
 
-<!-- ===== LOGIN SCREEN ===== -->
-<div id="loginScreen" class="admin-panel-bg">
+<!-- ===========================
+     LOGIN SCREEN
+============================== -->
+
+<div id="loginScreen" class="login-screen">
   <div class="login-box">
-    <div class="login-logo">🔑</div>
+    <div class="login-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+          stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M9 12l2 2 4-4" stroke="#7DD3FC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
     <div class="login-title">Admin Panel</div>
     <div class="login-subtitle">ChemStock — เข้าสู่ระบบผู้ดูแล</div>
 
-    <div style="margin-top:28px;">
-      <div class="form-group">
-        <label class="form-label">รหัสผ่าน Admin</label>
-        <div style="position:relative;">
-          <input type="password" class="form-control" id="adminPassword"
-            placeholder="ใส่รหัสผ่าน..."
-            onkeydown="if(event.key==='Enter') attemptLogin()"
-            style="padding-right:44px;">
-          <button onclick="togglePwd()" style="
-            position:absolute;right:12px;top:50%;transform:translateY(-50%);
-            background:none;border:none;cursor:pointer;color:#64748B;font-size:16px;
-          "><i class="bi bi-eye" id="eyeIcon"></i></button>
-        </div>
-      </div>
-
-      <div class="error-msg" id="loginError">
-        <i class="bi bi-exclamation-circle" style="margin-right:6px;"></i>
-        รหัสผ่านไม่ถูกต้อง
-      </div>
-
-      <button class="btn btn-primary btn-block btn-lg" onclick="attemptLogin()" style="margin-top:16px;">
-        <i class="bi bi-shield-check"></i> เข้าสู่ระบบ
+```
+<div style="margin-top:28px;">
+  <div class="form-group">
+    <label class="form-label">รหัสผ่าน Admin</label>
+    <div style="position:relative;">
+      <input type="password" class="form-control" id="adminPassword"
+        placeholder="กรอกรหัสผ่าน..."
+        onkeydown="if(event.key==='Enter')attemptLogin()"
+        style="padding-right:44px;">
+      <button onclick="togglePwd()" tabindex="-1" style="
+        position:absolute;right:11px;top:50%;transform:translateY(-50%);
+        background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.3);
+        padding:4px; display:flex; align-items:center; justify-content:center;
+        transition:color 0.15s;
+      " onmouseenter="this.style.color='rgba(255,255,255,0.7)'" onmouseleave="this.style.color='rgba(255,255,255,0.3)'">
+        <svg id="eyeIconShow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+        <svg id="eyeIconHide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
       </button>
-
-      <div style="margin-top:20px;text-align:center;">
-        <a href="index.html" style="font-size:13px;color:#475569;text-decoration:none;">
-          <i class="bi bi-arrow-left" style="margin-right:4px;"></i>กลับหน้าหลัก
-        </a>
-      </div>
-
-      <div style="margin-top:16px;padding:12px;background:rgba(14,165,233,0.08);border-radius:var(--r-md);border:1px solid rgba(14,165,233,0.15);text-align:center;">
-        <div style="font-size:11px;color:#64748B;">รหัสผ่านเริ่มต้น</div>
-        <div style="font-size:13px;color:#38BDF8;font-family:'JetBrains Mono',monospace;font-weight:600;margin-top:2px;">chem@admin</div>
-      </div>
     </div>
+  </div>
+
+  <div class="login-err" id="loginError">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+    </svg>
+    รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่
+  </div>
+
+  <button class="btn btn-primary btn-block btn-lg" onclick="attemptLogin()" style="margin-top:16px;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+      <polyline points="10 17 15 12 10 7"/>
+      <line x1="15" y1="12" x2="3" y2="12"/>
+    </svg>
+    เข้าสู่ระบบ Admin
+  </button>
+
+  <div style="margin-top:18px;text-align:center;">
+    <a href="index.html" style="font-size:13px;color:rgba(255,255,255,0.28);text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:color 0.15s;"
+      onmouseenter="this.style.color='rgba(255,255,255,0.6)'" onmouseleave="this.style.color='rgba(255,255,255,0.28)'">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      กลับหน้าหลัก
+    </a>
+  </div>
+
+  <div class="login-hint">
+    <div class="login-hint-label">รหัสผ่านเริ่มต้น</div>
+    <div class="login-hint-val">chem@admin</div>
+  </div>
+</div>
+```
+
   </div>
 </div>
 
-<!-- ===== ADMIN PANEL ===== -->
+<!-- ===========================
+     ADMIN PANEL
+============================== -->
+
 <div id="adminPanel" style="display:none;">
 
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
+  <!-- SIDEBAR -->
+
   <aside id="sidebar" class="sidebar">
     <div class="sidebar-brand">
-      <div class="sidebar-logo">🧪</div>
+      <div class="sidebar-logo-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M9 3h6M10 3v6.6L6.1 17.2A2 2 0 0 0 8 20h8a2 2 0 0 0 1.9-2.8L14 9.6V3"
+            stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M7.5 16h9" stroke="#7DD3FC" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="10" cy="15.5" r="1.1" fill="#38BDF8" opacity="0.9"/>
+          <circle cx="14.5" cy="17" r="0.75" fill="#93C5FD" opacity="0.8"/>
+        </svg>
+      </div>
       <div>
         <div class="sidebar-title">ChemStock</div>
-        <div class="sidebar-subtitle">Admin Dashboard</div>
+        <div class="sidebar-subtitle" style="color:rgba(239,68,68,0.6);">Admin Mode</div>
       </div>
     </div>
-    <nav class="sidebar-nav">
-      <div class="sidebar-section-label">เมนูหลัก</div>
-      <a class="nav-item" href="index.html"><i class="bi bi-box-seam"></i> จัดการสต็อก</a>
-      <a class="nav-item" href="transaction.html"><i class="bi bi-arrow-left-right"></i> ประวัติ รับ-จ่าย</a>
-      <a class="nav-item" href="dashboard.html"><i class="bi bi-speedometer2"></i> แดชบอร์ด</a>
-      <div class="sidebar-section-label">Admin</div>
-      <a class="nav-item active" href="admin.html"><i class="bi bi-shield-lock"></i> Admin Panel</a>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="sidebar-user">
-        <div class="user-avatar" style="background:linear-gradient(135deg,#EF4444,#DC2626);">A</div>
-        <div>
-          <div class="user-name">Administrator</div>
-          <div class="user-role"><span class="admin-badge">🔑 Admin Mode</span></div>
-        </div>
+
+```
+<nav class="sidebar-nav">
+  <div class="nav-section-label">เมนูหลัก</div>
+  <a class="nav-link" href="index.html">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+    </svg>
+    จัดการสต็อก
+  </a>
+  <a class="nav-link" href="transaction.html">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/>
+    </svg>
+    ประวัติ รับ-จ่าย
+  </a>
+  <a class="nav-link" href="dashboard.html">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+    </svg>
+    แดชบอร์ด
+  </a>
+  <div class="nav-section-label">Admin</div>
+  <a class="nav-link active" href="admin.html">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+    Admin Panel
+  </a>
+</nav>
+
+<div class="sidebar-footer">
+  <div class="sidebar-user" style="border-color:rgba(239,68,68,0.18);background:rgba(239,68,68,0.06);">
+    <div class="user-ava" style="background:linear-gradient(135deg,#DC2626,#EF4444);">A</div>
+    <div>
+      <div class="user-name">Administrator</div>
+      <div style="font-size:10.5px;display:inline-flex;align-items:center;gap:4px;color:#FCA5A5;margin-top:1px;">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Admin Session
       </div>
     </div>
+  </div>
+</div>
+```
+
   </aside>
 
+  <!-- TOP BAR (Mobile) -->
+
   <div class="top-bar">
-    <button id="sidebarOpenBtn" class="btn btn-ghost btn-icon" style="color:var(--text-primary)">
-      <i class="bi bi-list" style="font-size:22px;"></i>
+    <button id="sidebarOpenBtn" class="btn btn-ghost btn-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
     </button>
-    <div style="flex:1;display:flex;justify-content:center;font-size:15px;font-weight:700;color:var(--primary);">
-      🔑 Admin Panel
+    <div class="top-bar-brand">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0EA5E9" stroke-width="2" stroke-linecap="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      Admin Panel
     </div>
-    <div style="width:40px;"></div>
+    <button class="btn btn-outline-danger btn-sm" onclick="adminLogout()" style="font-size:11px;padding:5px 9px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      ออก
+    </button>
   </div>
+
+  <!-- MAIN -->
 
   <div class="main-content">
     <div class="page-wrapper">
 
-      <div class="page-header">
-        <div>
-          <div class="page-title">Admin Panel</div>
-          <div class="page-subtitle">จัดการระบบ ChemStock ทั้งหมด</div>
-        </div>
-        <button class="btn btn-outline-danger btn-sm" onclick="adminLogout()">
-          <i class="bi bi-box-arrow-right"></i> ออกจากระบบ
-        </button>
+```
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <div class="page-title">Admin Panel</div>
+      <div class="page-subtitle">จัดการระบบ ChemStock ระดับผู้ดูแล</div>
+    </div>
+    <button class="btn btn-outline-danger btn-sm" onclick="adminLogout()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      ออกจากระบบ
+    </button>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="stat-grid" style="margin-bottom:24px;">
+    <div class="stat-card blue">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        </svg>
       </div>
-
-      <!-- Quick Stats -->
-      <div class="grid-4" style="margin-bottom:24px;">
-        <div class="quick-stat">
-          <div class="stat-icon blue"><i class="bi bi-boxes"></i></div>
-          <div>
-            <div class="quick-stat-val" id="adminTotalChems">—</div>
-            <div class="quick-stat-lbl">สารเคมีทั้งหมด</div>
-          </div>
-        </div>
-        <div class="quick-stat">
-          <div class="stat-icon yellow"><i class="bi bi-exclamation-triangle"></i></div>
-          <div>
-            <div class="quick-stat-val" id="adminAlerts">—</div>
-            <div class="quick-stat-lbl">แจ้งเตือน EXP</div>
-          </div>
-        </div>
-        <div class="quick-stat">
-          <div class="stat-icon green"><i class="bi bi-receipt"></i></div>
-          <div>
-            <div class="quick-stat-val" id="adminTotalTrans">—</div>
-            <div class="quick-stat-lbl">รายการทั้งหมด</div>
-          </div>
-        </div>
-        <div class="quick-stat">
-          <div class="stat-icon purple"><i class="bi bi-calendar-check"></i></div>
-          <div>
-            <div class="quick-stat-val" id="adminThisMonth">—</div>
-            <div class="quick-stat-lbl">รายการเดือนนี้</div>
-          </div>
-        </div>
+      <div class="stat-val" id="adminTotalChems">—</div>
+      <div class="stat-lbl">สารเคมีทั้งหมด</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
       </div>
-
-      <!-- Tabs -->
-      <div class="card">
-        <div style="padding:0 20px;">
-          <div class="admin-tabs">
-            <button class="admin-tab active" onclick="switchTab('chemicals', this)">
-              <i class="bi bi-box-seam" style="margin-right:6px;"></i>จัดการสารเคมี
-            </button>
-            <button class="admin-tab" onclick="switchTab('transactions', this)">
-              <i class="bi bi-arrow-left-right" style="margin-right:6px;"></i>ประวัติรายการ
-            </button>
-            <button class="admin-tab" onclick="switchTab('export', this)">
-              <i class="bi bi-download" style="margin-right:6px;"></i>ส่งออกข้อมูล
-            </button>
-            <button class="admin-tab" onclick="switchTab('settings', this)">
-              <i class="bi bi-gear" style="margin-right:6px;"></i>ตั้งค่า
-            </button>
-          </div>
-        </div>
-
-        <div style="padding:0 0 8px;">
-
-          <!-- === TAB: CHEMICALS === -->
-          <div id="tab-chemicals" class="tab-pane active">
-            <div style="padding:0 20px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-              <div style="display:flex;gap:8px;align-items:center;flex:1;">
-                <input type="text" class="form-control" id="adminSearch" placeholder="🔍 ค้นหาสารเคมี..." style="max-width:240px;font-size:13px;" oninput="renderAdminChems()">
-              </div>
-              <button class="btn btn-primary btn-sm" onclick="openAdminAddModal()">
-                <i class="bi bi-plus-lg"></i> เพิ่มสารเคมี
-              </button>
-            </div>
-            <div class="table-wrapper">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th style="padding-left:20px;">สารเคมี</th>
-                    <th>จำนวน</th>
-                    <th>EXP</th>
-                    <th>สถานที่</th>
-                    <th style="padding-right:20px;text-align:right;">จัดการ</th>
-                  </tr>
-                </thead>
-                <tbody id="adminChemsTable">
-                  <tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">กำลังโหลด...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- === TAB: TRANSACTIONS === -->
-          <div id="tab-transactions" class="tab-pane">
-            <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-              <span style="font-size:13px;color:var(--text-muted);" id="transCount">กำลังโหลด...</span>
-              <button class="btn btn-outline-danger btn-sm" onclick="confirmClearTrans()">
-                <i class="bi bi-trash"></i> ล้างประวัติทั้งหมด
-              </button>
-            </div>
-            <div class="table-wrapper">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th style="padding-left:20px;">วัน-เวลา</th>
-                    <th>สารเคมี</th>
-                    <th>ประเภท</th>
-                    <th>จำนวน</th>
-                    <th style="padding-right:20px;">หมายเหตุ</th>
-                  </tr>
-                </thead>
-                <tbody id="adminTransTable">
-                  <tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">กำลังโหลด...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- === TAB: EXPORT === -->
-          <div id="tab-export" class="tab-pane" style="padding:24px;">
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;">
-              <div class="card" style="padding:20px;">
-                <div style="font-size:32px;margin-bottom:10px;">📊</div>
-                <div style="font-weight:600;font-size:15px;margin-bottom:4px;">ส่งออกรายการสารเคมี</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">ข้อมูลสต็อกทั้งหมดเป็น CSV</div>
-                <button class="btn btn-primary btn-sm btn-block" onclick="exportCSV('chemicals')">
-                  <i class="bi bi-download"></i> ดาวน์โหลด CSV
-                </button>
-              </div>
-              <div class="card" style="padding:20px;">
-                <div style="font-size:32px;margin-bottom:10px;">📋</div>
-                <div style="font-weight:600;font-size:15px;margin-bottom:4px;">ส่งออกประวัติรายการ</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">ประวัติ รับ-จ่าย ทั้งหมดเป็น CSV</div>
-                <button class="btn btn-primary btn-sm btn-block" onclick="exportCSV('transactions')">
-                  <i class="bi bi-download"></i> ดาวน์โหลด CSV
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- === TAB: SETTINGS === -->
-          <div id="tab-settings" class="tab-pane" style="padding:24px;">
-            <div class="settings-row">
-              <div>
-                <div class="settings-label">เปลี่ยนรหัสผ่าน Admin</div>
-                <div class="settings-desc">เปลี่ยนรหัสผ่านที่ใช้เข้า Admin Panel</div>
-              </div>
-              <button class="btn btn-outline btn-sm" onclick="openChangePwd()">เปลี่ยน</button>
-            </div>
-            <div class="settings-row">
-              <div>
-                <div class="settings-label">ออกจากระบบ Admin</div>
-                <div class="settings-desc">สิ้นสุดสิทธิ์ Admin และกลับหน้าผู้ใช้ทั่วไป</div>
-              </div>
-              <button class="btn btn-outline-danger btn-sm" onclick="adminLogout()">ออกจากระบบ</button>
-            </div>
-            <div class="settings-row">
-              <div>
-                <div class="settings-label" style="color:var(--danger);">ลบข้อมูลทั้งหมด</div>
-                <div class="settings-desc">ล้างประวัติการทำรายการทั้งหมด (ไม่สามารถกู้คืน)</div>
-              </div>
-              <button class="btn btn-outline-danger btn-sm" onclick="confirmClearTrans()">ล้างประวัติ</button>
-            </div>
-
-            <!-- App info -->
-            <div style="margin-top:24px;padding:16px;background:var(--bg-hover);border-radius:var(--r-md);">
-              <div style="font-size:12px;color:var(--text-muted);line-height:1.8;">
-                <div><strong>ChemStock</strong> — ระบบจัดการคลังสารเคมี</div>
-                <div>Supabase Backend · Bootstrap Icons · Chart.js</div>
-                <div style="margin-top:4px;font-family:'JetBrains Mono',monospace;">v2.0.0</div>
-              </div>
-            </div>
-          </div>
-
-        </div>
+      <div class="stat-val" id="adminAlerts">—</div>
+      <div class="stat-lbl">แจ้งเตือน EXP</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
       </div>
-
+      <div class="stat-val" id="adminTotalTrans">—</div>
+      <div class="stat-lbl">รายการทั้งหมด</div>
+    </div>
+    <div class="stat-card rose">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+      </div>
+      <div class="stat-val" id="adminThisMonth">—</div>
+      <div class="stat-lbl">รายการเดือนนี้</div>
     </div>
   </div>
 
-  <!-- Bottom Nav -->
+  <!-- Tab Panel -->
+  <div class="table-card">
+
+    <!-- Tabs -->
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchTab('chemicals',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M9 3h6M10 3v6.6L6.1 17.2A2 2 0 0 0 8 20h8a2 2 0 0 0 1.9-2.8L14 9.6V3"/>
+        </svg>
+        จัดการสารเคมี
+      </button>
+      <button class="admin-tab" onclick="switchTab('transactions',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/>
+        </svg>
+        ประวัติรายการ
+      </button>
+      <button class="admin-tab" onclick="switchTab('export',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        ส่งออกข้อมูล
+      </button>
+      <button class="admin-tab" onclick="switchTab('settings',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        ตั้งค่า
+      </button>
+    </div>
+
+    <!-- Tab: Chemicals -->
+    <div id="tab-chemicals" class="tab-pane active">
+      <div style="padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--border-soft);">
+        <div style="position:relative;flex:1;max-width:260px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" class="form-control" id="adminSearch"
+            placeholder="ค้นหาสารเคมี..." oninput="renderAdminChems()"
+            style="padding-left:34px;font-size:13px;">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="window.location.href='index.html'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          เพิ่มสารเคมี
+        </button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="padding-left:22px;min-width:200px;">สารเคมี</th>
+              <th>จำนวน</th>
+              <th>วันหมดอายุ / สถานะ</th>
+              <th>สถานที่</th>
+              <th style="padding-right:22px;text-align:right;">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="adminChemsTable">
+            <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-muted);">กำลังโหลด...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab: Transactions -->
+    <div id="tab-transactions" class="tab-pane">
+      <div style="padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--border-soft);">
+        <div style="font-size:13px;color:var(--text-muted);" id="transCount">กำลังโหลด...</div>
+        <button class="btn btn-outline-danger btn-sm" onclick="confirmClearTrans()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
+          ล้างประวัติทั้งหมด
+        </button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="padding-left:22px;">วัน-เวลา</th>
+              <th>สารเคมี</th>
+              <th>ประเภท</th>
+              <th>จำนวน</th>
+              <th style="padding-right:22px;">หมายเหตุ</th>
+            </tr>
+          </thead>
+          <tbody id="adminTransTable">
+            <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-muted);">กำลังโหลด...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab: Export -->
+    <div id="tab-export" class="tab-pane">
+      <div class="export-grid">
+        <div class="export-card">
+          <div class="export-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            </svg>
+          </div>
+          <div class="export-card-title">รายการสารเคมี</div>
+          <div class="export-card-desc">ส่งออกข้อมูลสต็อกทั้งหมดเป็น CSV</div>
+          <button class="btn btn-primary btn-sm btn-block" onclick="exportCSV('chemicals')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            ดาวน์โหลด CSV
+          </button>
+        </div>
+        <div class="export-card">
+          <div class="export-card-icon" style="background:var(--grad-green);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </div>
+          <div class="export-card-title">ประวัติรายการ</div>
+          <div class="export-card-desc">ส่งออกประวัติ รับ-จ่าย ทั้งหมดเป็น CSV</div>
+          <button class="btn btn-success btn-sm btn-block" onclick="exportCSV('transactions')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            ดาวน์โหลด CSV
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Settings -->
+    <div id="tab-settings" class="tab-pane">
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">เปลี่ยนรหัสผ่าน Admin</div>
+          <div class="setting-desc">เปลี่ยนรหัสผ่านที่ใช้เข้า Admin Panel</div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="openChangePwd()">เปลี่ยนรหัสผ่าน</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">ออกจากระบบ Admin</div>
+          <div class="setting-desc">สิ้นสุดสิทธิ์ Admin และกลับสู่โหมดผู้ใช้ทั่วไป</div>
+        </div>
+        <button class="btn btn-outline-danger btn-sm" onclick="adminLogout()">ออกจากระบบ</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label" style="color:var(--danger);">ล้างประวัติการทำรายการ</div>
+          <div class="setting-desc">ลบประวัติ รับ-จ่าย ทั้งหมด (ไม่สามารถกู้คืนได้)</div>
+        </div>
+        <button class="btn btn-outline-danger btn-sm" onclick="confirmClearTrans()">ล้างประวัติ</button>
+      </div>
+
+      <!-- App Info -->
+      <div style="padding:20px 22px;">
+        <div style="background:var(--bg-hover);border-radius:var(--r-lg);padding:16px 18px;border:1px solid var(--border-soft);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div style="width:36px;height:36px;border-radius:var(--r-md);background:var(--grad-brand);display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round">
+                <path d="M9 3h6M10 3v6.6L6.1 17.2A2 2 0 0 0 8 20h8a2 2 0 0 0 1.9-2.8L14 9.6V3"/>
+              </svg>
+            </div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--text-head);">ChemStock v2.0</div>
+              <div style="font-size:12px;color:var(--text-muted);">ระบบจัดการคลังสารเคมี</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.9;">
+            <div>Backend: Supabase · Frontend: Vanilla JS + CSS</div>
+            <div>Charts: Chart.js · Icons: Inline SVG</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end table-card -->
+
+</div>
+```
+
+  </div><!-- end main-content -->
+
+  <!-- BOTTOM NAV -->
+
   <nav class="bottom-nav">
     <div class="bottom-nav-inner">
-      <a class="bottom-nav-item" href="index.html"><i class="bi bi-box-seam"></i> สต็อก</a>
-      <a class="bottom-nav-item" href="transaction.html"><i class="bi bi-arrow-left-right"></i> รับ-จ่าย</a>
-      <a class="bottom-nav-item" href="dashboard.html"><i class="bi bi-speedometer2"></i> แดชบอร์ด</a>
-      <a class="bottom-nav-item active" href="admin.html"><i class="bi bi-shield-lock"></i> Admin</a>
+      <a class="bottom-nav-item" href="index.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+        </svg>
+        สต็อก
+      </a>
+      <a class="bottom-nav-item" href="transaction.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/>
+        </svg>
+        รับ-จ่าย
+      </a>
+      <a class="bottom-nav-item" href="dashboard.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+        </svg>
+        แดชบอร์ด
+      </a>
+      <a class="bottom-nav-item active" href="admin.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Admin
+      </a>
     </div>
   </nav>
 
 </div><!-- end adminPanel -->
 
 <!-- Change Password Modal -->
+
 <div class="modal-overlay" id="changePwdModal" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="modal-box modal-sm" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <span class="modal-title">เปลี่ยนรหัสผ่าน Admin</span>
-      <button class="btn-close-modal" onclick="document.getElementById('changePwdModal').classList.remove('open')"><i class="bi bi-x"></i></button>
+  <div class="modal-box modal-sm">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">เปลี่ยนรหัสผ่าน Admin</div>
+        <div class="modal-subtitle">รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร</div>
+      </div>
+      <button class="btn-close-x" onclick="document.getElementById('changePwdModal').classList.remove('open')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
     <div class="modal-body">
       <div class="form-group">
@@ -409,15 +623,20 @@
         <label class="form-label">รหัสผ่านใหม่</label>
         <input type="password" class="form-control" id="newPwd" placeholder="อย่างน้อย 6 ตัวอักษร">
       </div>
-      <div class="form-group">
+      <div class="form-group" style="margin-bottom:0;">
         <label class="form-label">ยืนยันรหัสผ่านใหม่</label>
         <input type="password" class="form-control" id="confirmPwd" placeholder="">
       </div>
-      <div class="error-msg" id="pwdError" style="display:none;">รหัสผ่านไม่ถูกต้องหรือไม่ตรงกัน</div>
+      <div id="pwdError" style="display:none;margin-top:12px;padding:10px 14px;border-radius:var(--r-md);background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.18);color:var(--danger);font-size:13px;">
+        รหัสผ่านไม่ถูกต้อง หรือรหัสผ่านใหม่ไม่ตรงกัน
+      </div>
     </div>
-    <div class="modal-footer">
+    <div class="modal-foot">
       <button class="btn btn-outline" onclick="document.getElementById('changePwdModal').classList.remove('open')">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="changePassword()">บันทึก</button>
+      <button class="btn btn-primary" onclick="changePassword()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        บันทึก
+      </button>
     </div>
   </div>
 </div>
@@ -425,7 +644,10 @@
 <div id="toastContainer" class="toast-container"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="js/ui.js"></script>
+
 <script src="js/admin.js"></script>
+
 </body>
 </html>
