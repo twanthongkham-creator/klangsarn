@@ -2,175 +2,196 @@ const SUPABASE_URL = “https://bdjyxkkzbbzlmxszmvhx.supabase.co”;
 const SUPABASE_KEY = “sb_publishable_inYG_le-QyiIvjkaUHXyfQ_Nvm4FpR2”;
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let allTransactions = [];
-let currentTypeFilter = ‘ALL’;
+document.addEventListener(“DOMContentLoaded”, () => { loadDashboardData(); });
 
-document.addEventListener(“DOMContentLoaded”, () => { fetchTransactions(); });
-
-async function fetchTransactions() {
-const { data, error } = await _supabase
-.from(‘chemical_transactions’)
-.select(`id, type, quantity, remark, transaction_date, chemical_stock(chemical_name, unit)`)
-.order(‘transaction_date’, { ascending: false });
+async function loadDashboardData() {
+const now = new Date();
+const el = document.getElementById(‘dashUpdateTime’);
+if (el) el.textContent =
+`อัปเดต: ${now.toLocaleDateString('th-TH',{day:'2-digit',month:'long',year:'numeric'})} ${now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})} น.`;
 
 ```
-if (error) { showToast("โหลดข้อมูลไม่สำเร็จ", "danger"); return; }
-allTransactions = data || [];
-applyFilters();
-```
+const [stockRes, transRes] = await Promise.all([
+    _supabase.from('chemical_stock').select('*'),
+    _supabase.from('chemical_transactions')
+        .select('id, type, quantity, transaction_date, chemical_stock(chemical_name, unit)')
+        .order('transaction_date', { ascending: false })
+]);
 
+if (stockRes.error || transRes.error) {
+    showToast("โหลดข้อมูลแดชบอร์ดไม่สำเร็จ", "danger");
+    return;
 }
 
-function filterTrans(type, btnEl) {
-currentTypeFilter = type;
-document.querySelectorAll(’#typeFilterBar .filter-chip’).forEach(b => b.classList.remove(‘active’));
-btnEl.classList.add(‘active’);
-applyFilters();
-}
+const stockData = stockRes.data || [];
+const transData = transRes.data || [];
 
-function applyFilters() {
-const q = (document.getElementById(‘searchTrans’)?.value || ‘’).toLowerCase().trim();
-let filtered = allTransactions;
-if (currentTypeFilter !== ‘ALL’) filtered = filtered.filter(t => t.type === currentTypeFilter);
-if (q) filtered = filtered.filter(t =>
-(t.chemical_stock?.chemical_name || ‘’).toLowerCase().includes(q) ||
-(t.remark || ‘’).toLowerCase().includes(q)
-);
+const firstDay = new Date();
+firstDay.setDate(1); firstDay.setHours(0,0,0,0);
 
-```
-const label = document.getElementById('transCountLabel');
-if (label) label.textContent = `แสดง ${filtered.length} จาก ${allTransactions.length} รายการ`;
-
-renderDesktopTable(filtered);
-renderMobileCards(filtered);
+renderSummaryCards(stockData, transData, firstDay);
+renderLocationChart(stockData);
+renderRecentTransactions(transData.slice(0, 10));
+renderAlertTable(stockData);
 ```
 
 }
 
-function fmtDate(ts) {
-const d = new Date(ts);
-return {
-date: `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`,
-time: `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')} น.`
-};
+// ===== STAT CARDS =====
+function renderSummaryCards(stockData, transData, firstDay) {
+const setEl = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+setEl(‘dashTotalItems’, stockData.length);
+
+```
+const today = new Date();
+const alerts = stockData.filter(c => {
+    if (!c.exp_date) return false;
+    return (new Date(c.exp_date) - today) / 864e5 <= 30;
+});
+setEl('dashAlertItems', alerts.length);
+
+let inC = 0, outC = 0;
+transData.forEach(t => {
+    if (new Date(t.transaction_date) >= firstDay) {
+        if (t.type === 'IN') inC++; else outC++;
+    }
+});
+setEl('dashInMonth', inC);
+setEl('dashOutMonth', outC);
+```
+
 }
 
-function typeBadge(type) {
-return type === ‘IN’
-? `<span class="badge badge-green"> <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg> รับเข้า</span>`
-: `<span class="badge badge-red"> <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg> เบิกจ่าย</span>`;
+// ===== DONUT CHART =====
+function renderLocationChart(stockData) {
+const counts = {};
+stockData.forEach(c => {
+const loc = c.location ? c.location.split(’ ‘).slice(0,2).join(’ ’) : ‘ไม่ระบุ’;
+counts[loc] = (counts[loc] || 0) + 1;
+});
+
+```
+const ctx = document.getElementById('locationChart')?.getContext('2d');
+if (!ctx) return;
+if (window._dashChart) window._dashChart.destroy();
+
+const gradColors = [
+    '#2563EB', '#D97706', '#10B981', '#F43F5E', '#7C3AED', '#0891B2'
+];
+
+window._dashChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: Object.keys(counts),
+        datasets: [{
+            data: Object.values(counts),
+            backgroundColor: gradColors,
+            borderWidth: 3,
+            borderColor: '#fff',
+            hoverOffset: 8,
+            hoverBorderWidth: 3
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    font: { family: "'Kanit', sans-serif", size: 12 },
+                    padding: 18,
+                    color: '#374151',
+                    usePointStyle: true,
+                    pointStyle: 'circle'
+                }
+            },
+            tooltip: {
+                backgroundColor: '#0A1628',
+                titleColor: '#fff',
+                bodyColor: '#94A3B8',
+                padding: 12,
+                cornerRadius: 10,
+                callbacks: {
+                    label: ctx => `  ${ctx.label}: ${ctx.raw} รายการ`
+                }
+            }
+        },
+        cutout: '68%'
+    }
+});
+```
+
 }
 
-// ===== DESKTOP TABLE =====
-function renderDesktopTable(data) {
-const tbody = document.getElementById(“transactionTableBody”);
+// ===== RECENT TRANSACTIONS TABLE =====
+function renderRecentTransactions(data) {
+const tbody = document.getElementById(‘dashRecentTrans’);
 if (!tbody) return;
 
 ```
 if (data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5">
-      <div class="empty-state">
-        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.2" stroke-linecap="round" style="margin:0 auto 12px;display:block;">
-          <rect x="5" y="2" width="14" height="20" rx="2"/>
-          <line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/>
-          <line x1="9" y1="17" x2="11" y2="17"/>
-        </svg>
-        <div class="empty-title">ไม่พบรายการที่ตรงกัน</div>
-        <div class="empty-desc">ลองเปลี่ยนตัวกรองหรือคำค้นหา</div>
-      </div>
-    </td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text-muted);">ยังไม่มีประวัติ</td></tr>`;
     return;
 }
 
 tbody.innerHTML = data.map(t => {
-    const { date, time } = fmtDate(t.transaction_date);
+    const d = new Date(t.transaction_date);
+    const ds = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+
+    const badge = t.type === 'IN'
+        ? `<span class="badge badge-green"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg> รับเข้า</span>`
+        : `<span class="badge badge-red"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg> เบิกจ่าย</span>`;
+
     const name = t.chemical_stock
         ? `<span style="font-weight:600;color:var(--text-head);">${t.chemical_stock.chemical_name}</span>`
-        : `<span style="color:var(--text-muted);font-style:italic;">ลบออกจากระบบแล้ว</span>`;
+        : `<span style="color:var(--text-muted);font-style:italic;">ลบแล้ว</span>`;
     const unit = t.chemical_stock?.unit || '';
 
     return `<tr>
-      <td style="padding-left:22px;">
-        <div style="font-weight:600;font-size:13.5px;color:var(--text-head);">${date}</div>
-        <div style="font-size:12px;color:var(--text-muted);">${time}</div>
-      </td>
+      <td style="padding-left:20px;font-size:13px;color:var(--text-muted);">${ds}</td>
       <td>${name}</td>
-      <td>${typeBadge(t.type)}</td>
-      <td>
-        <span class="mono" style="font-size:15px;font-weight:700;color:var(--text-head);">${t.quantity}</span>
-        <span style="font-size:12px;color:var(--text-muted);margin-left:4px;">${unit}</span>
+      <td>${badge}</td>
+      <td style="padding-right:20px;">
+        <span class="mono" style="font-weight:700;font-size:15px;color:var(--text-head);">${t.quantity}</span>
+        <span style="font-size:12px;color:var(--text-muted);margin-left:3px;">${unit}</span>
       </td>
-      <td style="padding-right:22px;font-size:13px;color:var(--text-muted);">${t.remark || '—'}</td>
     </tr>`;
 }).join('');
 ```
 
 }
 
-// ===== MOBILE CARDS =====
-function renderMobileCards(data) {
-const container = document.getElementById(“transCardsBody”);
-if (!container) return;
+// ===== ALERT TABLE =====
+function renderAlertTable(stockData) {
+const today = new Date();
+const alerts = stockData
+.filter(c => c.exp_date && (new Date(c.exp_date) - today) / 864e5 <= 30)
+.sort((a, b) => new Date(a.exp_date) - new Date(b.exp_date));
 
 ```
-if (data.length === 0) {
-    container.innerHTML = `
-      <div style="padding:40px 20px;text-align:center;background:var(--bg-card);border-radius:var(--r-xl);border:1.5px solid var(--border-soft);box-shadow:var(--shadow-xs);">
-        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.2" stroke-linecap="round" style="margin:0 auto 12px;display:block;">
-          <rect x="5" y="2" width="14" height="20" rx="2"/>
-          <line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/>
-        </svg>
-        <div style="font-weight:600;color:var(--text-body);">ไม่พบรายการ</div>
-        <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">ลองเปลี่ยนตัวกรอง</div>
-      </div>`;
-    return;
-}
+const card  = document.getElementById('alertCard');
+const tbody = document.getElementById('dashAlertTable');
+if (!card || !tbody) return;
+if (alerts.length === 0) { card.style.display = 'none'; return; }
+card.style.display = '';
 
-container.innerHTML = data.map(t => {
-    const { date, time } = fmtDate(t.transaction_date);
-    const isIN = t.type === 'IN';
-    const name = t.chemical_stock?.chemical_name || 'ลบออกจากระบบแล้ว';
-    const unit = t.chemical_stock?.unit || '';
+tbody.innerHTML = alerts.map(item => {
+    const diff = Math.ceil((new Date(item.exp_date) - today) / 864e5);
+    const statusBadge = diff <= 0
+        ? `<span class="badge badge-red">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+            หมดอายุแล้ว</span>`
+        : `<span class="badge badge-amber">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            เหลือ ${diff} วัน</span>`;
 
-    /* colour tokens */
-    const col  = isIN ? 'var(--success)'  : 'var(--danger)';
-    const bgC  = isIN ? 'rgba(16,185,129,0.10)' : 'rgba(239,68,68,0.09)';
-    const sign = isIN ? '+' : '−';
-
-    const arrowSvg = isIN
-        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`
-        : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`;
-
-    return `
-    <div style="background:var(--bg-card);border-radius:var(--r-xl);border:1.5px solid var(--border-soft);
-      padding:14px 16px;display:flex;gap:12px;align-items:center;box-shadow:var(--shadow-xs);">
-
-      <!-- Icon -->
-      <div style="width:44px;height:44px;border-radius:var(--r-md);background:${bgC};
-        display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        ${arrowSvg}
-      </div>
-
-      <!-- Info -->
-      <div style="flex:1;min-width:0;">
-        <div style="font-weight:600;font-size:14px;color:var(--text-head);
-          white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
-        <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">${date} · ${time}</div>
-        ${t.remark ? `<div style="font-size:12px;color:var(--text-body);margin-top:4px;display:flex;gap:4px;align-items:center;">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          ${t.remark}
-        </div>` : ''}
-      </div>
-
-      <!-- Qty + Badge -->
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-size:20px;font-weight:700;color:${col};font-family:'JetBrains Mono',monospace;line-height:1;">
-          ${sign}${t.quantity}
-        </div>
-        <div style="font-size:11px;color:var(--text-muted);">${unit}</div>
-        <div style="margin-top:5px;">${typeBadge(t.type)}</div>
-      </div>
-    </div>`;
+    return `<tr>
+      <td style="padding-left:20px;font-weight:600;color:var(--text-head);">${item.chemical_name}</td>
+      <td><span class="badge badge-gray" style="font-size:11px;">${item.location ? item.location.split(' ').slice(0,2).join(' ') : '—'}</span></td>
+      <td><span class="mono" style="font-size:13px;">${item.exp_date}</span></td>
+      <td style="padding-right:20px;">${statusBadge}</td>
+    </tr>`;
 }).join('');
 ```
 
