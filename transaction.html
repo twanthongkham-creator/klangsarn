@@ -1,78 +1,132 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaction History - Chemical Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="css/theme.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ประวัติ รับ-จ่าย — ChemStock</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="css/theme.css">
 </head>
 <body>
 
-   <nav class="navbar bg-white d-md-none sticky-top shadow-sm py-2">
-        <div class="container-fluid">
-            <button class="btn border-0 px-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
-                <i class="bi bi-list text-dark" style="font-size: 2rem;"></i>
-            </button>
-            
-            <span class="navbar-brand mb-0 h3 fw-bold text-primary mx-auto">
-                <i class="bi bi-droplet-half me-1"></i> ChemStock
-            </span>
-            
-            <div style="width: 40px;"></div> </div>
-    </nav>
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-    <div class="container-fluid">
-        <div class="row">
-            
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar offcanvas-md offcanvas-start" tabindex="-1">
-                <div class="position-sticky pt-4 d-flex flex-column h-100">
-                    <div class="d-flex justify-content-between align-items-center px-3 mb-4">
-                        <div>
-                            <h5 class="fw-bold text-primary mb-0"><i class="bi bi-droplet-half me-2"></i>CHEM Stock</h5>
-                            <small class="text-secondary d-none d-md-block">ระบบจัดการคลังสารเคมี</small>
-                        </div>
-                        <button type="button" class="btn-close btn-close-white d-md-none" data-bs-dismiss="offcanvas"></button>
-                    </div>
-                    
-                    <ul class="nav flex-column gap-2 px-2 flex-grow-1">
-                        <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-box-seam me-2"></i>จัดการสต็อก</a></li>
-                        <li class="nav-item"><a class="nav-link active" href="transaction.html"><i class="bi bi-arrow-left-right me-2"></i>ประวัติ รับ-จ่าย</a></li>
-                        <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="bi bi-speedometer2 me-2"></i>แดชบอร์ด</a></li>
-                    </ul>
-                </div>
-            </nav>
+<aside id="sidebar" class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-logo">🧪</div>
+    <div>
+      <div class="sidebar-title">ChemStock</div>
+      <div class="sidebar-subtitle">ระบบจัดการคลังสารเคมี</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-label">เมนูหลัก</div>
+    <a class="nav-item" href="index.html"><i class="bi bi-box-seam"></i> จัดการสต็อก</a>
+    <a class="nav-item active" href="transaction.html"><i class="bi bi-arrow-left-right"></i> ประวัติ รับ-จ่าย</a>
+    <a class="nav-item" href="dashboard.html"><i class="bi bi-speedometer2"></i> แดชบอร์ด</a>
+    <div class="sidebar-section-label">ระบบ</div>
+    <a class="nav-item" href="admin.html">
+      <i class="bi bi-shield-lock"></i> Admin Panel
+      <span class="nav-badge admin-indicator" style="display:none">ON</span>
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar">C</div>
+      <div>
+        <div class="user-name">ChemStock</div>
+        <div class="user-role" id="sidebarRole">ผู้ใช้ทั่วไป</div>
+      </div>
+    </div>
+  </div>
+</aside>
 
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-4 pb-5">
-                <h4 class="fw-bold text-dark mb-4">ประวัติการ รับ-จ่าย สารเคมี (ทั้งหมด)</h4>
-                
-                <div class="card border-0 shadow-sm">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="ps-4 py-3">วัน-เวลา</th>
-                                    <th>สารเคมี</th>
-                                    <th>ประเภท</th>
-                                    <th>จำนวน</th>
-                                    <th>ผู้ทำรายการ/หมายเหตุ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="transactionTableBody">
-                                <tr><td colspan="5" class="text-center py-5 text-muted">กำลังโหลดข้อมูล...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </main>
+<div class="top-bar">
+  <button id="sidebarOpenBtn" class="btn btn-ghost btn-icon" style="color:var(--text-primary)">
+    <i class="bi bi-list" style="font-size:22px;"></i>
+  </button>
+  <div style="flex:1;display:flex;justify-content:center;" class="top-bar-logo">🧪 ChemStock</div>
+  <div style="width:40px;"></div>
+</div>
 
-        </div>
+<div class="main-content">
+  <div class="page-wrapper">
+
+    <div class="page-header">
+      <div>
+        <div class="page-title">ประวัติการ รับ-จ่าย สารเคมี</div>
+        <div class="page-subtitle">บันทึกการรับเข้าและเบิกจ่ายทั้งหมด</div>
+      </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/transaction.js"></script>
+    <!-- Filter Row -->
+    <div class="card" style="padding:16px 20px;margin-bottom:20px;">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+        <div class="filter-bar">
+          <button class="filter-chip active" onclick="filterTrans('ALL', this)">ทั้งหมด</button>
+          <button class="filter-chip" onclick="filterTrans('IN', this)">
+            <i class="bi bi-arrow-down-short" style="color:var(--success);"></i> รับเข้า
+          </button>
+          <button class="filter-chip" onclick="filterTrans('OUT', this)">
+            <i class="bi bi-arrow-up-short" style="color:var(--danger);"></i> เบิกจ่าย
+          </button>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+          <input type="text" class="form-control" id="searchTrans" placeholder="🔍 ค้นหาสารเคมี..." style="max-width:200px;font-size:13px;" oninput="applyFilters()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop Table -->
+    <div class="card desktop-only">
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="padding-left:20px;">วัน-เวลา</th>
+              <th>สารเคมี</th>
+              <th>ประเภท</th>
+              <th>จำนวน</th>
+              <th style="padding-right:20px;">ผู้ทำรายการ/หมายเหตุ</th>
+            </tr>
+          </thead>
+          <tbody id="transactionTableBody">
+            <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">กำลังโหลดข้อมูล...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Mobile List -->
+    <div id="transCardsBody" class="mobile-only" style="display:flex;flex-direction:column;gap:10px;"></div>
+
+    <!-- Pagination -->
+    <div id="paginationBar" style="display:flex;justify-content:center;gap:8px;margin-top:20px;"></div>
+
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <a class="bottom-nav-item" href="index.html"><i class="bi bi-box-seam"></i> สต็อก</a>
+    <a class="bottom-nav-item active" href="transaction.html"><i class="bi bi-arrow-left-right"></i> รับ-จ่าย</a>
+    <a class="bottom-nav-item" href="dashboard.html"><i class="bi bi-speedometer2"></i> แดชบอร์ด</a>
+    <a class="bottom-nav-item" href="admin.html"><i class="bi bi-shield-lock"></i> Admin</a>
+  </div>
+</nav>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/ui.js"></script>
+<script src="js/transaction.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (isAdminLoggedIn()) {
+      document.getElementById('sidebarRole').textContent = '🔑 Admin';
+      document.querySelectorAll('.admin-indicator').forEach(el => el.style.display = '');
+    }
+  });
+</script>
 </body>
 </html>
