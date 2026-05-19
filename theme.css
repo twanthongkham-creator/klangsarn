@@ -1,16 +1,75 @@
-body {
-    font-family: 'Prompt', sans-serif;
-    background-color: #f8f9fa;
+:root {
+    --primary-color: #0d6efd;
+    --bg-light: #f8f9fa;
 }
 
-.table th {
+body {
+    font-family: 'Prompt', sans-serif;
+    background-color: #f1f3f5;
+    color: #495057;
+}
+
+.navbar {
+    padding: 0.8rem 0;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.table thead th {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: #6c757d;
+}
+
+.btn {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+}
+
+.badge-location {
+    background-color: #e9ecef;
+    color: #495057;
     font-weight: 500;
 }
 
-/* เพิ่มสถานะเตือนสำหรับสารเคมีที่กำลังจะหมดอายุ (ใช้ร่วมกับ JS) */
-.exp-warning {
-    background-color: #fff3cd !important;
+.image-preview-slot {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 2px border var(--bg-light);
 }
-.exp-danger {
-    background-color: #f8d7da !important;
+
+.preview-container {
+    position: relative;
+    display: inline-block;
 }
+
+.remove-img-btn {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+}
+
+/* Status styles */
+.exp-near { color: #fd7e14; font-weight: bold; }
+.exp-over { color: #dc3545; font-weight: bold; }
