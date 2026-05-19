@@ -3,48 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chemical Stock Management</title>
+    <title>Chemical Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">🧪 Chemical Stock</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-side-icon"></span>
-            </button>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="bi bi-droplet-half me-2"></i>
+                <span class="fw-bold">CHEMICAL STOCK</span>
+            </a>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link active" href="index.html">จัดการสต็อก</a></li>
-                    <li class="nav-item"><a class="nav-link" href="dashboard.html">แดชบอร์ด</a></li>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="index.html">คลังสินค้า</a></li>
+                    <li class="nav-item"><a class="nav-link" href="dashboard.html">รายงาน</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
     <div class="container my-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2>รายการสารเคมีในระบบ</h2>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#chemicalModal" onclick="openAddModal()">
-                ➕ เพิ่มสารเคมีใหม่
-            </button>
+        <div class="row mb-4 align-items-center">
+            <div class="col">
+                <h4 class="fw-bold text-secondary mb-0">จัดการรายการสารเคมี</h4>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary shadow-sm px-4" onclick="openAddModal()">
+                    <i class="bi bi-plus-lg me-2"></i>เพิ่มรายการใหม่
+                </button>
+            </div>
         </div>
 
-        <div class="card shadow-sm">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-3">
+                <p class="small text-muted mb-2 fw-medium"><i class="bi bi-filter me-1"></i>ตัวกรองสถานที่เก็บ:</p>
+                <div id="locationFilterBar" class="d-flex flex-wrap gap-2">
+                    <button class="btn btn-outline-primary btn-sm px-3 active" onclick="filterByLocation('All')">ทั้งหมด</button>
+                    </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead class="bg-light">
                         <tr>
-                            <th>ชื่อสารเคมี</th>
-                            <th>CAS No.</th>
+                            <th class="ps-4">ชื่อสารเคมี / ข้อมูล</th>
                             <th>จำนวนคงเหลือ</th>
-                            <th>วันผลิต (MFG)</th>
-                            <th>วันหมดอายุ (EXP)</th>
+                            <th>MFG / EXP</th>
                             <th>สถานที่เก็บ</th>
-                            <th>จัดการ</th>
+                            <th class="text-end pe-4">การจัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="chemicalTableBody">
@@ -55,48 +67,94 @@
     </div>
 
     <div class="modal fade" id="chemicalModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold" id="modalTitle">ข้อมูลสารเคมี</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="chemicalForm">
+                        <input type="hidden" id="chemicalId">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label small fw-bold">ชื่อสารเคมี</label>
+                                <input type="text" class="form-control" id="chemicalName" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">CAS Number</label>
+                                <input type="text" class="form-control" id="casNumber">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">จำนวน</label>
+                                <input type="number" step="0.01" class="form-control" id="quantity" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">หน่วยนับ</label>
+                                <input type="text" class="form-control" id="unit" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">สถานที่จัดเก็บ</label>
+                                <input type="text" class="form-control" id="location" required list="locationList">
+                                <datalist id="locationList"></datalist>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-success">วันที่ผลิต (MFG)</label>
+                                <input type="date" class="form-control" id="mfgDate">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-danger">วันหมดอายุ (EXP)</label>
+                                <input type="date" class="form-control" id="expDate">
+                            </div>
+                            
+                            <div class="col-12 mt-4">
+                                <label class="form-label small fw-bold"><i class="bi bi-camera me-1"></i>ภาพถ่ายสารเคมี (สูงสุด 3 ภาพ)</label>
+                                <input type="file" class="form-control" id="imageInput" accept="image/*" multiple onchange="handleImageSelection(event)">
+                                <div id="imagePreviewContainer" class="d-flex gap-2 mt-2">
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-top">
+                            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+                                <i class="bi bi-save me-2"></i>บันทึกข้อมูล
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="transactionModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">เพิ่มสารเคมี</h5>
+                    <h5 class="modal-title fw-bold text-primary"><i class="bi bi-arrow-left-right me-2"></i>บันทึกการ รับ-จ่าย</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="chemicalForm">
-                        <input type="hidden" id="chemicalId">
+                <div class="modal-body p-4">
+                    <h6 id="transChemName" class="fw-bold mb-3 text-secondary">---</h6>
+                    <form id="transactionForm">
+                        <input type="hidden" id="transChemId">
                         <div class="mb-3">
-                            <label class="form-label">ชื่อสารเคมี</label>
-                            <input type="text" class="form-control" id="chemicalName" required>
+                            <label class="form-label small fw-bold">ประเภทรายการ</label>
+                            <select class="form-select" id="transType" required>
+                                <option value="IN">รับเข้าสต็อก (Receive)</option>
+                                <option value="OUT">เบิกจ่าย (Dispense)</option>
+                            </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">CAS Number</label>
-                            <input type="text" class="form-control" id="casNumber">
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">จำนวน</label>
-                                <input type="number" step="0.01" class="form-control" id="quantity" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">หน่วยนับ</label>
-                                <input type="text" class="form-control" id="unit" placeholder="เช่น kg, L" required>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">วันผลิต (MFG)</label>
-                                <input type="date" class="form-control" id="mfgDate">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">วันหมดอายุ (EXP)</label>
-                                <input type="date" class="form-control" id="expDate">
+                            <label class="form-label small fw-bold">จำนวน</label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" class="form-control form-control-lg" id="transQty" required>
+                                <span class="input-group-text" id="transUnitLabel">หน่วย</span>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">สถานที่จัดเก็บ</label>
-                            <input type="text" class="form-control" id="location">
+                            <label class="form-label small fw-bold">หมายเหตุ / ผู้ทำรายการ</label>
+                            <input type="text" class="form-control" id="transRemark" placeholder="เช่น เบิกไปใช้ที่ไลน์ 1">
                         </div>
-                        <button type="submit" class="btn btn-success w-100">บันทึกข้อมูล</button>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">ยืนยันทำรายการ</button>
                     </form>
                 </div>
             </div>
