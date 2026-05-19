@@ -13,10 +13,12 @@
 
     <nav class="navbar navbar-dark bg-dark d-md-none sticky-top shadow">
         <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <span class="navbar-brand mb-0 h1 fw-bold text-primary">Chemical Stock</span>
+            <span class="navbar-brand mb-0 h1 fw-bold text-primary">
+                <i class="bi bi-droplet-half me-1"></i> ChemStock
+            </span>
             <div style="width: 40px;"></div> </div>
     </nav>
 
@@ -24,25 +26,20 @@
         <div class="row">
             
             <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar offcanvas-md offcanvas-start" tabindex="-1">
-                <div class="position-sticky pt-3 d-flex flex-column h-100">
+                <div class="position-sticky pt-4 d-flex flex-column h-100">
                     <div class="px-3 mb-4 d-none d-md-block">
-                        <h5 class="fw-bold text-primary mb-0"><i class="bi bi-droplet-half me-2"></i>CHEMICAL Stock</h5>
-                        <small class="text-muted">v2.0 Mobile-First</small>
+                        <h5 class="fw-bold text-primary mb-0"><i class="bi bi-droplet-half me-2"></i>CHEM Stock</h5>
+                        <small class="text-secondary">ระบบจัดการคลังสารเคมี</small>
                     </div>
                     
-                    <ul class="nav flex-column gap-1 px-2 flex-grow-1">
+                    <ul class="nav flex-column gap-2 px-2 flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#" id="menu-stock" onclick="switchView('stock')">
+                            <a class="nav-link active" href="index.html">
                                 <i class="bi bi-box-seam me-2"></i>จัดการสต็อก
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" id="menu-trans" onclick="switchView('trans')">
-                                <i class="bi bi-arrow-left-right me-2"></i>ประวัติ รับ-จ่าย
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" id="menu-dash" onclick="switchView('dash')">
+                            <a class="nav-link" href="dashboard.html">
                                 <i class="bi bi-speedometer2 me-2"></i>แดชบอร์ด
                             </a>
                         </li>
@@ -50,73 +47,47 @@
                 </div>
             </nav>
 
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-4">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-4 pb-5">
                 
-                <div id="view-stock" class="app-view">
-                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
-                        <h4 class="fw-bold text-dark mb-0">รายการสารเคมีในคลัง</h4>
-                        <button class="btn btn-primary shadow-sm w-100 w-sm-auto px-4" onclick="openAddModal()">
-                            <i class="bi bi-plus-lg me-2"></i>เพิ่มสารเคมีใหม่
-                        </button>
-                    </div>
-
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-body p-3">
-                            <div class="d-flex flex-wrap gap-2" id="locationFilterBar">
-                                <button class="btn btn-sm px-3 btn-primary active" onclick="filterByLocation('All')">ทั้งหมด</button>
-                                <button class="btn btn-sm px-3 btn-outline-primary" onclick="filterByLocation('ห้อง 1')">ห้อง 1 (ออกซิไดซ์)</button>
-                                <button class="btn btn-sm px-3 btn-outline-primary" onclick="filterByLocation('ห้อง 2')">ห้อง 2 (กรด)</button>
-                                <button class="btn btn-sm px-3 btn-outline-primary" onclick="filterByLocation('ห้อง 3')">ห้อง 3 (ด่าง)</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card border-0 shadow-sm d-none d-md-block">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="bg-light">
-                                    <tr>
-                                        <th class="ps-4">สารเคมี</th>
-                                        <th>จำนวนคงเหลือ</th>
-                                        <th>MFG / EXP</th>
-                                        <th id="th-location">สถานที่เก็บ</th>
-                                        <th class="text-end pe-4">การจัดการ</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="chemicalTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div id="chemicalCardsBody" class="d-md-none d-flex flex-column gap-3 mb-4">
-                        </div>
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+                    <h4 class="fw-bold text-dark mb-0">รายการสารเคมีในคลัง</h4>
+                    <button class="btn btn-primary shadow-sm w-100 w-sm-auto px-4" onclick="openAddModal()">
+                        <i class="bi bi-plus-lg me-2"></i>เพิ่มรายการใหม่
+                    </button>
                 </div>
 
-                <div id="view-trans" class="app-view d-none">
-                    <h4 class="fw-bold text-dark mb-4">ประวัติการ รับ-จ่าย สารเคมี</h4>
-                    <div class="card border-0 shadow-sm">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="bg-light">
-                                    <tr>
-                                        <th class="ps-4">วัน-เวลา</th>
-                                        <th>สารเคมี</th>
-                                        <th>ประเภท</th>
-                                        <th>จำนวน</th>
-                                        <th class="pe-4">หมายเหตุ</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="transactionTableBody"></tbody>
-                            </table>
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-3">
+                        <p class="small text-muted mb-2 fw-medium"><i class="bi bi-funnel me-1"></i>ตัวกรองสถานที่จัดเก็บ:</p>
+                        <div class="d-flex flex-wrap gap-2" id="locationFilterBar">
+                            <button class="btn btn-sm px-3 btn-primary filter-btn active" onclick="filterByLocation('All', this)">ทั้งหมด</button>
+                            <button class="btn btn-sm px-3 btn-outline-primary filter-btn" onclick="filterByLocation('ห้อง 1', this)">ห้อง 1 (ออกซิไดซ์)</button>
+                            <button class="btn btn-sm px-3 btn-outline-primary filter-btn" onclick="filterByLocation('ห้อง 2', this)">ห้อง 2 (กรด)</button>
+                            <button class="btn btn-sm px-3 btn-outline-primary filter-btn" onclick="filterByLocation('ห้อง 3', this)">ห้อง 3 (ด่าง)</button>
                         </div>
                     </div>
                 </div>
 
-                <div id="view-dash" class="app-view d-none">
-                    <h4 class="fw-bold text-dark mb-4">แดชบอร์ดภาพรวมคลัง</h4>
-                    <div class="row g-3" id="dashboardCounters">
-                        </div>
+                <div class="card border-0 shadow-sm d-none d-md-block">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">สารเคมี</th>
+                                    <th>จำนวนคงเหลือ</th>
+                                    <th>MFG / EXP</th>
+                                    <th id="th-location">สถานที่เก็บ</th>
+                                    <th class="text-end pe-4">การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="chemicalTableBody">
+                                </tbody>
+                        </table>
+                    </div>
                 </div>
+
+                <div id="chemicalCardsBody" class="d-md-none d-flex flex-column gap-3">
+                    </div>
 
             </main>
         </div>
@@ -152,6 +123,7 @@
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold">สถานที่จัดเก็บ</label>
                                 <select class="form-select" id="location" required>
+                                    <option value="" disabled selected>-- เลือกห้องจัดเก็บ --</option>
                                     <option value="ห้อง 1 สารเคมีประเภทออกซิไดซ์">ห้อง 1 (ออกซิไดซ์)</option>
                                     <option value="ห้อง 2 สารเคมีประเภทกรด (Acid)">ห้อง 2 (กรด)</option>
                                     <option value="ห้อง 3 สารเคมีประเภทด่าง">ห้อง 3 (ด่าง)</option>
@@ -166,8 +138,8 @@
                                 <input type="date" class="form-control" id="expDate">
                             </div>
                             
-                            <div class="col-12 mt-3">
-                                <label class="form-label small fw-bold"><i class="bi bi-camera me-1"></i>ภาพถ่ายสารเคมี (สูงสุด 3 ภาพ / ย่อขนาดอัตโนมัติ)</label>
+                            <div class="col-12 mt-4">
+                                <label class="form-label small fw-bold"><i class="bi bi-camera me-1"></i>ภาพถ่ายสารเคมี (สูงสุด 3 ภาพ)</label>
                                 <input type="file" class="form-control" id="imageInput" accept="image/*" multiple onchange="handleImageSelection(event)">
                                 <div id="imagePreviewContainer" class="d-flex gap-2 mt-3 flex-wrap"></div>
                             </div>
@@ -196,21 +168,21 @@
                         <input type="hidden" id="transChemId">
                         <div class="mb-3">
                             <label class="form-label small fw-bold">ประเภทรายการ</label>
-                            <select class="form-select form-select-lg" id="transType" required>
-                                <option value="IN">➕ รับเข้าสต็อก (Receive)</option>
-                                <option value="OUT">➖ เบิกจ่าย (Dispense)</option>
+                            <select class="form-select form-select-lg fw-bold" id="transType" required>
+                                <option value="IN" class="text-success">รับเข้าสต็อก (IN)</option>
+                                <option value="OUT" class="text-danger">เบิกจ่าย (OUT)</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label small fw-bold">จำนวนที่ต้องการ ดำเนินการ</label>
+                            <label class="form-label small fw-bold">จำนวนที่ต้องการทำรายการ</label>
                             <div class="input-group">
                                 <input type="number" step="0.01" class="form-control form-control-lg" id="transQty" required>
-                                <span class="input-group-text" id="transUnitLabel">หน่วย</span>
+                                <span class="input-group-text fw-bold" id="transUnitLabel">หน่วย</span>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">หมายเหตุ / แผนกที่เบิก</label>
-                            <input type="text" class="form-control" id="transRemark" placeholder="ระบุเหตุผลการเบิกหรือรับเข้า">
+                            <input type="text" class="form-control" id="transRemark" placeholder="ระบุเหตุผลการเบิก หรือ รับเข้า">
                         </div>
                         <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">ยืนยันทำรายการ</button>
                     </form>
