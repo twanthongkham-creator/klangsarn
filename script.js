@@ -1,69 +1,76 @@
+// ==========================================
+// 1. การตั้งค่า Supabase
+// ==========================================
 const SUPABASE_URL = "https://bdjyxkkzbbzlmxszmvhx.supabase.co";
 const SUPABASE_KEY = "sb_publishable_inYG_le-QyiIvjkaUHXyfQ_Nvm4FpR2"; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ตัวแปรส่วนกลาง
 let allChemicals = [];
 let currentFilter = 'All';
-let uploadedImagesBase64 = []; // เก็บ base64 ชั่วคราวสำหรับการย่อไฟล์และส่งขึ้น DB
+let uploadedImagesBase64 = []; // เก็บไฟล์ภาพที่ถูกย่อขนาดเป็น Base64
 
+// ==========================================
+// 2. โหลดข้อมูลเมื่อเปิดหน้าเว็บ
+// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     fetchData();
+    
+    // ผูก Event ให้กับฟอร์มต่างๆ
     document.getElementById("chemicalForm").addEventListener("submit", handleChemicalSubmit);
     document.getElementById("transactionForm").addEventListener("submit", handleTransactionSubmit);
 });
 
-// ระบบสลับหน้า Nav ด้านซ้าย (SPA View Switcher)
-function switchView(viewName) {
-    document.querySelectorAll('.app-view').forEach(view => view.classList.add('d-none'));
-    document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
-    
-    document.getElementById(`view-${viewName}`).classList.remove('d-none');
-    document.getElementById(`menu-${viewName}`).classList.add('active');
-    
-    // โหลดประวัติรายการธุรกรรมเมื่อกดเข้าหน้า Transaction
-    if(viewName === 'trans') fetchTransactions();
-    if(viewName === 'dash') renderDashboard();
-    
-    // ปิด Offcanvas sidebar บน Mobile อัตโนมัติเมื่อเลือกเมนูแล้ว
-    const sidebarEl = document.getElementById('sidebarMenu');
-    const instance = bootstrap.Offcanvas.getInstance(sidebarEl);
-    if(instance) instance.hide();
-}
-
+// ฟังก์ชันดึงข้อมูลจากตาราง chemical_stock
 async function fetchData() {
-    const { data, error } = await _supabase.from('chemical_stock').select('*').order('chemical_name');
-    if (error) return console.error(error);
+    const { data, error } = await _supabase
+        .from('chemical_stock')
+        .select('*')
+        .order('chemical_name');
+        
+    if (error) {
+        console.error("Error fetching data:", error);
+        return;
+    }
+    
     allChemicals = data;
     renderTableAndCards();
 }
 
-// ระบบกรองสถานที่จัดเก็บ และการ ซ่อน/แสดง คอลัมน์สถานที่เก็บ
-function filterByLocation(locKey) {
+// ==========================================
+// 3. ระบบ Filter และแสดงผลข้อมูล (Render UI)
+// ==========================================
+
+// เมื่อกดปุ่ม Filter สถานที่เก็บ
+function filterByLocation(locKey, btnElement) {
     currentFilter = locKey;
     
-    // เปลี่ยนสถานะปุ่ม Active
-    document.querySelectorAll('#locationFilterBar .btn').forEach(btn => {
+    // รีเซ็ตปุ่มทั้งหมดให้เป็นเส้นขอบ (outline)
+    document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.classList.remove('btn-primary', 'active');
         btn.classList.add('btn-outline-primary');
     });
-    event.target.classList.remove('btn-outline-primary');
-    event.target.classList.add('btn-primary', 'active');
+    // เปลี่ยนปุ่มที่กดให้เป็นสีทึบ (active)
+    btnElement.classList.remove('btn-outline-primary');
+    btnElement.classList.add('btn-primary', 'active');
     
     renderTableAndCards();
 }
 
+// ฟังก์ชันหลักในการวาด UI (แยก Desktop และ Mobile)
 function renderTableAndCards() {
-    // ทำการกรองข้อมูลตามคีย์สถานที่คำค้นสั้นๆ
+    // 1. กรองข้อมูลตามที่เลือก
     const filtered = currentFilter === 'All' 
         ? allChemicals 
         : allChemicals.filter(item => item.location && item.location.includes(currentFilter));
 
+    // 2. ถ้าเลือกฟิลเตอร์เฉพาะห้อง จะซ่อนคอลัมน์สถานที่เก็บทิ้งเพื่อประหยัดพื้นที่
     const showLocationColumn = (currentFilter === 'All');
-    
-    // จัดการหัวตารางของฝั่ง Desktop
     document.getElementById('th-location').style.display = showLocationColumn ? '' : 'none';
 
-    // 1. RENDER DESKTOP TABLE
+    // ------------------------------------
+    // ส่วนที่ 1: วาดตารางสำหรับ Desktop
+    // ------------------------------------
     const tbody = document.getElementById("chemicalTableBody");
     tbody.innerHTML = filtered.map(item => {
         const expStatus = getExpiryStatus(item.exp_date);
@@ -74,7 +81,7 @@ function renderTableAndCards() {
             <tr>
                 <td class="ps-4">
                     <div class="d-flex align-items-center">
-                        <img src="${mainImg}" class="rounded me-3 border" style="width: 48px; height: 48px; object-fit: cover;" onclick="previewImageGroup(${item.id})">
+                        <img src="${mainImg}" class="rounded me-3 border table-img-thumbnail">
                         <div>
                             <div class="fw-bold text-dark">${item.chemical_name}</div>
                             <small class="text-muted">CAS: ${item.cas_number || '-'}</small>
@@ -87,7 +94,7 @@ function renderTableAndCards() {
                     <div class="small ${expStatus.class}">E: ${item.exp_date || '-'}</div>
                 </td>
                 <td style="display: ${showLocationColumn ? '' : 'none'}">
-                    <span class="badge badge-location px-2 py-2">${item.location}</span>
+                    <span class="badge badge-location px-2 py-2">${item.location || '-'}</span>
                 </td>
                 <td class="text-end pe-4">
                     <button class="btn btn-sm btn-outline-primary me-1" onclick="openTransactionModal(${item.id})"><i class="bi bi-arrow-left-right"></i> รับ/จ่าย</button>
@@ -98,10 +105,12 @@ function renderTableAndCards() {
         `;
     }).join('');
 
-    // 2. RENDER MOBILE CARDS (ตัดเรื่องเลื่อนขวาออก ออกแบบแนวตั้งกดง่าย)
+    // ------------------------------------
+    // ส่วนที่ 2: วาดการ์ดสำหรับ Mobile (ไม่ต้องเลื่อนซ้ายขวา)
+    // ------------------------------------
     const cardBody = document.getElementById("chemicalCardsBody");
     if(filtered.length === 0) {
-        cardBody.innerHTML = `<div class="text-center p-4 text-muted small">ไม่พบรายการสารเคมี</div>`;
+        cardBody.innerHTML = `<div class="text-center p-5 text-muted small bg-white rounded shadow-sm">ไม่พบรายการสารเคมีในหมวดหมู่นี้</div>`;
         return;
     }
     
@@ -118,18 +127,21 @@ function renderTableAndCards() {
                             <h6 class="fw-bold text-dark mb-0">${item.chemical_name}</h6>
                             <small class="text-muted d-block">CAS: ${item.cas_number || '-'}</small>
                         </div>
-                        <span class="fs-5 fw-bold text-primary">${item.quantity} <span class="fs-6 text-muted fw-normal">${item.unit}</span></span>
+                        <div class="text-end">
+                            <span class="fs-5 fw-bold text-primary">${item.quantity}</span> 
+                            <span class="fs-6 text-muted fw-normal">${item.unit}</span>
+                        </div>
                     </div>
                     
                     <div class="row g-2 my-2 bg-light rounded p-2 small">
                         <div class="col-6"><strong>วันผลิต:</strong> ${item.mfg_date || '-'}</div>
                         <div class="col-6"><strong>วันหมดอายุ:</strong> <span class="${expStatus.class}">${item.exp_date || '-'}</span></div>
-                        ${showLocationColumn ? `<div class="col-12"><strong>สถานที่เก็บ:</strong> ${item.location}</div>` : ''}
+                        ${showLocationColumn ? `<div class="col-12 border-top pt-2 mt-2"><strong>สถานที่เก็บ:</strong> ${item.location || '-'}</div>` : ''}
                     </div>
 
                     ${imgList.length > 0 ? `<div class="d-flex gap-2 mb-3 overflow-x-auto py-1">${imagesHtml}</div>` : ''}
 
-                    <div class="d-grid gap-2 d-flex justify-content-end border-top pt-2">
+                    <div class="d-grid gap-2 d-flex justify-content-end border-top pt-2 mt-3">
                         <button class="btn btn-sm btn-primary flex-grow-1" onclick="openTransactionModal(${item.id})"><i class="bi bi-arrow-left-right me-1"></i>รับ/จ่าย</button>
                         <button class="btn btn-sm btn-outline-warning px-3" onclick="editChemical(${item.id})"><i class="bi bi-pencil"></i></button>
                         <button class="btn btn-sm btn-outline-danger px-3" onclick="deleteChemical(${item.id})"><i class="bi bi-trash"></i></button>
@@ -140,12 +152,14 @@ function renderTableAndCards() {
     }).join('');
 }
 
-// 3. ระบบบีบอัดภาพ (Image Compression) ปรับลดขนาดและคุณภาพลง เพื่อเซฟพื้นที่และโหลดไวบนมือถือ
+// ==========================================
+// 4. ระบบจัดการภาพถ่าย (ย่อขนาดอัตโนมัติ)
+// ==========================================
 function handleImageSelection(e) {
-    const files = Array.from(e.target.files).slice(0, 3); // จำกัดให้เลือกไม่เกิน 3 ภาพ
+    const files = Array.from(e.target.files).slice(0, 3); // อนุญาตสูงสุดแค่ 3 รูป
     const container = document.getElementById("imagePreviewContainer");
     container.innerHTML = "";
-    uploadedImagesBase64 = [];
+    uploadedImagesBase64 = []; // ล้างภาพเก่าทิ้ง
 
     files.forEach(file => {
         const reader = new FileReader();
@@ -155,7 +169,7 @@ function handleImageSelection(e) {
             img.src = event.target.result;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 600; // บีบความกว้างให้เหลือสูงสุด 600px พอสำหรับการดูในมือถือสเปกกำลังดี
+                const MAX_WIDTH = 600; // บีบภาพให้กว้างสุด 600px
                 let width = img.width;
                 let height = img.height;
 
@@ -169,8 +183,8 @@ function handleImageSelection(e) {
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
                 
-                // แปลงไฟล์เป็น Base64 ที่ลดคุณภาพลงเหลือ 65% (ช่วยลดขนาดจาก 4MB เหลือประมาณ 80-120KB เท่านั้น)
-                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.65);
+                // แปลงไฟล์เป็น Base64 ที่ลดคุณภาพลงเหลือ 70% 
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.70);
                 uploadedImagesBase64.push(compressedBase64);
 
                 container.innerHTML += `<img src="${compressedBase64}" class="img-preview-card">`;
@@ -179,7 +193,9 @@ function handleImageSelection(e) {
     });
 }
 
-// 4. บันทึกและแก้ไขข้อมูลสารเคมีคลังหลัก
+// ==========================================
+// 5. จัดการเพิ่ม/แก้ไข ข้อมูลสารเคมี
+// ==========================================
 function openAddModal() {
     document.getElementById("chemicalId").value = "";
     document.getElementById("chemicalForm").reset();
@@ -200,8 +216,9 @@ function editChemical(id) {
     document.getElementById("unit").value = item.unit;
     document.getElementById("mfgDate").value = item.mfg_date || "";
     document.getElementById("expDate").value = item.exp_date || "";
-    document.getElementById("location").value = item.location;
+    document.getElementById("location").value = item.location || "";
     
+    // โหลดรูปภาพเดิมมาแสดง
     const container = document.getElementById("imagePreviewContainer");
     container.innerHTML = "";
     uploadedImagesBase64 = item.image_urls ? JSON.parse(item.image_urls) : [];
@@ -217,6 +234,7 @@ async function handleChemicalSubmit(e) {
     e.preventDefault();
     const id = document.getElementById("chemicalId").value;
     
+    // ข้อมูลที่จะอัปเดตลงฐานข้อมูล
     const payload = {
         chemical_name: document.getElementById("chemicalName").value,
         cas_number: document.getElementById("casNumber").value,
@@ -230,29 +248,43 @@ async function handleChemicalSubmit(e) {
 
     let error;
     if (id) {
+        // แก้ไข
         const res = await _supabase.from('chemical_stock').update(payload).eq('id', id);
         error = res.error;
     } else {
+        // เพิ่มใหม่
         const res = await _supabase.from('chemical_stock').insert([payload]);
         error = res.error;
     }
 
-    if (error) alert("ล้มเหลว: " + error.message);
-    else {
+    if (error) {
+        alert("เกิดข้อผิดพลาดในการบันทึก: " + error.message);
+    } else {
         bootstrap.Modal.getInstance(document.getElementById('chemicalModal')).hide();
+        fetchData(); // โหลดตารางใหม่
+    }
+}
+
+async function deleteChemical(id) {
+    if(confirm("ยืนยันที่จะลบข้อมูลสารเคมีรายการนี้ออกจากระบบหรือไม่? (ประวัติธุรกรรมจะถูกลบตามไปด้วย)")) {
+        await _supabase.from('chemical_stock').delete().eq('id', id);
         fetchData();
     }
 }
 
-// 5. บันทึกและทำรายการธุรกรรม (รับ-จ่าย)
+// ==========================================
+// 6. ระบบเบิก-จ่าย (Transactions)
+// ==========================================
 function openTransactionModal(id) {
     const item = allChemicals.find(i => i.id == id);
     if(!item) return;
+    
     document.getElementById("transChemId").value = item.id;
     document.getElementById("transChemName").innerText = item.chemical_name;
     document.getElementById("transUnitLabel").innerText = item.unit;
     document.getElementById("transQty").value = "";
     document.getElementById("transRemark").value = "";
+    
     new bootstrap.Modal(document.getElementById('transactionModal')).show();
 }
 
@@ -266,74 +298,32 @@ async function handleTransactionSubmit(e) {
     const item = allChemicals.find(i => i.id == id);
     let newQty = (type === 'IN') ? item.quantity + qty : item.quantity - qty;
 
-    if (newQty < 0) return alert("สต็อกคงเหลือติดลบไม่ได้! ตรวจสอบจำนวนเบิกจ่ายอีกครั้ง");
+    // ป้องกันการเบิกของจนยอดติดลบ
+    if (newQty < 0) return alert("สต็อกคงเหลือไม่เพียงพอสำหรับการเบิกจ่าย!");
 
-    // 1. อัปเดตปริมาณในตารางหลัก
+    // 1. อัปเดตปริมาณสินค้าในตาราง chemical_stock
     await _supabase.from('chemical_stock').update({ quantity: newQty }).eq('id', id);
     
-    // 2. บันทึกลงตาราง log ประวัติการเบิกจ่าย
+    // 2. บันทึกประวัติลงตาราง chemical_transactions
     await _supabase.from('chemical_transactions').insert([{
-        chemical_id: id, type: type, quantity: qty, remark: remark
+        chemical_id: id, 
+        type: type, 
+        quantity: qty, 
+        remark: remark
     }]);
 
     bootstrap.Modal.getInstance(document.getElementById('transactionModal')).hide();
-    fetchData();
+    fetchData(); // โหลดข้อมูลสต็อกที่หักลบแล้วมาแสดงใหม่
 }
 
-async function deleteChemical(id) {
-    if(confirm("ยืนยันที่จะลบข้อมูลสารเคมีรายการนี้ออกจากระบบหรือไม่?")) {
-        await _supabase.from('chemical_stock').delete().eq('id', id);
-        fetchData();
-    }
-}
-
-// 6. ส่วนงานการดึงหน้าประวัติและแดชบอร์ดมาแสดง
-async function fetchTransactions() {
-    const { data, error } = await _supabase.from('chemical_transactions').select(`
-        id, type, quantity, remark, transaction_date, chemical_stock(chemical_name, unit)
-    `).order('transaction_date', { ascending: false });
-
-    if(error) return;
-    const tbody = document.getElementById("transactionTableBody");
-    tbody.innerHTML = data.map(t => `
-        <tr>
-            <td class="ps-4">${new Date(t.transaction_date).toLocaleString('th-TH')}</td>
-            <td><strong class="text-dark">${t.chemical_stock?.chemical_name || 'รายการถูกลบแล้ว'}</strong></td>
-            <td><span class="badge ${t.type === 'IN' ? 'bg-success' : 'bg-danger'}">${t.type === 'IN' ? 'รับเข้า' : 'เบิกจ่าย'}</span></td>
-            <td><strong>${t.quantity}</strong> <small class="text-muted">${t.chemical_stock?.unit || ''}</small></td>
-            <td class="pe-4 text-muted">${t.remark || '-'}</td>
-        </tr>
-    `).join('');
-}
-
-function renderDashboard() {
-    const totalItems = allChemicals.length;
-    const alertExpiry = allChemicals.filter(item => {
-        if(!item.exp_date) return false;
-        const diff = (new Date(item.exp_date) - new Date()) / (1000*60*60*24);
-        return diff <= 30;
-    }).length;
-
-    document.getElementById("dashboardCounters").innerHTML = `
-        <div class="col-6 col-md-4">
-            <div class="card border-0 shadow-sm bg-primary text-white p-3">
-                <small class="text-white-50">รายการทั้งหมด</small>
-                <h2 class="fw-bold mb-0">${totalItems}</h2>
-            </div>
-        </div>
-        <div class="col-6 col-md-4">
-            <div class="card border-0 shadow-sm bg-warning text-dark p-3">
-                <small class="text-dark-50">หมดอายุ/ใกล้หมดอายุ (30 วัน)</small>
-                <h2 class="fw-bold mb-0">${alertExpiry}</h2>
-            </div>
-        </div>
-    `;
-}
-
+// ==========================================
+// 7. ฟังก์ชันตัวช่วย (Helper)
+// ==========================================
+// เช็กวันหมดอายุเพื่อเปลี่ยนสีตัวอักษร
 function getExpiryStatus(date) {
     if (!date) return { class: '' };
     const diff = (new Date(date) - new Date()) / (1000 * 60 * 60 * 24);
-    if (diff <= 0) return { class: 'exp-over' };
-    if (diff <= 30) return { class: 'exp-near' };
-    return { class: '' };
+    if (diff <= 0) return { class: 'exp-over' }; // หมดอายุแล้ว (สีแดง)
+    if (diff <= 30) return { class: 'exp-near' }; // ใกล้หมดอายุ 30 วัน (สีส้ม)
+    return { class: '' }; // ปกติ
 }
