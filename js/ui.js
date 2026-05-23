@@ -41,7 +41,7 @@ function showToast(message, type = 'success') {
   const colors = { success: '#10B981', danger: '#EF4444', warning: '#F59E0B', info: '#0EA5E9' };
 
   const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
+  toast.className = `toast t-${type}`;
   toast.innerHTML = `
     <i class="bi ${icons[type] || icons.info}" style="color:${colors[type]}; font-size:16px;"></i>
     <span style="flex:1; font-family:'Kanit',sans-serif;">${message}</span>
@@ -82,3 +82,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initSidebar();
   updateAdminUI();
 });
+
+// ===== DATE FORMATTER =====
+function formatDisplayDate(dateStr) {
+  if (!dateStr) return '—';
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return dateStr;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`; // YYYY-MM-DD -> DD/MM/YYYY
+}

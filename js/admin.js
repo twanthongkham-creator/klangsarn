@@ -1,298 +1,774 @@
 // ==========================================
-// ChemStock — Admin Panel Logic v2.1
+// ChemStock — Admin Panel Logic v2.3
+// Direct CRUD on Supabase Tables with Pricing
 // ==========================================
-const SUPABASE_URL = “https://bdjyxkkzbbzlmxszmvhx.supabase.co”;
-const SUPABASE_KEY = “sb_publishable_inYG_le-QyiIvjkaUHXyfQ_Nvm4FpR2”;
+const SUPABASE_URL = "https://bdjyxkkzbbzlmxszmvhx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_inYG_le-QyiIvjkaUHXyfQ_Nvm4FpR2";
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const ADMIN_PWD_KEY     = ‘chemstock_admin_pwd’;
-const ADMIN_SESSION_KEY = ‘chemstock_admin’;
-const DEFAULT_PASSWORD  = ‘chem@admin’;
+const ADMIN_PWD_KEY     = 'chemstock_admin_pwd';
+const ADMIN_SESSION_KEY = 'chemstock_admin';
+const DEFAULT_PASSWORD  = 'chem@admin';
 
 let adminChems = [];
 let adminTrans = [];
+let uploadedImagesBase64 = [];
 
 function getAdminPassword() { return localStorage.getItem(ADMIN_PWD_KEY) || DEFAULT_PASSWORD; }
 
 // ===== EYE TOGGLE =====
 function togglePwd() {
-const input = document.getElementById(‘adminPassword’);
-const show  = document.getElementById(‘eyeIconShow’);
-const hide  = document.getElementById(‘eyeIconHide’);
-const isHidden = input.type === ‘password’;
-input.type = isHidden ? ‘text’ : ‘password’;
-show.style.display = isHidden ? ‘none’ : ‘’;
-hide.style.display = isHidden ? ‘’ : ‘none’;
+  const input = document.getElementById('adminPassword');
+  const show  = document.getElementById('eyeIconShow');
+  const hide  = document.getElementById('eyeIconHide');
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  show.style.display = isHidden ? 'none' : '';
+  hide.style.display = isHidden ? '' : 'none';
 }
 
 // ===== LOGIN =====
 function attemptLogin() {
-const pwd = document.getElementById(‘adminPassword’).value;
-const err = document.getElementById(‘loginError’);
-if (pwd === getAdminPassword()) {
-localStorage.setItem(ADMIN_SESSION_KEY, ‘true’);
-err.classList.remove(‘show’);
-showAdminPanel();
-} else {
-err.classList.add(‘show’);
-document.getElementById(‘adminPassword’).value = ‘’;
-document.getElementById(‘adminPassword’).focus();
-// Shake animation on the input
-const box = document.querySelector(’.login-box’);
-box.style.animation = ‘none’;
-box.offsetWidth; // reflow
-box.style.animation = ‘shake 0.4s ease’;
-}
+  const pwd = document.getElementById('adminPassword').value;
+  const err = document.getElementById('loginError');
+  if (pwd === getAdminPassword()) {
+    localStorage.setItem(ADMIN_SESSION_KEY, 'true');
+    err.classList.remove('show');
+    showAdminPanel();
+  } else {
+    err.classList.add('show');
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('adminPassword').focus();
+    // Shake animation on the input
+    const box = document.querySelector('.login-box');
+    box.style.animation = 'none';
+    box.offsetWidth; // reflow
+    box.style.animation = 'shake 0.4s ease';
+  }
 }
 
 function adminLogout() {
-localStorage.removeItem(ADMIN_SESSION_KEY);
-window.location.reload();
+  localStorage.removeItem(ADMIN_SESSION_KEY);
+  window.location.reload();
 }
 
 function showAdminPanel() {
-document.getElementById(‘loginScreen’).style.display = ‘none’;
-document.getElementById(‘adminPanel’).style.display  = ‘’;
-initSidebar();
-loadAdminData();
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminPanel').style.display  = '';
+  initSidebar();
+  loadAdminData();
+  initDragAndDrop();
 }
 
 // Add shake keyframe dynamically
-const shakeStyle = document.createElement(‘style’);
+const shakeStyle = document.createElement('style');
 shakeStyle.textContent = `@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }`;
 document.head.appendChild(shakeStyle);
 
 // ===== LOAD DATA =====
 async function loadAdminData() {
-const [c, t] = await Promise.all([
-_supabase.from(‘chemical_stock’).select(’*’).order(‘chemical_name’),
-_supabase.from(‘chemical_transactions’)
-.select(‘id, type, quantity, remark, transaction_date, chemical_stock(chemical_name, unit)’)
-.order(‘transaction_date’, { ascending: false })
-]);
-adminChems = c.data || [];
-adminTrans = t.data || [];
-updateQuickStats();
-renderAdminChems();
-renderAdminTrans();
-}
-
-function updateQuickStats() {
-const s = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-s(‘adminTotalChems’, adminChems.length);
-
-```
-const today = new Date();
-const alerts = adminChems.filter(c => c.exp_date && (new Date(c.exp_date) - today) / 864e5 <= 30);
-s('adminAlerts', alerts.length);
-s('adminTotalTrans', adminTrans.length);
-
-const firstDay = new Date(); firstDay.setDate(1); firstDay.setHours(0,0,0,0);
-s('adminThisMonth', adminTrans.filter(t => new Date(t.transaction_date) >= firstDay).length);
-```
-
+  const [c, t] = await Promise.all([
+    _supabase.from('chemical_stock').select('*').order('chemical_name'),
+    _supabase.from('chemical_transactions')
+      .select('id, chemical_id, type, quantity, remark, price_per_unit, free_quantity, saving, transaction_date, chemical_stock(chemical_name, unit)')
+      .order('transaction_date', { ascending: false })
+  ]);
+  adminChems = c.data || [];
+  adminTrans = t.data || [];
+  renderAdminChems();
+  renderAdminTrans();
+  populateChemicalSelect();
 }
 
 // ===== CHEMICALS TABLE =====
 function renderAdminChems() {
-const q = (document.getElementById(‘adminSearch’)?.value || ‘’).toLowerCase();
-const filtered = adminChems.filter(c =>
-c.chemical_name.toLowerCase().includes(q) ||
-(c.cas_number || ‘’).toLowerCase().includes(q)
-);
+  const q = (document.getElementById('adminSearch')?.value || '').toLowerCase();
+  const filtered = adminChems.filter(c =>
+    c.chemical_name.toLowerCase().includes(q) ||
+    (c.material_number || '').toLowerCase().includes(q) ||
+    (c.lot_number || '').toLowerCase().includes(q)
+  );
 
-```
-const tbody = document.getElementById('adminChemsTable');
-if (!tbody) return;
+  const tbody = document.getElementById('adminChemsTable');
+  if (!tbody) return;
 
-if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5">
-      <div class="empty-state" style="padding:40px 20px;">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.2" stroke-linecap="round" style="margin:0 auto 10px;display:block;">
-          <path d="M9 3h6M10 3v6.6L6.1 17.2A2 2 0 0 0 8 20h8a2 2 0 0 0 1.9-2.8L14 9.6V3"/>
-        </svg>
-        <div class="empty-title">ไม่พบรายการ</div>
-      </div>
-    </td></tr>`;
-    return;
-}
-
-const today = new Date();
-tbody.innerHTML = filtered.map(item => {
-    const diff = item.exp_date ? (new Date(item.exp_date) - today) / 864e5 : Infinity;
-    const expBadge = diff <= 0
-        ? `<span class="badge badge-red" style="margin-top:3px;">หมดอายุ</span>`
-        : diff <= 30
-            ? `<span class="badge badge-amber" style="margin-top:3px;">เหลือ ${Math.ceil(diff)} วัน</span>`
-            : `<span class="badge badge-green" style="margin-top:3px;">ปกติ</span>`;
-
-    return `<tr>
-      <td style="padding-left:22px;">
-        <div class="cell-name">${item.chemical_name}</div>
-        <div class="cell-cas">CAS: ${item.cas_number || '—'}</div>
-      </td>
-      <td>
-        <span class="mono" style="font-size:15px;font-weight:700;color:var(--text-head);">${item.quantity}</span>
-        <span style="font-size:12px;color:var(--text-muted);margin-left:4px;">${item.unit}</span>
-      </td>
-      <td>
-        <div style="font-size:13px;color:var(--text-body);">${item.exp_date || '—'}</div>
-        ${expBadge}
-      </td>
-      <td>
-        <span class="badge badge-loc" style="font-size:11px;">${item.location ? item.location.split(' ').slice(0,2).join(' ') : '—'}</span>
-      </td>
-      <td style="padding-right:22px;text-align:right;">
-        <div style="display:inline-flex;gap:6px;">
-          <button class="btn btn-outline btn-sm btn-icon" onclick="window.location.href='index.html'" title="แก้ไข (ไปหน้าหลัก)">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-          </button>
-          <button class="btn btn-outline-danger btn-sm btn-icon" onclick="adminDeleteChem(${item.id})" title="ลบ">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <polyline points="3 6 5 6 21 6"/>
-              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-              <path d="M10 11v6M14 11v6"/>
-              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-            </svg>
-          </button>
+  if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="10">
+        <div class="empty-state" style="padding:40px 20px;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.2" stroke-linecap="round" style="margin:0 auto 10px;display:block;">
+            <path d="M9 3h6M10 3v6.6L6.1 17.2A2 2 0 0 0 8 20h8a2 2 0 0 0 1.9-2.8L14 9.6V3"/>
+          </svg>
+          <div class="empty-title">ไม่พบรายการสารเคมี</div>
         </div>
-      </td>
-    </tr>`;
-}).join('');
-```
+      </td></tr>`;
+      return;
+  }
 
-}
+  const today = new Date();
+  tbody.innerHTML = filtered.map(item => {
+      const diff = item.exp_date ? (new Date(item.exp_date) - today) / 864e5 : Infinity;
+      const expBadge = diff <= 0
+          ? `<span class="badge badge-red" style="margin-top:3px;">หมดอายุ</span>`
+          : diff <= 30
+              ? `<span class="badge badge-amber" style="margin-top:3px;">เหลือ ${Math.ceil(diff)} วัน</span>`
+              : `<span class="badge badge-green" style="margin-top:3px;">ปกติ</span>`;
 
-async function adminDeleteChem(id) {
-const item = adminChems.find(c => c.id == id);
-if (!confirm(`ยืนยันลบ "${item?.chemical_name}"?\nประวัติธุรกรรมที่เกี่ยวข้องจะถูกลบด้วย`)) return;
-const { error } = await _supabase.from(‘chemical_stock’).delete().eq(‘id’, id);
-if (error) { showToast(“ลบไม่สำเร็จ: “ + error.message, “danger”); return; }
-showToast(“ลบรายการสำเร็จ”, “success”);
-loadAdminData();
+      let lotThumb = `<div style="width:36px;height:36px;border-radius:6px;background:var(--bg-hover);border:1px solid var(--border-soft);display:flex;align-items:center;justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>`;
+      const imgs = item.image_urls ? JSON.parse(item.image_urls) : [];
+      if (imgs.length > 0) {
+          lotThumb = `<img src="${imgs[0]}" class="table-thumb" onclick="viewImage('${imgs[0]}'); event.stopPropagation();">`;
+      }
+
+      return `<tr>
+        <td style="padding-left:22px;" class="mono">${item.id}</td>
+        <td style="font-weight:600;color:var(--text-head);">${item.chemical_name}</td>
+        <td class="mono">${item.material_number || '—'}</td>
+        <td class="mono">${item.lot_number || '—'}</td>
+        <td>
+          <span class="mono" style="font-size:15px;font-weight:700;color:var(--text-head);">${item.quantity}</span>
+          <span style="font-size:12px;color:var(--text-muted);margin-left:4px;">${item.unit}</span>
+        </td>
+        <td>
+          <div style="font-size:12px;color:var(--text-muted);"><span style="color:var(--success);font-weight:500;">MFG</span> ${formatDisplayDate(item.mfg_date)}</div>
+          <div style="font-size:12px;color:var(--text-muted);"><span style="color:var(--danger);font-weight:500;">EXP</span> ${formatDisplayDate(item.exp_date)} ${expBadge}</div>
+        </td>
+        <td>
+          <span class="badge badge-loc" style="font-size:11px;">${item.location ? item.location.split(' ').slice(0,2).join(' ') : '—'}</span>
+        </td>
+        <td class="mono">${item.price_per_unit ? item.price_per_unit.toFixed(2) : '0.00'}</td>
+        <td>
+          ${lotThumb}
+        </td>
+        <td style="padding-right:22px;text-align:right;">
+          <div style="display:inline-flex;gap:6px;">
+            <button class="btn btn-outline btn-sm btn-icon" onclick="openEditChemModal(${item.id})" title="แก้ไข">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button class="btn btn-outline-danger btn-sm btn-icon" onclick="adminDeleteChem(${item.id})" title="ลบ">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </button>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
 }
 
 // ===== TRANSACTIONS TABLE =====
 function renderAdminTrans() {
-const tbody  = document.getElementById(‘adminTransTable’);
-const countEl = document.getElementById(‘transCount’);
-if (!tbody) return;
+  const tbody  = document.getElementById('adminTransTable');
+  const countEl = document.getElementById('transCount');
+  if (!tbody) return;
 
-```
-if (countEl) countEl.textContent = `รายการทั้งหมด ${adminTrans.length} รายการ`;
+  if (countEl) countEl.textContent = `รายการทั้งหมด ${adminTrans.length} รายการ`;
 
-if (adminTrans.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-muted);">ยังไม่มีประวัติ</td></tr>`;
-    return;
+  if (adminTrans.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted);">ยังไม่มีประวัติ</td></tr>`;
+      return;
+  }
+
+  tbody.innerHTML = adminTrans.map(t => {
+      const d = new Date(t.transaction_date);
+      const ds = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+
+      const badge = t.type === 'IN'
+          ? `<span class="badge badge-green"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg> รับเข้า</span>`
+          : `<span class="badge badge-red"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg> เบิกจ่าย</span>`;
+
+      const name = t.chemical_stock?.chemical_name
+          ? `<span style="font-weight:600;color:var(--text-head);">${t.chemical_stock.chemical_name}</span>`
+          : `<span style="color:var(--text-muted);font-style:italic;">ลบแล้ว</span>`;
+
+      return `<tr>
+        <td style="padding-left:22px;" class="mono">${t.id}</td>
+        <td>
+          ${name}
+          <div class="cell-cas">Chemical ID: ${t.chemical_id}</div>
+        </td>
+        <td>${badge}</td>
+        <td>
+          <span class="mono" style="font-size:15px;font-weight:700;color:var(--text-head);">${t.quantity}</span>
+          <span style="font-size:12px;color:var(--text-muted);margin-left:3px;">${t.chemical_stock?.unit || ''}</span>
+        </td>
+        <td class="mono">${t.price_per_unit ? t.price_per_unit.toFixed(2) : '—'}</td>
+        <td class="mono" style="${t.saving > 0 ? 'color:var(--success);font-weight:600;' : ''}">
+          ${t.saving ? t.saving.toLocaleString('th-TH') : '—'}
+        </td>
+        <td style="font-size:13px;color:var(--text-muted);">${ds}</td>
+        <td style="font-size:13px;color:var(--text-muted);">${t.remark || '—'}</td>
+        <td style="padding-right:22px;text-align:right;">
+          <div style="display:inline-flex;gap:6px;">
+            <button class="btn btn-outline btn-sm btn-icon" onclick="openEditTransModal(${t.id})" title="แก้ไข">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button class="btn btn-outline-danger btn-sm btn-icon" onclick="adminDeleteTrans(${t.id})" title="ลบ">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </button>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
 }
 
-tbody.innerHTML = adminTrans.map(t => {
-    const d = new Date(t.transaction_date);
-    const ds = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+// ===== POPULATE CHEMICAL DROP-DOWN =====
+function populateChemicalSelect() {
+  const select = document.getElementById('adminTransChemId');
+  if (!select) return;
+  const currentVal = select.value;
+  select.innerHTML = `<option value="" disabled selected>— เลือกสารเคมี —</option>` + 
+    adminChems.map(c => `<option value="${c.id}">${c.chemical_name} (ID: ${c.id}${c.lot_number ? ', Lot: ' + c.lot_number : ''})</option>`).join('');
+  if (currentVal) select.value = currentVal;
+}
 
-    const badge = t.type === 'IN'
-        ? `<span class="badge badge-green"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg> รับเข้า</span>`
-        : `<span class="badge badge-red"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg> เบิกจ่าย</span>`;
+// ===== CHEMICAL MODAL CRUD =====
+function openAddChemModal() {
+    document.getElementById("chemicalId").value = "";
+    document.getElementById("chemicalForm").reset();
+    uploadedImagesBase64 = [];
+    renderUploadedPreviews();
+    document.getElementById("modalTitle").innerText = "เพิ่มสารเคมีเข้าสต็อก";
+    document.getElementById('chemModalOverlay').classList.add('open');
+}
 
-    const name = t.chemical_stock?.chemical_name
-        ? `<span style="font-weight:600;color:var(--text-head);">${t.chemical_stock.chemical_name}</span>`
-        : `<span style="color:var(--text-muted);font-style:italic;">ลบแล้ว</span>`;
+function openEditChemModal(id) {
+    const item = adminChems.find(c => c.id == id);
+    if (!item) return;
+    document.getElementById("chemicalId").value = item.id;
+    document.getElementById("chemicalName").value = item.chemical_name;
+    document.getElementById("materialNumber").value = item.material_number || "";
+    document.getElementById("lotNumber").value = item.lot_number || "";
+    document.getElementById("quantity").value = item.quantity;
+    document.getElementById("unit").value = item.unit;
+    document.getElementById("mfgDate").value = item.mfg_date || "";
+    document.getElementById("expDate").value = item.exp_date || "";
+    document.getElementById("location").value = item.location || "";
+    document.getElementById("pricePerUnit").value = item.price_per_unit || 0.0;
+    
+    // Load existing images
+    uploadedImagesBase64 = item.image_urls ? JSON.parse(item.image_urls) : [];
+    renderUploadedPreviews();
+    
+    document.getElementById("modalTitle").innerText = "แก้ไขข้อมูลเคมีภัณฑ์";
+    document.getElementById('chemModalOverlay').classList.add('open');
+}
 
-    return `<tr>
-      <td style="padding-left:22px;font-size:13px;color:var(--text-muted);">${ds}</td>
-      <td>${name}</td>
-      <td>${badge}</td>
-      <td>
-        <span class="mono" style="font-size:15px;font-weight:700;color:var(--text-head);">${t.quantity}</span>
-        <span style="font-size:12px;color:var(--text-muted);margin-left:3px;">${t.chemical_stock?.unit || ''}</span>
-      </td>
-      <td style="padding-right:22px;font-size:13px;color:var(--text-muted);">${t.remark || '—'}</td>
-    </tr>`;
-}).join('');
-```
+function closeChemModal() {
+    document.getElementById('chemModalOverlay').classList.remove('open');
+}
 
+async function handleChemicalSubmit(e) {
+    e.preventDefault();
+    const id = document.getElementById("chemicalId").value;
+    const payload = {
+        chemical_name:   document.getElementById("chemicalName").value,
+        material_number: document.getElementById("materialNumber").value,
+        lot_number:      document.getElementById("lotNumber").value || null,
+        quantity:        parseFloat(document.getElementById("quantity").value),
+        unit:            document.getElementById("unit").value,
+        mfg_date:        document.getElementById("mfgDate").value || null,
+        exp_date:        document.getElementById("expDate").value || null,
+        location:        document.getElementById("location").value,
+        price_per_unit:  parseFloat(document.getElementById("pricePerUnit").value) || 0.0,
+        image_urls:      uploadedImagesBase64.length > 0 ? JSON.stringify(uploadedImagesBase64) : null
+    };
+
+    let error;
+    if (id) {
+        const r = await _supabase.from('chemical_stock').update(payload).eq('id', id);
+        error = r.error;
+    } else {
+        const r = await _supabase.from('chemical_stock').insert([payload]);
+        error = r.error;
+    }
+
+    if (error) {
+        showToast("บันทึกไม่สำเร็จ: " + error.message, "danger");
+    } else {
+        closeChemModal();
+        showToast(id ? "อัปเดตข้อมูลสำเร็จ" : "เพิ่มสารเคมีสำเร็จ", "success");
+        loadAdminData();
+    }
+}
+
+function adminDeleteChem(id) {
+  const item = adminChems.find(c => c.id == id);
+  if (!item) return;
+  pendingDeleteId = id;
+  pendingDeleteType = 'chemical';
+  document.getElementById('deleteItemName').textContent = `คุณกำลังจะลบสารเคมี "${item.chemical_name}"`;
+  document.getElementById('deleteItemDesc').textContent = 'การลบจะทำให้ข้อมูลสารเคมีคงค้างและประวัติธุรกรรมที่เกี่ยวข้องทั้งหมดถูกลบออกจากฐานข้อมูลอย่างถาวรและไม่สามารถกู้คืนได้';
+  document.getElementById('confirmDeleteModalOverlay').classList.add('open');
+}
+
+// ===== IMAGE UPLOAD & COMPRESSION =====
+function initDragAndDrop() {
+    const zone = document.getElementById("imageUploadZone");
+    if (!zone) return;
+
+    ['dragenter', 'dragover'].forEach(name => {
+        zone.addEventListener(name, e => {
+            e.preventDefault();
+            zone.classList.add('dragover');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(name => {
+        zone.addEventListener(name, e => {
+            e.preventDefault();
+            zone.classList.remove('dragover');
+        }, false);
+    });
+
+    zone.addEventListener('drop', e => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files && files.length > 0) {
+            processImageFiles(files);
+        }
+    }, false);
+}
+
+function handleImageSelection(event) {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+        processImageFiles(files);
+    }
+}
+
+function processImageFiles(files) {
+    const currentCount = uploadedImagesBase64.length;
+    const limit = 3 - currentCount;
+    if (limit <= 0) {
+        showToast("เลือกภาพได้สูงสุด 3 รูปเท่านั้น", "warning");
+        document.getElementById('imageInput').value = '';
+        return;
+    }
+
+    const filesToProcess = Array.from(files).slice(0, limit);
+
+    let processedCount = 0;
+    filesToProcess.forEach(file => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = ev => {
+            const img = new Image();
+            img.src = ev.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_W = 600;
+                let w = img.width, h = img.height;
+                if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                const b64 = canvas.toDataURL('image/jpeg', 0.72);
+                uploadedImagesBase64.push(b64);
+                
+                processedCount++;
+                if (processedCount === filesToProcess.length) {
+                    renderUploadedPreviews();
+                }
+            };
+        };
+    });
+
+    document.getElementById('imageInput').value = '';
+}
+
+function renderUploadedPreviews() {
+    const container = document.getElementById("imagePreviewContainer");
+    if (!container) return;
+    container.innerHTML = "";
+
+    uploadedImagesBase64.forEach((b64, index) => {
+        container.innerHTML += `
+          <div class="img-thumb-wrap" style="margin-right: 8px; margin-bottom: 8px;">
+            <img src="${b64}" class="img-thumb" onclick="viewImage('${b64}')" alt="ภาพพรีวิวที่ ${index+1}">
+            <div class="img-thumb-remove" onclick="removeUploadedImage(${index}, event)">×</div>
+          </div>`;
+    });
+}
+
+function removeUploadedImage(index, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    uploadedImagesBase64.splice(index, 1);
+    renderUploadedPreviews();
+}
+
+function viewImage(src) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;`;
+    overlay.innerHTML = `<img src="${src}" style="max-width:90vw;max-height:88vh;border-radius:12px;box-shadow:0 24px 60px rgba(0,0,0,0.5);">`;
+    overlay.onclick = () => overlay.remove();
+    document.body.appendChild(overlay);
+}
+
+// ===== TRANSACTION MODAL CRUD =====
+function openAddTransModal() {
+    document.getElementById("adminTransId").value = "";
+    document.getElementById("adminTransForm").reset();
+    document.getElementById("adminTransDate").value = getLocalISOString(new Date());
+    document.getElementById("transModalTitle").innerText = "เพิ่มประวัติธุรกรรม";
+    document.getElementById("adminTransPricePerUnit").value = 0.0;
+    document.getElementById("adminTransFreeQty").value = 0.0;
+    selectTransType('IN');
+    document.getElementById('adminTransModalOverlay').classList.add('open');
+}
+
+async function openEditTransModal(id) {
+    const t = adminTrans.find(item => item.id == id);
+    if (!t) return;
+    document.getElementById("adminTransId").value = t.id;
+    document.getElementById("adminTransChemId").value = t.chemical_id;
+    document.getElementById("adminTransQty").value = t.quantity;
+    document.getElementById("adminTransRemark").value = t.remark || "";
+    document.getElementById("adminTransPricePerUnit").value = t.price_per_unit || 0.0;
+    document.getElementById("adminTransFreeQty").value = t.free_quantity || 0.0;
+    
+    // Set type
+    selectTransType(t.type);
+    
+    // Set date
+    if (t.transaction_date) {
+        const d = new Date(t.transaction_date);
+        document.getElementById("adminTransDate").value = getLocalISOString(d);
+    } else {
+        document.getElementById("adminTransDate").value = "";
+    }
+    
+    document.getElementById("transModalTitle").innerText = "แก้ไขข้อมูลธุรกรรม";
+    document.getElementById('adminTransModalOverlay').classList.add('open');
+}
+
+function closeTransModal() {
+    document.getElementById('adminTransModalOverlay').classList.remove('open');
+}
+
+function getLocalISOString(date) {
+    const tzoffset = date.getTimezoneOffset() * 60000;
+    const localISOTime = (new Date(date - tzoffset)).toISOString().slice(0, -1);
+    return localISOTime.substring(0, 16);
+}
+
+function selectTransType(type) {
+    document.getElementById('adminTransType').value = type;
+    const btnIN  = document.getElementById('transBtnIN');
+    const btnOUT = document.getElementById('transBtnOUT');
+    const lblIN  = btnIN.querySelector('.trans-btn-label');
+    const lblOUT = btnOUT.querySelector('.trans-btn-label');
+    const promoFields = document.getElementById('adminTransPromoFields');
+
+    if (type === 'IN') {
+      btnIN.className  = 'trans-btn sel-in';
+      btnOUT.className = 'trans-btn';
+      lblIN.style.color  = 'var(--success)';
+      lblOUT.style.color = 'var(--text-muted)';
+      if (promoFields) promoFields.style.display = 'grid';
+    } else {
+      btnOUT.className = 'trans-btn sel-out';
+      btnIN.className  = 'trans-btn';
+      lblOUT.style.color = 'var(--danger)';
+      lblIN.style.color  = 'var(--text-muted)';
+      if (promoFields) promoFields.style.display = 'none';
+    }
+}
+
+async function handleTransSubmit(e) {
+    e.preventDefault();
+    const id = document.getElementById("adminTransId").value;
+    const chemId = document.getElementById("adminTransChemId").value;
+    const type = document.getElementById("adminTransType").value;
+    const qty = parseFloat(document.getElementById("adminTransQty").value);
+    const remark = document.getElementById("adminTransRemark").value;
+    const dateInput = document.getElementById("adminTransDate").value;
+    const dateVal = dateInput ? new Date(dateInput).toISOString() : new Date().toISOString();
+
+    const transPrice = parseFloat(document.getElementById("adminTransPricePerUnit").value) || 0.0;
+    const transFree  = parseFloat(document.getElementById("adminTransFreeQty").value) || 0.0;
+    const transSaving = (type === 'IN') ? (transPrice * transFree) : 0.0;
+
+    if (!chemId) { showToast("กรุณาเลือกสารเคมี", "warning"); return; }
+    if (isNaN(qty) || qty <= 0) { showToast("กรุณากรอกจำนวนที่ถูกต้อง", "warning"); return; }
+
+    // Fetch corresponding chemical to verify and calculate stock adjustment
+    const { data: chem, error: fetchError } = await _supabase
+        .from('chemical_stock')
+        .select('quantity')
+        .eq('id', chemId)
+        .single();
+
+    if (fetchError || !chem) {
+        showToast("ไม่พบสารเคมีที่เกี่ยวข้องในคลัง", "danger");
+        return;
+    }
+
+    let originalQty = chem.quantity;
+    let newQty = originalQty;
+
+    if (id) {
+        // Edit transaction
+        const oldTrans = adminTrans.find(item => item.id == id);
+        if (!oldTrans) { showToast("ไม่พบรายการธุรกรรมเดิม", "danger"); return; }
+
+        // Revert old transaction effect
+        let tempQty = (oldTrans.type === 'IN') ? originalQty - oldTrans.quantity : originalQty + oldTrans.quantity;
+        // Apply new transaction effect
+        newQty = (type === 'IN') ? tempQty + qty : tempQty - qty;
+    } else {
+        // Add transaction
+        newQty = (type === 'IN') ? originalQty + qty : originalQty - qty;
+    }
+
+    if (newQty < 0) {
+        showToast("ไม่สามารถทำรายการได้เนื่องจากจะทำให้ยอดคงเหลือติดลบ!", "danger");
+        return;
+    }
+
+    // Begin updates
+    // 1. Update chemical quantity in stock
+    const { error: stockError } = await _supabase
+        .from('chemical_stock')
+        .update({ quantity: newQty })
+        .eq('id', chemId);
+
+    if (stockError) {
+        showToast("อัปเดตสต็อกสารเคมีไม่สำเร็จ: " + stockError.message, "danger");
+        return;
+    }
+
+    // 2. Insert or update transaction row
+    const payload = {
+        chemical_id: chemId,
+        type: type,
+        quantity: qty,
+        remark: remark,
+        price_per_unit: transPrice,
+        free_quantity: transFree,
+        saving: transSaving,
+        transaction_date: dateVal
+    };
+
+    let transError;
+    if (id) {
+        const r = await _supabase.from('chemical_transactions').update(payload).eq('id', id);
+        transError = r.error;
+    } else {
+        const r = await _supabase.from('chemical_transactions').insert([payload]);
+        transError = r.error;
+    }
+
+    if (transError) {
+        showToast("บันทึกธุรกรรมไม่สำเร็จ: " + transError.message, "danger");
+        // Revert chemical stock
+        await _supabase.from('chemical_stock').update({ quantity: originalQty }).eq('id', chemId);
+    } else {
+        closeTransModal();
+        showToast(id ? "อัปเดตธุรกรรมสำเร็จ" : "เพิ่มธุรกรรมสำเร็จ", "success");
+        loadAdminData();
+    }
+}
+
+function adminDeleteTrans(id) {
+    const t = adminTrans.find(item => item.id == id);
+    if (!t) return;
+    pendingDeleteId = id;
+    pendingDeleteType = 'transaction';
+    const chemName = t.chemical_stock?.chemical_name || `Chemical ID ${t.chemical_id}`;
+    document.getElementById('deleteItemName').textContent = `คุณกำลังจะลบประวัติธุรกรรม ID #${t.id} (${chemName})`;
+    document.getElementById('deleteItemDesc').textContent = 'การลบจะทำให้ข้อมูลนี้ถูกลบอย่างถาวร และปริมาณสารเคมีในคลังจะได้รับการคำนวณปรับตามธุรกรรมที่ลบ';
+    document.getElementById('confirmDeleteModalOverlay').classList.add('open');
 }
 
 // ===== TABS =====
 function switchTab(tabId, btnEl) {
-document.querySelectorAll(’.tab-pane’).forEach(p => p.classList.remove(‘active’));
-document.querySelectorAll(’.admin-tab’).forEach(b => b.classList.remove(‘active’));
-document.getElementById(‘tab-’ + tabId).classList.add(‘active’);
-btnEl.classList.add(‘active’);
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+  btnEl.classList.add('active');
 }
 
 // ===== EXPORT CSV =====
 function exportCSV(type) {
-let csv = ‘\uFEFF’, filename = ‘’;
-const q = v => v ? `"${String(v).replace(/"/g,'""')}"` : ‘’;
-const ds = () => { const d=new Date(); return `${d.getFullYear()}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}`; };
+  let csv = '\uFEFF', filename = '';
+  const q = v => v ? `"${String(v).replace(/"/g,'""')}"` : '';
+  const ds = () => { const d=new Date(); return `${d.getFullYear()}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}`; };
 
-```
-if (type === 'chemicals') {
-    filename = `chemstock_chemicals_${ds()}.csv`;
-    csv += 'ลำดับ,ชื่อสารเคมี,CAS Number,จำนวน,หน่วย,วันผลิต,วันหมดอายุ,สถานที่\n';
-    adminChems.forEach((c, i) => {
-        csv += [i+1, q(c.chemical_name), q(c.cas_number), c.quantity, q(c.unit), c.mfg_date||'', c.exp_date||'', q(c.location)].join(',') + '\n';
-    });
-} else {
-    filename = `chemstock_transactions_${ds()}.csv`;
-    csv += 'ลำดับ,วัน-เวลา,สารเคมี,ประเภท,จำนวน,หน่วย,หมายเหตุ\n';
-    adminTrans.forEach((t, i) => {
-        const d = new Date(t.transaction_date).toLocaleString('th-TH');
-        csv += [i+1, q(d), q(t.chemical_stock?.chemical_name||'ลบแล้ว'), t.type, t.quantity, q(t.chemical_stock?.unit||''), q(t.remark||'')].join(',') + '\n';
-    });
-}
+  if (type === 'chemicals') {
+      filename = `chemstock_chemicals_${ds()}.csv`;
+      csv += 'ลำดับ,ชื่อสารเคมี,Material Number,เลขที่ล็อต,จำนวน,หน่วย,ราคาต่อหน่วย,วันผลิต,วันหมดอายุ,สถานที่\n';
+      adminChems.forEach((c, i) => {
+          csv += [i+1, q(c.chemical_name), q(c.material_number), q(c.lot_number||'—'), c.quantity, q(c.unit), c.price_per_unit||0.0, c.mfg_date||'', c.exp_date||'', q(c.location)].join(',') + '\n';
+      });
+  } else {
+      filename = `chemstock_transactions_${ds()}.csv`;
+      csv += 'ลำดับ,วัน-เวลา,สารเคมี,ประเภท,จำนวน,หน่วย,ราคาซื้อต่อหน่วย,จำนวนของแถม,ยอดประหยัด,หมายเหตุ\n';
+      adminTrans.forEach((t, i) => {
+          const d = new Date(t.transaction_date).toLocaleString('th-TH');
+          csv += [i+1, q(d), q(t.chemical_stock?.chemical_name||'ลบแล้ว'), t.type, t.quantity, q(t.chemical_stock?.unit||''), t.price_per_unit||0.0, t.free_quantity||0.0, t.saving||0.0, q(t.remark||'')].join(',') + '\n';
+      });
+  }
 
-const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: filename });
-a.click(); URL.revokeObjectURL(a.href);
-showToast(`ส่งออก ${type === 'chemicals' ? 'สารเคมี' : 'ประวัติรายการ'} สำเร็จ`, 'success');
-```
-
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: filename });
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast(`ส่งออก ${type === 'chemicals' ? 'สารเคมี' : 'ประวัติรายการ'} สำเร็จ`, 'success');
 }
 
 // ===== CLEAR TRANSACTIONS =====
 async function confirmClearTrans() {
-if (!confirm(“⚠️ ยืนยันล้างประวัติการทำรายการทั้งหมด?\nการดำเนินการนี้ไม่สามารถยกเลิกได้”)) return;
-const confirm2 = prompt(‘พิมพ์ “ยืนยัน” เพื่อดำเนินการต่อ:’);
-if (confirm2 !== ‘ยืนยัน’) { showToast(“ยกเลิกการดำเนินการ”, “warning”); return; }
-const { error } = await _supabase.from(‘chemical_transactions’).delete().neq(‘id’, 0);
-if (error) { showToast(“เกิดข้อผิดพลาด: “ + error.message, “danger”); return; }
-showToast(“ล้างประวัติสำเร็จ”, “success”);
-loadAdminData();
+  if (!confirm("⚠️ ยืนยันล้างประวัติการทำรายการทั้งหมด?\nการดำเนินการนี้ไม่สามารถยกเลิกได้")) return;
+  const confirm2 = prompt('พิมพ์ "ยืนยัน" เพื่อดำเนินการต่อ:');
+  if (confirm2 !== 'ยืนยัน') { showToast("ยกเลิกการดำเนินการ", "warning"); return; }
+  const { error } = await _supabase.from('chemical_transactions').delete().neq('id', 0);
+  if (error) { showToast("เกิดข้อผิดพลาด: " + error.message, "danger"); return; }
+  showToast("ล้างประวัติสำเร็จ", "success");
+  loadAdminData();
 }
 
 // ===== CHANGE PASSWORD =====
 function openChangePwd() {
-[‘oldPwd’,‘newPwd’,‘confirmPwd’].forEach(id => { const e=document.getElementById(id); if(e) e.value=’’; });
-document.getElementById(‘pwdError’).style.display = ‘none’;
-document.getElementById(‘changePwdModal’).classList.add(‘open’);
+  ['oldPwd','newPwd','confirmPwd'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
+  document.getElementById('pwdError').style.display = 'none';
+  document.getElementById('changePwdModal').classList.add('open');
 }
 
 function changePassword() {
-const old  = document.getElementById(‘oldPwd’).value;
-const nw   = document.getElementById(‘newPwd’).value;
-const conf = document.getElementById(‘confirmPwd’).value;
-const err  = document.getElementById(‘pwdError’);
+  const old  = document.getElementById('oldPwd').value;
+  const nw   = document.getElementById('newPwd').value;
+  const conf = document.getElementById('confirmPwd').value;
+  const err  = document.getElementById('pwdError');
 
-```
-if (old !== getAdminPassword() || nw !== conf || nw.length < 6) {
-    err.style.display = 'block'; return;
-}
-localStorage.setItem(ADMIN_PWD_KEY, nw);
-document.getElementById('changePwdModal').classList.remove('open');
-showToast("เปลี่ยนรหัสผ่านสำเร็จ", "success");
-```
-
+  if (old !== getAdminPassword() || nw !== conf || nw.length < 6) {
+      err.style.display = 'block'; return;
+  }
+  localStorage.setItem(ADMIN_PWD_KEY, nw);
+  document.getElementById('changePwdModal').classList.remove('open');
+  showToast("เปลี่ยนรหัสผ่านสำเร็จ", "success");
 }
 
 // ===== INIT =====
-document.addEventListener(‘DOMContentLoaded’, () => {
-if (isAdminLoggedIn()) {
-showAdminPanel();
-}
-// loginScreen always visible initially via HTML display logic
+document.addEventListener('DOMContentLoaded', () => {
+  if (isAdminLoggedIn()) {
+    showAdminPanel();
+  }
+  // Forms submit binding
+  document.getElementById("chemicalForm").addEventListener("submit", handleChemicalSubmit);
+  document.getElementById("adminTransForm").addEventListener("submit", handleTransSubmit);
+
+  // Auto-fill price per unit on chemical dropdown select
+  document.getElementById('adminTransChemId')?.addEventListener('change', (e) => {
+      const id = e.target.value;
+      const chem = adminChems.find(c => c.id == id);
+      if (chem) {
+          document.getElementById('adminTransPricePerUnit').value = chem.price_per_unit || 0.0;
+      }
+  });
+
+  // Auto-calculate EXP date to MFG date + 1 Year
+  document.getElementById("mfgDate")?.addEventListener("change", (e) => {
+      const val = e.target.value;
+      if (val) {
+          const parts = val.split('-');
+          const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+          d.setFullYear(d.getFullYear() + 1);
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          document.getElementById('expDate').value = `${y}-${m}-${day}`;
+      }
+  });
 });
+
+function setQuickExp(months) {
+    const mfgVal = document.getElementById('mfgDate').value;
+    let baseDate;
+    if (mfgVal) {
+        const parts = mfgVal.split('-');
+        baseDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    } else {
+        baseDate = new Date();
+    }
+    baseDate.setMonth(baseDate.getMonth() + months);
+    const y = baseDate.getFullYear();
+    const m = String(baseDate.getMonth() + 1).padStart(2, '0');
+    const day = String(baseDate.getDate()).padStart(2, '0');
+    document.getElementById('expDate').value = `${y}-${m}-${day}`;
+}
+window.setQuickExp = setQuickExp;
+
+let pendingDeleteId = null;
+let pendingDeleteType = null; // 'chemical' or 'transaction'
+
+function closeDeleteModal() {
+    const modal = document.getElementById('confirmDeleteModalOverlay');
+    if (modal) modal.classList.remove('open');
+    pendingDeleteId = null;
+    pendingDeleteType = null;
+}
+window.closeDeleteModal = closeDeleteModal;
+
+async function executeAdminDelete() {
+    if (!pendingDeleteId || !pendingDeleteType) return;
+    const id = pendingDeleteId;
+    const type = pendingDeleteType;
+    closeDeleteModal();
+
+    if (type === 'chemical') {
+        const { error } = await _supabase.from('chemical_stock').delete().eq('id', id);
+        if (error) { showToast("ลบไม่สำเร็จ: " + error.message, "danger"); return; }
+        showToast("ลบรายการสำเร็จ", "success");
+        loadAdminData();
+    } else if (type === 'transaction') {
+        const t = adminTrans.find(item => item.id == id);
+        if (!t) return;
+        
+        // Fetch corresponding chemical to adjust stock
+        const { data: chem, error: fetchError } = await _supabase
+            .from('chemical_stock')
+            .select('quantity')
+            .eq('id', t.chemical_id)
+            .single();
+
+        if (fetchError && fetchError.code !== 'PGRST116') {
+            showToast("ลบไม่สำเร็จ: ไม่พบข้อมูลสารเคมีที่เกี่ยวข้อง", "danger");
+            return;
+        }
+
+        if (chem) {
+            let newQty = (t.type === 'IN') ? chem.quantity - t.quantity : chem.quantity + t.quantity;
+            if (newQty < 0) {
+                showToast("ไม่สามารถลบธุรกรรมนี้ได้เนื่องจากยอดคงเหลือในสต็อกของสารเคมีนี้จะติดลบ!", "danger");
+                return;
+            }
+            await _supabase.from('chemical_stock').update({ quantity: newQty }).eq('id', t.chemical_id);
+        }
+
+        const { error: deleteError } = await _supabase.from('chemical_transactions').delete().eq('id', id);
+        if (deleteError) {
+            showToast("ลบธุรกรรมไม่สำเร็จ: " + deleteError.message, "danger");
+        } else {
+            showToast("ลบธุรกรรมสำเร็จ", "success");
+            loadAdminData();
+        }
+    }
+}
+window.executeAdminDelete = executeAdminDelete;

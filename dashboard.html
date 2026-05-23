@@ -99,7 +99,6 @@
 <div class="main-content">
   <div class="page-wrapper">
 
-```
 <!-- Header -->
 <div class="page-header">
   <div>
@@ -116,7 +115,7 @@
 </div>
 
 <!-- Gradient Stat Cards -->
-<div class="stat-grid">
+<div class="stat-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
   <div class="stat-card blue">
     <div class="stat-icon">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -149,15 +148,15 @@
     <div class="stat-lbl">รับเข้าเดือนนี้</div>
     <div class="stat-sub">จำนวนรายการ</div>
   </div>
-  <div class="stat-card rose">
+  <div class="stat-card blue" style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);">
     <div class="stat-icon">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+        <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
       </svg>
     </div>
-    <div class="stat-val" id="dashOutMonth">—</div>
-    <div class="stat-lbl">เบิกจ่ายเดือนนี้</div>
-    <div class="stat-sub">จำนวนรายการ</div>
+    <div class="stat-val" id="dashFiscalSaving">—</div>
+    <div class="stat-lbl">ประหยัดปีงบประมาณ</div>
+    <div class="stat-sub" id="dashFiscalLabel">ปีงบประมาณ —</div>
   </div>
 </div>
 
@@ -214,6 +213,25 @@
   </div>
 </div>
 
+<!-- Fiscal Year Savings Report Card -->
+<div class="table-card" style="margin-bottom:20px;">
+  <div style="padding:18px 20px 12px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <div style="font-size:14px;font-weight:700;color:var(--text-head);">รายงานยอดประหยัดสะสมจากการจัดซื้อ (Fiscal Year Savings)</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">ยอดประหยัดรวมในแต่ละเดือนของปีงบประมาณ (ตุลาคม - กันยายน)</div>
+    </div>
+    <div style="display:inline-flex;align-items:center;gap:8px;">
+      <span style="font-size:13px;color:var(--text-muted);">เลือกปีงบประมาณ:</span>
+      <select class="form-select" id="savingYearSelect" onchange="changeFiscalYear()" style="width:140px;height:36px;padding:6px 12px;font-size:13px;">
+        <!-- Years filled dynamically -->
+      </select>
+    </div>
+  </div>
+  <div style="padding:20px;height:280px;position:relative;">
+    <canvas id="savingChart"></canvas>
+  </div>
+</div>
+
 <!-- Alert Table -->
 <div class="table-card" id="alertCard" style="display:none;margin-bottom:20px;">
   <div style="padding:18px 20px 12px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:10px;">
@@ -242,7 +260,6 @@
     </table>
   </div>
 </div>
-```
 
   </div>
 </div>
