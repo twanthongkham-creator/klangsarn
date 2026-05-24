@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel — ChemStock</title>
-  <link rel="stylesheet" href="css/theme.css">
+  <title>Admin Panel — KlangSarn</title>
+  <link rel="stylesheet" href="css/theme.css?v=3.9">
   <style>
     /* ===== LOGIN SCREEN ===== */
     .login-screen {
@@ -69,7 +69,7 @@
       text-align: center;
     }
     .login-hint-label { font-size: 11px; color: rgba(255,255,255,0.3); }
-    .login-hint-val   { font-size: 13.5px; color: #38BDF8; font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-top: 2px; }
+    .login-hint-val   { font-size: 13.5px; color: #38BDF8; font-family: 'IBM Plex Mono', monospace; font-weight: 600; margin-top: 2px; }
 
 .login-err {
   display: none; margin-top: 12px;
@@ -94,7 +94,7 @@
   color: var(--text-muted); cursor: pointer;
   border: none; background: none;
   border-bottom: 2px solid transparent;
-  font-family: 'Kanit', sans-serif;
+  font-family: 'IBM Plex Sans Thai', sans-serif;
   transition: all var(--t-fast);
   margin-bottom: -1px; white-space: nowrap;
   display: inline-flex; align-items: center; gap: 7px;
@@ -150,7 +150,7 @@
       </svg>
     </div>
     <div class="login-title">Admin Panel</div>
-    <div class="login-subtitle">ChemStock — เข้าสู่ระบบผู้ดูแล</div>
+    <div class="login-subtitle">KlangSarn — เข้าสู่ระบบผู้ดูแล</div>
 
 <div style="margin-top:28px;">
   <div class="form-group">
@@ -222,16 +222,10 @@
   <aside id="sidebar" class="sidebar">
     <div class="sidebar-brand">
       <div class="sidebar-logo-wrap">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M9 3h6M10 3v6.6L6.1 17.2A2 2 0 0 0 8 20h8a2 2 0 0 0 1.9-2.8L14 9.6V3"
-            stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M7.5 16h9" stroke="#7DD3FC" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="10" cy="15.5" r="1.1" fill="#38BDF8" opacity="0.9"/>
-          <circle cx="14.5" cy="17" r="0.75" fill="#93C5FD" opacity="0.8"/>
-        </svg>
+        <img src="img/logo.png" alt="KlangSarn Logo" style="width:24px; height:24px; object-fit:contain; border-radius:4px;">
       </div>
       <div>
-        <div class="sidebar-title">ChemStock</div>
+        <div class="sidebar-title">KlangSarn</div>
         <div class="sidebar-subtitle" style="color:rgba(239,68,68,0.6);">Admin Mode</div>
       </div>
     </div>
@@ -290,9 +284,7 @@
       </svg>
     </button>
     <div class="top-bar-brand">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0EA5E9" stroke-width="2" stroke-linecap="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      </svg>
+      <img src="img/logo.png" alt="KlangSarn Logo" style="width:20px; height:20px; object-fit:contain; border-radius:4px; margin-right:6px;">
       Admin Panel
     </div>
     <button class="btn btn-outline-danger btn-sm" onclick="adminLogout()" style="font-size:11px;padding:5px 9px;">
@@ -313,7 +305,7 @@
   <div class="page-header">
     <div>
       <div class="page-title">Admin Panel</div>
-      <div class="page-subtitle">จัดการระบบ ChemStock ระดับผู้ดูแล</div>
+      <div class="page-subtitle">จัดการระบบ KlangSarn ระดับผู้ดูแล</div>
     </div>
     <button class="btn btn-outline-danger btn-sm" onclick="adminLogout()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -448,7 +440,7 @@
             </svg>
           </div>
           <div class="export-card-title">รายการสารเคมี</div>
-          <div class="export-card-desc">ส่งออกข้อมูลสต็อกทั้งหมดเป็น CSV</div>
+          <div class="export-card-desc">ส่งออกข้อมูลสต็อกทั้งหมด</div>
           <button class="btn btn-primary btn-sm btn-block" onclick="exportCSV('chemicals')">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -466,7 +458,7 @@
             </svg>
           </div>
           <div class="export-card-title">ประวัติรายการ</div>
-          <div class="export-card-desc">ส่งออกประวัติ รับ-จ่าย ทั้งหมดเป็น CSV</div>
+          <div class="export-card-desc">ส่งออกประวัติ รับ-จ่าย</div>
           <button class="btn btn-success btn-sm btn-block" onclick="exportCSV('transactions')">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -506,14 +498,12 @@
       <div style="padding:20px 22px;">
         <div style="background:var(--bg-hover);border-radius:var(--r-lg);padding:16px 18px;border:1px solid var(--border-soft);">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <div style="width:36px;height:36px;border-radius:var(--r-md);background:var(--grad-brand);display:flex;align-items:center;justify-content:center;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round">
-                <path d="M9 3h6M10 3v6.6L6.1 17.2A2 2 0 0 0 8 20h8a2 2 0 0 0 1.9-2.8L14 9.6V3"/>
-              </svg>
+            <div style="width:36px;height:36px;border-radius:var(--r-md);background:var(--grad-brand);display:flex;align-items:center;justify-content:center;padding:6px;">
+              <img src="img/logo.png" alt="Logo" style="width:100%;height:100%;object-fit:contain;filter:brightness(0) invert(1);">
             </div>
             <div>
-              <div style="font-size:14px;font-weight:700;color:var(--text-head);">ChemStock v2.0</div>
-              <div style="font-size:12px;color:var(--text-muted);">ระบบจัดการคลังสารเคมี</div>
+              <div style="font-size:14px;font-weight:700;color:var(--text-head);">KlangSarn v2.0</div>
+              <div style="font-size:12px;color:var(--text-muted);">ระบบจัดการคลังสารเคมี (KlangSarn)</div>
             </div>
           </div>
           <div style="font-size:12px;color:var(--text-muted);line-height:1.9;">
@@ -543,7 +533,7 @@
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/>
         </svg>
-        รับ-จ่าย
+        ประวัติการรับ-จ่าย
       </a>
       <a class="bottom-nav-item" href="dashboard.html">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -624,19 +614,19 @@
           </div>
           <div class="form-group">
             <label class="form-label">Material Number</label>
-            <input type="text" class="form-control" id="materialNumber" placeholder="เช่น MAT-001" style="font-family:'JetBrains Mono',monospace;">
+            <input type="text" class="form-control" id="materialNumber" placeholder="เช่น MAT-001" style="font-family:'IBM Plex Mono',monospace;">
           </div>
           <div class="form-group">
             <label class="form-label">เลขที่ล็อต (Lot Number)</label>
-            <input type="text" class="form-control" id="lotNumber" placeholder="เช่น LOT-01, Batch-02" style="font-family:'JetBrains Mono',monospace;">
+            <input type="text" class="form-control" id="lotNumber" placeholder="เช่น LOT-01, Batch-02" style="font-family:'IBM Plex Mono',monospace;">
           </div>
           <div class="form-group">
             <label class="form-label">สถานที่จัดเก็บ <span style="color:var(--danger);">*</span></label>
             <select class="form-select" id="location" required>
               <option value="" disabled selected>— เลือกห้องจัดเก็บ —</option>
-              <option value="ห้อง 1 สารเคมีประเภทออกซิไดซ์">ห้อง 1 (ออกซิไดซ์)</option>
+              <option value="ห้อง 1 สารเคมีประเภทออกซิไดซ์ (Oxidizing Agent)">ห้อง 1 (ออกซิไดซ์)</option>
               <option value="ห้อง 2 สารเคมีประเภทกรด (Acid)">ห้อง 2 (กรด)</option>
-              <option value="ห้อง 3 สารเคมีประเภทด่าง">ห้อง 3 (ด่าง)</option>
+              <option value="ห้อง 3 สารเคมีประเภทด่าง (Alkali)">ห้อง 3 (ด่าง)</option>
             </select>
           </div>
           <div class="form-group">
@@ -651,6 +641,18 @@
             <label class="form-label">หน่วยนับ <span style="color:var(--danger);">*</span></label>
             <input type="text" class="form-control" id="unit" required placeholder="เช่น kg, L, ขวด, กระป๋อง">
           </div>
+          <div class="form-group" style="grid-column: 1/-1;">
+            <label class="form-label">ผู้จัดจำหน่าย (Vendor)</label>
+            <input type="text" class="form-control" id="chemicalVendor" placeholder="ระบุชื่อบริษัท, ผู้จัดจำหน่าย หรือแหล่งที่มา">
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="color:var(--text-body);">จำนวนขั้นต่ำ (Min)</label>
+            <input type="number" step="0.01" min="0" class="form-control" id="minQuantity" placeholder="เช่น 5.00">
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="color:var(--text-body);">จำนวนสูงสุด (Max)</label>
+            <input type="number" step="0.01" min="0" class="form-control" id="maxQuantity" placeholder="เช่น 100.00">
+          </div>
           <div class="form-group">
             <label class="form-label green">วันที่ผลิต (MFG)</label>
             <input type="date" class="form-control" id="mfgDate">
@@ -658,12 +660,12 @@
           <div class="form-group">
             <label class="form-label red">วันหมดอายุ (EXP)</label>
             <input type="date" class="form-control" id="expDate">
-            <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;">
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(6)" style="font-size:10px; padding:2px 6px;">+6 เดือน</button>
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(12)" style="font-size:10px; padding:2px 6px;">+1 ปี</button>
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(24)" style="font-size:10px; padding:2px 6px;">+2 ปี</button>
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(36)" style="font-size:10px; padding:2px 6px;">+3 ปี</button>
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(60)" style="font-size:10px; padding:2px 6px;">+5 ปี</button>
+            <div class="quick-exp-btns">
+              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(6)">+6 เดือน</button>
+              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(12)">+1 ปี</button>
+              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(24)">+2 ปี</button>
+              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(36)">+3 ปี</button>
+              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(60)">+5 ปี</button>
             </div>
           </div>
           <div class="form-group" style="grid-column:1/-1;">
@@ -674,14 +676,16 @@
             <div id="imageUploadZone" class="upload-zone" onclick="document.getElementById('imageInput').click()">
               <div class="upload-zone-inner">
                 <div class="upload-icon-wrap">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                     <polyline points="17 8 12 3 7 8"/>
                     <line x1="12" y1="3" x2="12" y2="15"/>
                   </svg>
                 </div>
-                <div class="upload-title">ลากและวางรูปภาพ หรือ คลิกเพื่อเลือกไฟล์</div>
-                <div class="upload-subtitle">สูงสุด 3 รูป (ย่อขนาดและบีบอัดอัตโนมัติ)</div>
+                <div style="text-align: left;">
+                  <span class="upload-title" style="display:inline-block; font-size:12px; font-weight:600;">คลิกเพื่อเลือกไฟล์ หรือลากรูปภาพมาวางที่นี่</span>
+                  <span class="upload-subtitle" style="display:block; font-size:10.5px; color:var(--text-muted); margin-top:2px;">(อัปโหลดได้สูงสุด 3 รูป ย่อขนาดและบีบอัดอัตโนมัติ)</span>
+                </div>
               </div>
             </div>
             
@@ -745,14 +749,70 @@
           <input type="number" step="0.01" min="0.01" class="form-control" id="adminTransQty" required placeholder="0.00">
         </div>
         <!-- Promo Fields for Receive (IN) only -->
-        <div id="adminTransPromoFields" style="display:none; gap:16px; margin-bottom: 16px;" class="grid-2">
-          <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label">ราคาซื้อต่อหน่วย (บาท)</label>
-            <input type="number" step="0.01" min="0" class="form-control" id="adminTransPricePerUnit" placeholder="0.00">
+        <div id="adminTransPromoFields" style="display:none; margin-bottom: 16px;">
+          <!-- New Lot Toggle (Shown only for IN) -->
+          <div class="form-group" id="adminTransNewLotToggleGroup" style="margin-bottom: 12px;">
+            <label class="checkbox-container" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-head); user-select: none;">
+              <input type="checkbox" id="adminTransNewLotToggle" style="width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;">
+              รับเข้าเป็นล็อตใหม่ (เปิดล็อตใหม่)
+            </label>
           </div>
-          <div class="form-group" style="margin-bottom:0;">
+
+          <!-- New Lot Container (Hidden by default) -->
+          <div id="adminTransNewLotContainer" style="display:none; padding: 14px; border-radius: var(--r-md); background: rgba(14,165,233,0.04); border: 1px solid rgba(14,165,233,0.1); margin-bottom: 16px;">
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label">เลขที่ล็อต (Lot Number) <span style="color:var(--danger);">*</span></label>
+              <input type="text" class="form-control" id="adminTransLotNumber" placeholder="เช่น LOT-02, Batch-03" style="font-family:'IBM Plex Mono',monospace;">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label">สถานที่จัดเก็บ <span style="color:var(--danger);">*</span></label>
+              <select class="form-select" id="adminTransLocation">
+                <option value="" disabled selected>— เลือกห้องจัดเก็บ —</option>
+                <option value="ห้อง 1 สารเคมีประเภทออกซิไดซ์ (Oxidizing Agent)">ห้อง 1 (ออกซิไดซ์)</option>
+                <option value="ห้อง 2 สารเคมีประเภทกรด (Acid)">ห้อง 2 (กรด)</option>
+                <option value="ห้อง 3 สารเคมีประเภทด่าง (Alkali)">ห้อง 3 (ด่าง)</option>
+              </select>
+            </div>
+            <div class="grid-2" style="margin-bottom: 0;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label green">วันที่ผลิต (MFG)</label>
+                <input type="date" class="form-control" id="adminTransMfgDate">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label red">วันหมดอายุ (EXP)</label>
+                <input type="date" class="form-control" id="adminTransExpDate">
+                <div class="quick-exp-btns" style="display: flex; gap: 4px; margin-top: 4px;">
+                  <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExpTransAdmin(12)">+1 ปี</button>
+                  <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExpTransAdmin(24)">+2 ปี</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-bottom: 12px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">ราคาซื้อต่อหน่วย (บาท)</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="adminTransPricePerUnit" placeholder="0.00">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">ผู้จัดจำหน่าย (Vendor)</label>
+              <input type="text" class="form-control" id="adminTransVendor" placeholder="ระบุชื่อบริษัท, ผู้จัดจำหน่าย หรือแหล่งที่มา">
+            </div>
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="checkbox-container" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-head); user-select: none;">
+              <input type="checkbox" id="adminTransPromoToggle" style="width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;">
+              รายการนี้มีโปรโมชันของแถม (แถมฟรี)
+            </label>
+          </div>
+
+          <div class="form-group" id="adminTransFreeQtyContainer" style="display:none; margin-bottom: 12px;">
             <label class="form-label">จำนวนของแถม (แถมฟรี)</label>
-            <input type="number" step="0.01" min="0" class="form-control" id="adminTransFreeQty" placeholder="0.00">
+            <input type="number" step="0.01" min="0" class="form-control" id="adminTransFreeQty" placeholder="0.00" value="0">
+          </div>
+
+          <div id="adminTransSummaryText" style="padding: 12px; border-radius: 8px; background: var(--bg-hover); border: 1px dashed var(--primary); font-size: 12.5px; line-height: 1.5; color: var(--text-body); display: none; margin-bottom: 12px;">
           </div>
         </div>
         <div class="form-group">
@@ -773,6 +833,7 @@
       </button>
     </div>
   </div>
+</div>
 <!-- ===== MODAL: ยืนยันการลบ ===== -->
 <div class="modal-overlay" id="confirmDeleteModalOverlay" onclick="if(event.target===this)closeDeleteModal()">
   <div class="modal-box modal-sm" style="border-radius: var(--r-xl); overflow: hidden;">
@@ -808,9 +869,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="js/ui.js"></script>
+<script src="js/ui.js?v=3.4"></script>
 
-<script src="js/admin.js"></script>
+<script src="js/admin.js?v=3.4"></script>
 
 </body>
 </html>
