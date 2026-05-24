@@ -3,6 +3,13 @@
    sidebar, bottom nav, toasts
    ============================================ */
 
+// ===== CACHE BUSTER =====
+const CACHE_VERSION = 'v3.4';
+if (sessionStorage.getItem('klangsarn_cache_version') !== CACHE_VERSION) {
+  sessionStorage.clear();
+  sessionStorage.setItem('klangsarn_cache_version', CACHE_VERSION);
+}
+
 // ===== SIDEBAR TOGGLE (MOBILE) =====
 function initSidebar() {
   const sidebar = document.getElementById('sidebar');
@@ -44,7 +51,7 @@ function showToast(message, type = 'success') {
   toast.className = `toast t-${type}`;
   toast.innerHTML = `
     <i class="bi ${icons[type] || icons.info}" style="color:${colors[type]}; font-size:16px;"></i>
-    <span style="flex:1; font-family:'Kanit',sans-serif;">${message}</span>
+    <span style="flex:1; font-family:'IBM Plex Sans Thai',sans-serif;">${message}</span>
     <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:#94A3B8;font-size:16px;padding:0;">×</button>
   `;
   container.appendChild(toast);
@@ -53,7 +60,7 @@ function showToast(message, type = 'success') {
 
 // ===== ADMIN SESSION CHECK =====
 function isAdminLoggedIn() {
-  return localStorage.getItem('chemstock_admin') === 'true';
+  return localStorage.getItem('klangsarn_admin') === 'true';
 }
 
 function updateAdminUI() {
@@ -89,4 +96,15 @@ function formatDisplayDate(dateStr) {
   const parts = dateStr.split('-');
   if (parts.length !== 3) return dateStr;
   return `${parts[2]}/${parts[1]}/${parts[0]}`; // YYYY-MM-DD -> DD/MM/YYYY
+}
+
+// ===== CLEAR STORAGE CACHE =====
+function clearStorageCache() {
+  sessionStorage.removeItem('klangsarn_chemicals');
+  sessionStorage.removeItem('klangsarn_transactions');
+  sessionStorage.removeItem('klangsarn_dash_stock');
+  sessionStorage.removeItem('klangsarn_dash_trans');
+  sessionStorage.removeItem('klangsarn_history_transactions');
+  sessionStorage.removeItem('klangsarn_admin_chems');
+  sessionStorage.removeItem('klangsarn_admin_trans');
 }

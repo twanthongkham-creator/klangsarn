@@ -1,13 +1,13 @@
 // ==========================================
-// ChemStock — Admin Panel Logic v2.3
+// KlangSarn — Admin Panel Logic v2.3
 // Direct CRUD on Supabase Tables with Pricing
 // ==========================================
 const SUPABASE_URL = "https://bdjyxkkzbbzlmxszmvhx.supabase.co";
 const SUPABASE_KEY = "sb_publishable_inYG_le-QyiIvjkaUHXyfQ_Nvm4FpR2";
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const ADMIN_PWD_KEY     = 'chemstock_admin_pwd';
-const ADMIN_SESSION_KEY = 'chemstock_admin';
+const ADMIN_PWD_KEY     = 'klangsarn_admin_pwd';
+const ADMIN_SESSION_KEY = 'klangsarn_admin';
 const DEFAULT_PASSWORD  = 'chem@admin';
 
 let adminChems = [];
@@ -67,14 +67,43 @@ document.head.appendChild(shakeStyle);
 
 // ===== LOAD DATA =====
 async function loadAdminData() {
+  // 1. Load cached data from sessionStorage to render instantly
+  const cachedStock = sessionStorage.getItem('klangsarn_admin_chems');
+  const cachedTrans = sessionStorage.getItem('klangsarn_admin_trans');
+  if (cachedStock && cachedTrans) {
+      try {
+          adminChems = JSON.parse(cachedStock);
+          adminTrans = JSON.parse(cachedTrans);
+          renderAdminChems();
+          renderAdminTrans();
+          populateChemicalSelect();
+      } catch (e) {
+          console.warn("Error parsing admin cache", e);
+      }
+  }
+
+  // 2. Fetch fresh data in background from Supabase
   const [c, t] = await Promise.all([
     _supabase.from('chemical_stock').select('*').order('chemical_name'),
     _supabase.from('chemical_transactions')
-      .select('id, chemical_id, type, quantity, remark, price_per_unit, free_quantity, saving, transaction_date, chemical_stock(chemical_name, unit)')
+      .select('id, chemical_id, type, quantity, remark, price_per_unit, free_quantity, saving, transaction_date, vendor, chemical_stock(chemical_name, unit)')
       .order('transaction_date', { ascending: false })
   ]);
+
+  if (c.error || t.error) {
+      if (!adminChems.length) {
+          showToast("โหลดข้อมูลแผงควบคุมไม่สำเร็จ", "danger");
+      }
+      return;
+  }
+
   adminChems = c.data || [];
   adminTrans = t.data || [];
+
+  // 3. Cache new data and render updates
+  sessionStorage.setItem('klangsarn_admin_chems', JSON.stringify(adminChems));
+  sessionStorage.setItem('klangsarn_admin_trans', JSON.stringify(adminTrans));
+
   renderAdminChems();
   renderAdminTrans();
   populateChemicalSelect();
@@ -86,7 +115,8 @@ function renderAdminChems() {
   const filtered = adminChems.filter(c =>
     c.chemical_name.toLowerCase().includes(q) ||
     (c.material_number || '').toLowerCase().includes(q) ||
-    (c.lot_number || '').toLowerCase().includes(q)
+    (c.lot_number || '').toLowerCase().includes(q) ||
+    (c.vendor || '').toLowerCase().includes(q)
   );
 
   const tbody = document.getElementById('adminChemsTable');
@@ -121,14 +151,30 @@ function renderAdminChems() {
           lotThumb = `<img src="${imgs[0]}" class="table-thumb" onclick="viewImage('${imgs[0]}'); event.stopPropagation();">`;
       }
 
+      const vendorInfo = item.vendor ? `<div style="font-size:11px;color:var(--text-muted);font-weight:normal;margin-top:2px;">Vendor: ${item.vendor}</div>` : '';
+
+      let minWarning = '';
+      if (item.min_quantity > 0 && item.quantity < item.min_quantity) {
+          minWarning = ` <span class="badge badge-red" style="font-size:10px;padding:1px 4px;margin-top:2px;display:inline-block;">⚠️ ต่ำกว่า Min</span>`;
+      } else if (item.max_quantity > 0 && item.quantity > item.max_quantity) {
+          minWarning = ` <span class="badge badge-amber" style="font-size:10px;padding:1px 4px;margin-top:2px;display:inline-block;">⚠️ เกิน Max</span>`;
+      }
+
       return `<tr>
         <td style="padding-left:22px;" class="mono">${item.id}</td>
-        <td style="font-weight:600;color:var(--text-head);">${item.chemical_name}</td>
+        <td>
+          <div style="font-weight:600;color:var(--text-head);">${item.chemical_name}</div>
+          ${vendorInfo}
+        </td>
         <td class="mono">${item.material_number || '—'}</td>
         <td class="mono">${item.lot_number || '—'}</td>
         <td>
           <span class="mono" style="font-size:15px;font-weight:700;color:var(--text-head);">${item.quantity}</span>
           <span style="font-size:12px;color:var(--text-muted);margin-left:4px;">${item.unit}</span>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">
+            Min: ${item.min_quantity || '—'} | Max: ${item.max_quantity || '—'}
+          </div>
+          ${minWarning}
         </td>
         <td>
           <div style="font-size:12px;color:var(--text-muted);"><span style="color:var(--success);font-weight:500;">MFG</span> ${formatDisplayDate(item.mfg_date)}</div>
@@ -192,7 +238,7 @@ function renderAdminTrans() {
         <td style="padding-left:22px;" class="mono">${t.id}</td>
         <td>
           ${name}
-          <div class="cell-cas">Chemical ID: ${t.chemical_id}</div>
+          <div class="cell-cas">Chemical ID: ${t.chemical_id}${t.vendor ? ` | Vendor: ${t.vendor}` : ''}</div>
         </td>
         <td>${badge}</td>
         <td>
@@ -241,6 +287,7 @@ function populateChemicalSelect() {
 function openAddChemModal() {
     document.getElementById("chemicalId").value = "";
     document.getElementById("chemicalForm").reset();
+    document.getElementById("location").disabled = false;
     uploadedImagesBase64 = [];
     renderUploadedPreviews();
     document.getElementById("modalTitle").innerText = "เพิ่มสารเคมีเข้าสต็อก";
@@ -258,8 +305,24 @@ function openEditChemModal(id) {
     document.getElementById("unit").value = item.unit;
     document.getElementById("mfgDate").value = item.mfg_date || "";
     document.getElementById("expDate").value = item.exp_date || "";
-    document.getElementById("location").value = item.location || "";
+    if (item.location) {
+        if (item.location.includes("ห้อง 1")) {
+            document.getElementById("location").value = "ห้อง 1 สารเคมีประเภทออกซิไดซ์ (Oxidizing Agent)";
+        } else if (item.location.includes("ห้อง 2")) {
+            document.getElementById("location").value = "ห้อง 2 สารเคมีประเภทกรด (Acid)";
+        } else if (item.location.includes("ห้อง 3")) {
+            document.getElementById("location").value = "ห้อง 3 สารเคมีประเภทด่าง (Alkali)";
+        } else {
+            document.getElementById("location").value = item.location;
+        }
+    } else {
+        document.getElementById("location").value = "";
+    }
+    document.getElementById("location").disabled = false;
     document.getElementById("pricePerUnit").value = item.price_per_unit || 0.0;
+    document.getElementById("chemicalVendor").value = item.vendor || "";
+    document.getElementById("minQuantity").value = item.min_quantity !== undefined && item.min_quantity !== null ? item.min_quantity : "";
+    document.getElementById("maxQuantity").value = item.max_quantity !== undefined && item.max_quantity !== null ? item.max_quantity : "";
     
     // Load existing images
     uploadedImagesBase64 = item.image_urls ? JSON.parse(item.image_urls) : [];
@@ -286,6 +349,9 @@ async function handleChemicalSubmit(e) {
         exp_date:        document.getElementById("expDate").value || null,
         location:        document.getElementById("location").value,
         price_per_unit:  parseFloat(document.getElementById("pricePerUnit").value) || 0.0,
+        vendor:          document.getElementById("chemicalVendor").value.trim() || null,
+        min_quantity:    parseFloat(document.getElementById("minQuantity").value) || 0.0,
+        max_quantity:    parseFloat(document.getElementById("maxQuantity").value) || 0.0,
         image_urls:      uploadedImagesBase64.length > 0 ? JSON.stringify(uploadedImagesBase64) : null
     };
 
@@ -303,6 +369,7 @@ async function handleChemicalSubmit(e) {
     } else {
         closeChemModal();
         showToast(id ? "อัปเดตข้อมูลสำเร็จ" : "เพิ่มสารเคมีสำเร็จ", "success");
+        clearStorageCache();
         loadAdminData();
     }
 }
@@ -430,6 +497,28 @@ function openAddTransModal() {
     document.getElementById("transModalTitle").innerText = "เพิ่มประวัติธุรกรรม";
     document.getElementById("adminTransPricePerUnit").value = 0.0;
     document.getElementById("adminTransFreeQty").value = 0.0;
+    document.getElementById("adminTransPromoToggle").checked = false;
+    document.getElementById("adminTransFreeQtyContainer").style.display = "none";
+    document.getElementById("adminTransSummaryText").style.display = "none";
+    document.getElementById("adminTransSummaryText").innerHTML = "";
+    const submitBtn = document.querySelector("#adminTransModalOverlay .btn-primary");
+    if (submitBtn) submitBtn.disabled = false;
+    document.getElementById("adminTransVendor").value = "";
+
+    // Handle New Lot toggles and inputs
+    const newLotToggle = document.getElementById("adminTransNewLotToggle");
+    const newLotContainer = document.getElementById("adminTransNewLotContainer");
+    if (newLotToggle && newLotContainer) {
+        newLotToggle.checked = false;
+        newLotContainer.style.display = "none";
+        document.getElementById("adminTransLotNumber").required = false;
+        document.getElementById("adminTransLocation").required = false;
+        document.getElementById("adminTransLotNumber").value = "";
+        document.getElementById("adminTransLocation").value = "";
+        document.getElementById("adminTransMfgDate").value = "";
+        document.getElementById("adminTransExpDate").value = "";
+    }
+
     selectTransType('IN');
     document.getElementById('adminTransModalOverlay').classList.add('open');
 }
@@ -444,6 +533,24 @@ async function openEditTransModal(id) {
     document.getElementById("adminTransPricePerUnit").value = t.price_per_unit || 0.0;
     document.getElementById("adminTransFreeQty").value = t.free_quantity || 0.0;
     
+    const isPromo = t.free_quantity > 0;
+    document.getElementById("adminTransPromoToggle").checked = isPromo;
+    document.getElementById("adminTransFreeQtyContainer").style.display = isPromo ? "block" : "none";
+    
+    document.getElementById("adminTransVendor").value = t.vendor || "";
+
+    // Handle New Lot toggles and inputs (Hide and disable during edits)
+    const newLotToggleGroup = document.getElementById("adminTransNewLotToggleGroup");
+    const newLotContainer = document.getElementById("adminTransNewLotContainer");
+    const newLotToggle = document.getElementById("adminTransNewLotToggle");
+    if (newLotToggleGroup && newLotContainer && newLotToggle) {
+        newLotToggle.checked = false;
+        newLotToggleGroup.style.display = "none";
+        newLotContainer.style.display = "none";
+        document.getElementById("adminTransLotNumber").required = false;
+        document.getElementById("adminTransLocation").required = false;
+    }
+    
     // Set type
     selectTransType(t.type);
     
@@ -457,6 +564,7 @@ async function openEditTransModal(id) {
     
     document.getElementById("transModalTitle").innerText = "แก้ไขข้อมูลธุรกรรม";
     document.getElementById('adminTransModalOverlay').classList.add('open');
+    updateAdminTransSummary();
 }
 
 function closeTransModal() {
@@ -477,18 +585,37 @@ function selectTransType(type) {
     const lblOUT = btnOUT.querySelector('.trans-btn-label');
     const promoFields = document.getElementById('adminTransPromoFields');
 
+    const newLotToggleGroup = document.getElementById("adminTransNewLotToggleGroup");
+    const newLotContainer = document.getElementById("adminTransNewLotContainer");
+    const newLotToggle = document.getElementById("adminTransNewLotToggle");
+
+    // Only show new lot toggle if we are adding a new transaction (transId is empty)
+    const isEdit = document.getElementById("adminTransId").value !== "";
+
     if (type === 'IN') {
       btnIN.className  = 'trans-btn sel-in';
       btnOUT.className = 'trans-btn';
       lblIN.style.color  = 'var(--success)';
       lblOUT.style.color = 'var(--text-muted)';
-      if (promoFields) promoFields.style.display = 'grid';
+      if (promoFields) promoFields.style.display = 'block';
+      if (newLotToggleGroup && !isEdit) newLotToggleGroup.style.display = 'block';
+      if (newLotToggle && newLotToggle.checked && newLotContainer && !isEdit) newLotContainer.style.display = 'block';
+      updateAdminTransSummary();
     } else {
       btnOUT.className = 'trans-btn sel-out';
       btnIN.className  = 'trans-btn';
       lblOUT.style.color = 'var(--danger)';
       lblIN.style.color  = 'var(--text-muted)';
       if (promoFields) promoFields.style.display = 'none';
+      if (newLotToggleGroup) newLotToggleGroup.style.display = 'none';
+      if (newLotContainer) newLotContainer.style.display = 'none';
+      if (newLotToggle) {
+          newLotToggle.checked = false;
+          document.getElementById("adminTransLotNumber").required = false;
+          document.getElementById("adminTransLocation").required = false;
+      }
+      const summaryDiv = document.getElementById("adminTransSummaryText");
+      if (summaryDiv) summaryDiv.style.display = "none";
     }
 }
 
@@ -503,8 +630,10 @@ async function handleTransSubmit(e) {
     const dateVal = dateInput ? new Date(dateInput).toISOString() : new Date().toISOString();
 
     const transPrice = parseFloat(document.getElementById("adminTransPricePerUnit").value) || 0.0;
-    const transFree  = parseFloat(document.getElementById("adminTransFreeQty").value) || 0.0;
+    const isPromo = document.getElementById("adminTransPromoToggle").checked;
+    const transFree  = (type === 'IN' && isPromo) ? (parseFloat(document.getElementById("adminTransFreeQty").value) || 0.0) : 0.0;
     const transSaving = (type === 'IN') ? (transPrice * transFree) : 0.0;
+    const transVendor = (type === 'IN') ? document.getElementById("adminTransVendor").value.trim() : null;
 
     if (!chemId) { showToast("กรุณาเลือกสารเคมี", "warning"); return; }
     if (isNaN(qty) || qty <= 0) { showToast("กรุณากรอกจำนวนที่ถูกต้อง", "warning"); return; }
@@ -512,7 +641,7 @@ async function handleTransSubmit(e) {
     // Fetch corresponding chemical to verify and calculate stock adjustment
     const { data: chem, error: fetchError } = await _supabase
         .from('chemical_stock')
-        .select('quantity')
+        .select('*')
         .eq('id', chemId)
         .single();
 
@@ -521,50 +650,95 @@ async function handleTransSubmit(e) {
         return;
     }
 
-    let originalQty = chem.quantity;
-    let newQty = originalQty;
+    const isNewLot = (type === 'IN') && document.getElementById("adminTransNewLotToggle").checked;
+    
+    let targetChemId = chemId;
 
-    if (id) {
-        // Edit transaction
-        const oldTrans = adminTrans.find(item => item.id == id);
-        if (!oldTrans) { showToast("ไม่พบรายการธุรกรรมเดิม", "danger"); return; }
+    if (isNewLot) {
+        // Create new lot row in chemical_stock first
+        const lotNum = document.getElementById("adminTransLotNumber").value.trim();
+        const lotLoc = document.getElementById("adminTransLocation").value;
+        const mfgVal = document.getElementById("adminTransMfgDate").value || null;
+        const expVal = document.getElementById("adminTransExpDate").value || null;
 
-        // Revert old transaction effect
-        let tempQty = (oldTrans.type === 'IN') ? originalQty - oldTrans.quantity : originalQty + oldTrans.quantity;
-        // Apply new transaction effect
-        newQty = (type === 'IN') ? tempQty + qty : tempQty - qty;
+        if (!lotNum || !lotLoc) {
+            showToast("กรุณากรอกเลขที่ล็อตและสถานที่จัดเก็บสำหรับล็อตใหม่!", "warning");
+            return;
+        }
+
+        const newLotPayload = {
+            chemical_name:   chem.chemical_name,
+            material_number: chem.material_number,
+            lot_number:      lotNum,
+            quantity:        qty, // initial quantity of new lot
+            unit:            chem.unit,
+            mfg_date:        mfgVal,
+            exp_date:        expVal,
+            location:        lotLoc,
+            price_per_unit:  transPrice,
+            vendor:          transVendor,
+            image_urls:      null
+        };
+
+        const { data: insertData, error: insertError } = await _supabase
+            .from('chemical_stock')
+            .insert([newLotPayload])
+            .select('id')
+            .single();
+
+        if (insertError) {
+            showToast("สร้างล็อตใหม่ไม่สำเร็จ: " + insertError.message, "danger");
+            return;
+        }
+
+        targetChemId = insertData.id;
     } else {
-        // Add transaction
-        newQty = (type === 'IN') ? originalQty + qty : originalQty - qty;
-    }
+        // Normal transaction (revert old transaction and apply new, or add new)
+        let originalQty = chem.quantity;
+        let newQty = originalQty;
 
-    if (newQty < 0) {
-        showToast("ไม่สามารถทำรายการได้เนื่องจากจะทำให้ยอดคงเหลือติดลบ!", "danger");
-        return;
-    }
+        if (id) {
+            // Edit transaction
+            const oldTrans = adminTrans.find(item => item.id == id);
+            if (!oldTrans) { showToast("ไม่พบรายการธุรกรรมเดิม", "danger"); return; }
 
-    // Begin updates
-    // 1. Update chemical quantity in stock
-    const { error: stockError } = await _supabase
-        .from('chemical_stock')
-        .update({ quantity: newQty })
-        .eq('id', chemId);
+            // Revert old transaction effect
+            let tempQty = (oldTrans.type === 'IN') ? originalQty - oldTrans.quantity : originalQty + oldTrans.quantity;
+            // Apply new transaction effect
+            newQty = (type === 'IN') ? tempQty + qty : tempQty - qty;
+        } else {
+            // Add transaction
+            newQty = (type === 'IN') ? originalQty + qty : originalQty - qty;
+        }
 
-    if (stockError) {
-        showToast("อัปเดตสต็อกสารเคมีไม่สำเร็จ: " + stockError.message, "danger");
-        return;
+        if (newQty < 0) {
+            showToast("ไม่สามารถทำรายการได้เนื่องจากจะทำให้ยอดคงเหลือติดลบ!", "danger");
+            return;
+        }
+
+        // Update stock
+        const { error: stockError } = await _supabase
+            .from('chemical_stock')
+            .update({ quantity: newQty })
+            .eq('id', chemId);
+
+        if (stockError) {
+            showToast("อัปเดตสต็อกสารเคมีไม่สำเร็จ: " + stockError.message, "danger");
+            return;
+        }
     }
 
     // 2. Insert or update transaction row
     const payload = {
-        chemical_id: chemId,
+        chemical_id: targetChemId,
         type: type,
         quantity: qty,
         remark: remark,
         price_per_unit: transPrice,
         free_quantity: transFree,
         saving: transSaving,
-        transaction_date: dateVal
+        transaction_date: dateVal,
+        vendor: transVendor
     };
 
     let transError;
@@ -578,11 +752,10 @@ async function handleTransSubmit(e) {
 
     if (transError) {
         showToast("บันทึกธุรกรรมไม่สำเร็จ: " + transError.message, "danger");
-        // Revert chemical stock
-        await _supabase.from('chemical_stock').update({ quantity: originalQty }).eq('id', chemId);
     } else {
         closeTransModal();
         showToast(id ? "อัปเดตธุรกรรมสำเร็จ" : "เพิ่มธุรกรรมสำเร็จ", "success");
+        clearStorageCache();
         loadAdminData();
     }
 }
@@ -613,13 +786,13 @@ function exportCSV(type) {
   const ds = () => { const d=new Date(); return `${d.getFullYear()}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}`; };
 
   if (type === 'chemicals') {
-      filename = `chemstock_chemicals_${ds()}.csv`;
+      filename = `klangsarn_chemicals_${ds()}.csv`;
       csv += 'ลำดับ,ชื่อสารเคมี,Material Number,เลขที่ล็อต,จำนวน,หน่วย,ราคาต่อหน่วย,วันผลิต,วันหมดอายุ,สถานที่\n';
       adminChems.forEach((c, i) => {
           csv += [i+1, q(c.chemical_name), q(c.material_number), q(c.lot_number||'—'), c.quantity, q(c.unit), c.price_per_unit||0.0, c.mfg_date||'', c.exp_date||'', q(c.location)].join(',') + '\n';
       });
   } else {
-      filename = `chemstock_transactions_${ds()}.csv`;
+      filename = `klangsarn_transactions_${ds()}.csv`;
       csv += 'ลำดับ,วัน-เวลา,สารเคมี,ประเภท,จำนวน,หน่วย,ราคาซื้อต่อหน่วย,จำนวนของแถม,ยอดประหยัด,หมายเหตุ\n';
       adminTrans.forEach((t, i) => {
           const d = new Date(t.transaction_date).toLocaleString('th-TH');
@@ -641,6 +814,7 @@ async function confirmClearTrans() {
   const { error } = await _supabase.from('chemical_transactions').delete().neq('id', 0);
   if (error) { showToast("เกิดข้อผิดพลาด: " + error.message, "danger"); return; }
   showToast("ล้างประวัติสำเร็จ", "success");
+  clearStorageCache();
   loadAdminData();
 }
 
@@ -680,6 +854,56 @@ document.addEventListener('DOMContentLoaded', () => {
       const chem = adminChems.find(c => c.id == id);
       if (chem) {
           document.getElementById('adminTransPricePerUnit').value = chem.price_per_unit || 0.0;
+          updateAdminTransSummary();
+      }
+  });
+
+  // Promotion fields behavior in admin transaction modal
+  const adminPromoToggle = document.getElementById("adminTransPromoToggle");
+  const adminFreeQtyContainer = document.getElementById("adminTransFreeQtyContainer");
+
+  adminPromoToggle?.addEventListener("change", (e) => {
+      if (e.target.checked) {
+          adminFreeQtyContainer.style.display = "block";
+          document.getElementById("adminTransFreeQty").value = "0";
+      } else {
+          adminFreeQtyContainer.style.display = "none";
+          document.getElementById("adminTransFreeQty").value = "0";
+      }
+      updateAdminTransSummary();
+  });
+
+  ["adminTransQty", "adminTransPricePerUnit", "adminTransFreeQty"].forEach(id => {
+      document.getElementById(id)?.addEventListener("input", updateAdminTransSummary);
+  });
+
+  // New Lot fields behavior in admin transaction modal
+  const adminNewLotToggle = document.getElementById("adminTransNewLotToggle");
+  const adminNewLotContainer = document.getElementById("adminTransNewLotContainer");
+
+  adminNewLotToggle?.addEventListener("change", (e) => {
+      if (e.target.checked) {
+          adminNewLotContainer.style.display = "block";
+          document.getElementById("adminTransLotNumber").required = true;
+          document.getElementById("adminTransLocation").required = true;
+      } else {
+          adminNewLotContainer.style.display = "none";
+          document.getElementById("adminTransLotNumber").required = false;
+          document.getElementById("adminTransLocation").required = false;
+      }
+  });
+
+  // Auto-calculate EXP date inside admin transaction modal
+  document.getElementById("adminTransMfgDate")?.addEventListener("change", (e) => {
+      const val = e.target.value;
+      if (val) {
+          const parts = val.split('-');
+          const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+          d.setFullYear(d.getFullYear() + 1);
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          document.getElementById('adminTransExpDate').value = `${y}-${m}-${day}`;
       }
   });
 
@@ -736,6 +960,7 @@ async function executeAdminDelete() {
         const { error } = await _supabase.from('chemical_stock').delete().eq('id', id);
         if (error) { showToast("ลบไม่สำเร็จ: " + error.message, "danger"); return; }
         showToast("ลบรายการสำเร็จ", "success");
+        clearStorageCache();
         loadAdminData();
     } else if (type === 'transaction') {
         const t = adminTrans.find(item => item.id == id);
@@ -767,8 +992,87 @@ async function executeAdminDelete() {
             showToast("ลบธุรกรรมไม่สำเร็จ: " + deleteError.message, "danger");
         } else {
             showToast("ลบธุรกรรมสำเร็จ", "success");
+            clearStorageCache();
             loadAdminData();
         }
     }
 }
+function setQuickExpTransAdmin(months) {
+    const mfgVal = document.getElementById('adminTransMfgDate').value;
+    let baseDate;
+    if (mfgVal) {
+        const parts = mfgVal.split('-');
+        baseDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    } else {
+        baseDate = new Date();
+    }
+    baseDate.setMonth(baseDate.getMonth() + months);
+    const y = baseDate.getFullYear();
+    const m = String(baseDate.getMonth() + 1).padStart(2, '0');
+    const day = String(baseDate.getDate()).padStart(2, '0');
+    document.getElementById('adminTransExpDate').value = `${y}-${m}-${day}`;
+}
+
 window.executeAdminDelete = executeAdminDelete;
+window.adminDeleteChem = adminDeleteChem;
+window.adminDeleteTrans = adminDeleteTrans;
+window.updateAdminTransSummary = updateAdminTransSummary;
+window.setQuickExpTransAdmin = setQuickExpTransAdmin;
+
+function updateAdminTransSummary() {
+    const isPromo = document.getElementById("adminTransPromoToggle")?.checked;
+    const qtyInput = document.getElementById("adminTransQty");
+    const priceInput = document.getElementById("adminTransPricePerUnit");
+    const freeInput = document.getElementById("adminTransFreeQty");
+    const summaryDiv = document.getElementById("adminTransSummaryText");
+    const submitBtn = document.querySelector("#adminTransModalOverlay .btn-primary");
+
+    if (!qtyInput || !priceInput || !freeInput || !summaryDiv || !submitBtn) return;
+
+    const totalQty = parseFloat(qtyInput.value) || 0.0;
+    const unitPrice = parseFloat(priceInput.value) || 0.0;
+    const freeQty = isPromo ? (parseFloat(freeInput.value) || 0.0) : 0.0;
+
+    if (!qtyInput.value) {
+        summaryDiv.style.display = "none";
+        submitBtn.disabled = false;
+        return;
+    }
+
+    // Validation
+    if (isPromo && freeQty > totalQty) {
+        summaryDiv.style.display = "block";
+        summaryDiv.style.borderColor = "var(--danger)";
+        summaryDiv.style.background = "rgba(239, 68, 68, 0.05)";
+        summaryDiv.innerHTML = `<span style="color: var(--danger); font-weight: bold;">⚠️ จำนวนของแถม (${freeQty}) ต้องไม่เกินจำนวนรับเข้าทั้งหมด (${totalQty})</span>`;
+        submitBtn.disabled = true;
+        return;
+    }
+
+    // Calculations
+    const paidQty = Math.max(0, totalQty - freeQty);
+    const totalPaid = paidQty * unitPrice;
+    const totalSaving = freeQty * unitPrice;
+
+    summaryDiv.style.display = "block";
+    summaryDiv.style.borderColor = "var(--primary)";
+    summaryDiv.style.background = "var(--bg-hover)";
+    submitBtn.disabled = false;
+
+    if (isPromo) {
+        summaryDiv.innerHTML = `
+            <div style="font-weight: 700; margin-bottom: 4px; color: var(--primary);">สรุปราคารับเข้าแบบโปรโมชัน:</div>
+            • ซื้อจริง: <span style="font-weight:600; color:var(--text-head);">${paidQty.toLocaleString('th-TH')}</span> | แถมฟรี: <span style="font-weight:600; color:var(--success);">${freeQty.toLocaleString('th-TH')}</span><br>
+            • รวมได้รับเข้าสต็อก: <span style="font-weight:600; color:var(--text-head);">${totalQty.toLocaleString('th-TH')}</span><br>
+            • <span style="color: var(--success); font-weight:600;">ยอดประหยัด (Saving): ${totalSaving.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บาท</span><br>
+            • ยอดจ่ายจริง: <span style="font-weight:600; color:var(--text-head);">${totalPaid.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บาท</span>
+        `;
+    } else {
+        summaryDiv.innerHTML = `
+            <div style="font-weight: 700; margin-bottom: 4px; color: var(--text-head);">สรุปราคารับเข้าปกติ:</div>
+            • จำนวนซื้อจริง: <span style="font-weight:600; color:var(--text-head);">${totalQty.toLocaleString('th-TH')}</span> (ไม่มีของแถม)<br>
+            • ยอดจ่ายรวม: <span style="font-weight:600; color:var(--primary); font-size: 13.5px;">${totalPaid.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บาท</span>
+        `;
+    }
+}
+window.updateAdminTransSummary = updateAdminTransSummary;

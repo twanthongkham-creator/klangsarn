@@ -1,5 +1,5 @@
 // ==========================================
-// ChemStock — Main Logic v2.1
+// KlangSarn — Main Logic v2.1
 // Flash animation + Gallery + Stat cards
 // ==========================================
 const SUPABASE_URL = "https://bdjyxkkzbbzlmxszmvhx.supabase.co";
@@ -20,11 +20,57 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("chemicalForm").addEventListener("submit", handleChemicalSubmit);
     document.getElementById("transactionForm").addEventListener("submit", handleTransactionSubmit);
     
-    // Bind custom delete confirmation button
-    document.getElementById("confirmDeleteBtn")?.addEventListener("click", executeChemicalDelete);
-
     // Bind Drag & Drop Events to custom Upload Zone
     initDragAndDrop();
+
+    // Promotion fields behavior in main transaction modal
+    const promoToggle = document.getElementById("transPromoToggle");
+    const freeQtyContainer = document.getElementById("transFreeQtyContainer");
+    
+    promoToggle?.addEventListener("change", (e) => {
+        if (e.target.checked) {
+            freeQtyContainer.style.display = "block";
+            document.getElementById("transFreeQty").value = "0";
+        } else {
+            freeQtyContainer.style.display = "none";
+            document.getElementById("transFreeQty").value = "0";
+        }
+        updateTransSummary();
+    });
+
+    ["transQty", "transPricePerUnit", "transFreeQty"].forEach(id => {
+        document.getElementById(id)?.addEventListener("input", updateTransSummary);
+    });
+
+    // New Lot fields behavior in transaction modal
+    const transNewLotToggle = document.getElementById("transNewLotToggle");
+    const transNewLotContainer = document.getElementById("transNewLotContainer");
+    
+    transNewLotToggle?.addEventListener("change", (e) => {
+        if (e.target.checked) {
+            transNewLotContainer.style.display = "block";
+            document.getElementById("transLotNumber").required = true;
+            document.getElementById("transLocation").required = true;
+        } else {
+            transNewLotContainer.style.display = "none";
+            document.getElementById("transLotNumber").required = false;
+            document.getElementById("transLocation").required = false;
+        }
+    });
+
+    // Auto-calculate EXP date inside transaction modal
+    document.getElementById("transMfgDate")?.addEventListener("change", (e) => {
+        const val = e.target.value;
+        if (val) {
+            const parts = val.split('-');
+            const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            d.setFullYear(d.getFullYear() + 1);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            document.getElementById('transExpDate').value = `${y}-${m}-${day}`;
+        }
+    });
 
     // Auto-calculate EXP date to MFG date + 1 Year
     document.getElementById("mfgDate")?.addEventListener("change", (e) => {
@@ -42,6 +88,21 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function fetchData() {
+    // 1. Load cached data from sessionStorage to render instantly
+    const cachedStock = sessionStorage.getItem('klangsarn_chemicals');
+    const cachedTrans = sessionStorage.getItem('klangsarn_transactions');
+    if (cachedStock && cachedTrans) {
+        try {
+            allChemicals = JSON.parse(cachedStock);
+            allTransactions = JSON.parse(cachedTrans);
+            updateStatCards();
+            renderAll();
+        } catch (e) {
+            console.warn("Error parsing cache", e);
+        }
+    }
+
+    // 2. Fetch fresh data in background from Supabase
     const [stockRes, transRes] = await Promise.all([
         _supabase.from('chemical_stock').select('*').order('chemical_name'),
         _supabase.from('chemical_transactions')
@@ -49,10 +110,19 @@ async function fetchData() {
             .order('transaction_date', { ascending: false })
     ]);
 
-    if (stockRes.error) { showToast("โหลดข้อมูลไม่สำเร็จ", "danger"); return; }
+    if (stockRes.error) { 
+        if (!allChemicals.length) {
+            showToast("โหลดข้อมูลไม่สำเร็จ", "danger"); 
+        }
+        return; 
+    }
 
     allChemicals    = stockRes.data || [];
     allTransactions = transRes.data || [];
+
+    // 3. Cache new data and render updates
+    sessionStorage.setItem('klangsarn_chemicals', JSON.stringify(allChemicals));
+    sessionStorage.setItem('klangsarn_transactions', JSON.stringify(allTransactions));
 
     updateStatCards();
     renderAll();
@@ -141,9 +211,14 @@ function renderAll() {
                 material_number: c.material_number,
                 unit: c.unit,
                 total_quantity: 0,
+                min_quantity: c.min_quantity || 0,
+                max_quantity: c.max_quantity || 0,
                 locations: new Set(),
                 batches: []
             };
+        } else {
+            if (c.min_quantity > 0) groups[key].min_quantity = c.min_quantity;
+            if (c.max_quantity > 0) groups[key].max_quantity = c.max_quantity;
         }
         groups[key].total_quantity += c.quantity;
         if (c.location) {
@@ -217,6 +292,15 @@ function renderDesktopTable(groupedList, showLoc) {
             statusText = `<span class="badge badge-amber">ใกล้หมดอายุ (${nearCount} ล็อต)</span>`;
         }
 
+        // Min/Max alerts
+        const minVal = parseFloat(group.min_quantity);
+        const maxVal = parseFloat(group.max_quantity);
+        if (minVal > 0 && group.total_quantity < minVal) {
+            statusText += ` <span class="badge badge-red" style="margin-top:4px; display:inline-block;">⚠️ ต่ำกว่า Min</span>`;
+        } else if (maxVal > 0 && group.total_quantity > maxVal) {
+            statusText += ` <span class="badge badge-amber" style="margin-top:4px; display:inline-block;">⚠️ เกิน Max</span>`;
+        }
+
         const locationsArray = Array.from(group.locations);
         const locationsText = locationsArray.length > 0 
             ? locationsArray.map(l => `<span class="badge badge-loc" style="margin-right:4px;">${l.split(' ').slice(0,2).join(' ')}</span>`).join('')
@@ -228,44 +312,51 @@ function renderDesktopTable(groupedList, showLoc) {
                 ? `<span class="badge ${exp.badgeClass}" style="margin-left:8px; font-size:10.5px; font-weight:600; padding:2px 8px;">${exp.label}</span>`
                 : '';
 
-            return `<tr>
-              <td style="font-weight:600; color:var(--text-head); font-family:'JetBrains Mono',monospace;">
-                ${batch.lot_number || '—'}
-              </td>
-              <td>
+            return `
+            <div class="nested-lot-item-row">
+              <!-- Lot info -->
+              <div class="lot-info" style="width: 160px; font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--text-head);">
+                <span style="font-size: 11px; color:var(--text-muted); font-weight:normal; margin-right:4px;">Lot:</span> ${batch.lot_number || '—'}
+              </div>
+              
+              <!-- Dates -->
+              <div class="lot-dates" style="width: 250px;">
                 <div style="font-size:12px;color:var(--text-muted);">
                   <span style="color:var(--success);font-weight:500;margin-right:4px;">MFG</span> ${formatDisplayDate(batch.mfg_date)}
                 </div>
                 <div style="font-size:12px; display: flex; align-items: center;" class="${exp.class}">
                   <span style="font-weight:500; margin-right:5px;">EXP</span> ${formatDisplayDate(batch.exp_date)}${expBadge}
                 </div>
-              </td>
-              <td style="font-family:'JetBrains Mono',monospace; font-weight:700;">
+              </div>
+              
+              <!-- Qty -->
+              <div class="lot-qty" style="width: 140px; font-family:'IBM Plex Mono',monospace; font-weight:700;">
                 ${batch.quantity} <span style="font-size:12px;color:var(--text-muted);font-weight:normal;margin-left:2px;">${batch.unit}</span>
-              </td>
-              <td>
-                <span class="badge badge-loc" style="font-size:11px;">${batch.location ? batch.location.split(' ').slice(0,2).join(' ') : '—'}</span>
-              </td>
-              <td style="text-align:right;">
-                <div class="btn-action-group">
-                  <button class="btn-action btn-action-primary" onclick="openTransactionModal(${batch.id}); event.stopPropagation();">
+              </div>
+              
+              <!-- Actions -->
+              <div class="lot-actions" style="flex: 1; text-align: right;">
+                <div class="nested-action-group">
+                  <button class="btn-lot-action btn-lot-action-recv" onclick="openTransactionModal(${batch.id}); event.stopPropagation();">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="pointer-events: none;"><path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/></svg>
                     รับ/จ่าย
                   </button>
-                  <button class="btn-action-icon edit" onclick="editChemical(${batch.id}); event.stopPropagation();" title="แก้ไข">
+                  <button class="btn-lot-action btn-lot-action-edit" onclick="editChemical(${batch.id}); event.stopPropagation();">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="pointer-events: none;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    แก้ไข
                   </button>
-                  <button class="btn-action-icon delete" onclick="deleteChemical(${batch.id}); event.stopPropagation();" title="ลบ">
+                  <button class="btn-lot-action btn-lot-action-delete" onclick="deleteChemical(${batch.id}); event.stopPropagation();">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="pointer-events: none;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                    ลบ
                   </button>
                 </div>
-              </td>
-            </tr>`;
+              </div>
+            </div>`;
         }).join('');
 
         return `
         <!-- Master Row -->
-        <tr class="master-row" onclick="toggleLotGroup('${group.key}')">
+        <tr class="master-row" id="master-${group.key}" onclick="toggleLotGroup('${group.key}')">
           <td style="padding-left:22px;">
             <div style="display:flex;align-items:center;gap:12px;">
               <div class="chevron-icon" id="chevron-${group.key}" style="color:var(--text-muted);display:flex;align-items:center;justify-content:center;">
@@ -274,13 +365,16 @@ function renderDesktopTable(groupedList, showLoc) {
               ${mainThumb}
               <div>
                 <div class="cell-name" style="font-size:14.5px; font-weight:700; color:var(--text-head);">${group.chemical_name}</div>
-                <div class="cell-cas" style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-muted); margin-top:2px;">Material: ${group.material_number || '—'}</div>
+                <div class="cell-cas" style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--text-muted); margin-top:2px;">Material: ${group.material_number || '—'}</div>
               </div>
             </div>
           </td>
           <td>
-            <span class="cell-qty" style="font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:var(--text-head);">${group.total_quantity}</span>
+            <span class="cell-qty" style="font-family:'IBM Plex Mono',monospace; font-size:16px; font-weight:700; color:var(--text-head);">${group.total_quantity}</span>
             <span style="font-size:12px;color:var(--text-muted);margin-left:4px;">${group.unit}</span>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;font-weight:normal;">
+              Min: ${group.min_quantity || '—'} | Max: ${group.max_quantity || '—'}
+            </div>
           </td>
           <td>
             ${statusText}
@@ -289,35 +383,18 @@ function renderDesktopTable(groupedList, showLoc) {
             ${locationsText}
           </td>
           <td style="text-align:right;padding-right:22px;">
-            <button class="btn btn-outline btn-sm" onclick="openAddLotModal('${group.chemical_name.replace(/'/g, "\\'")}', '${(group.material_number || '').replace(/'/g, "\\'")}'); event.stopPropagation();" style="border-radius: var(--r-md); font-weight:600; padding:6px 12px; display:inline-flex; align-items:center; gap:5px;">
+            <button class="btn btn-add-lot" onclick="openTransactionModal(${group.batches[0].id}, true); event.stopPropagation();">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              เพิ่มล็อตใหม่
+              เปิดล็อตใหม่
             </button>
           </td>
         </tr>
         
-        <!-- Detail Row (Nested Lots Table) -->
+        <!-- Detail Row (Indented Branching Lots) -->
         <tr class="nested-lot-row" id="detail-${group.key}">
           <td colspan="${showLoc ? 5 : 4}" style="padding:0;">
             <div class="nested-lot-container">
-              <div style="font-size:12.5px; font-weight:600; color:var(--text-muted); margin-bottom:8px; display:flex; align-items:center; gap:6px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                รายการล็อตสินค้า (${group.batches.length} ล็อต)
-              </div>
-              <table class="nested-lot-table">
-                <thead>
-                  <tr>
-                    <th>เลขล็อต (Lot No.)</th>
-                    <th>วันผลิต / วันหมดอายุ</th>
-                    <th>จำนวนคงเหลือ</th>
-                    <th>สถานที่จัดเก็บ</th>
-                    <th style="text-align:right; width:220px;">การจัดการล็อต</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${subTableRows}
-                </tbody>
-              </table>
+              ${subTableRows}
             </div>
           </td>
         </tr>`;
@@ -344,9 +421,11 @@ function renderMobileCards(groupedList, showLoc) {
     }
 
     container.innerHTML = groupedList.map(group => {
+        const groupLocation = Array.from(group.locations)[0] || '';
+        const escapedGroupLoc = groupLocation.replace(/'/g, "\\'");
         // Collect first batch image or fallback
-        let mainImgHtml = `<div class="chem-card-icon" style="background: linear-gradient(135deg, #EEF6FF, #E0EEFF); border-color: rgba(14,165,233,0.15); width: 44px; height: 44px; border-radius: var(--r-md);">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0EA5E9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        let mainImgHtml = `<div class="chem-card-icon" style="width: 68px; height: 68px; border-radius: var(--r-lg);">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0EA5E9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 3h6M10 3v6.6L6.1 17.2A2 2 0 0 0 8 20h8a2 2 0 0 0 1.9-2.8L14 9.6V3"/>
                 <path d="M7.5 16h9"/><circle cx="10.5" cy="15.5" r="0.8" fill="#0EA5E9"/>
               </svg>
@@ -355,7 +434,7 @@ function renderMobileCards(groupedList, showLoc) {
         for (const batch of group.batches) {
             const imgs = batch.image_urls ? JSON.parse(batch.image_urls) : [];
             if (imgs.length > 0) {
-                mainImgHtml = `<img src="${imgs[0]}" onclick="viewImage('${imgs[0]}'); event.stopPropagation();" style="width: 44px; height: 44px; object-fit: cover; border-radius: var(--r-md); border: 1px solid var(--border-soft);">`;
+                mainImgHtml = `<img src="${imgs[0]}" onclick="viewImage('${imgs[0]}'); event.stopPropagation();" style="width: 68px; height: 68px; object-fit: cover; border-radius: var(--r-lg); border: 1px solid var(--border-soft); flex-shrink: 0;">`;
                 break;
             }
         }
@@ -379,6 +458,15 @@ function renderMobileCards(groupedList, showLoc) {
             cardClass = 'status-near';
         }
 
+        // Min/Max alerts
+        const minVal = parseFloat(group.min_quantity);
+        const maxVal = parseFloat(group.max_quantity);
+        if (minVal > 0 && group.total_quantity < minVal) {
+            statusText += ` <span class="badge badge-red" style="display:inline-block; margin-top:2px;">⚠️ ต่ำกว่า Min</span>`;
+        } else if (maxVal > 0 && group.total_quantity > maxVal) {
+            statusText += ` <span class="badge badge-amber" style="display:inline-block; margin-top:2px;">⚠️ เกิน Max</span>`;
+        }
+
         const locationsArray = Array.from(group.locations);
         const locBadge = showLoc && locationsArray.length > 0
             ? `<span class="badge badge-loc" style="margin-top:4px;display:inline-flex;">${locationsArray.map(l => l.split(' ').slice(0,2).join(' ')).join(', ')}</span>`
@@ -391,10 +479,16 @@ function renderMobileCards(groupedList, showLoc) {
                 ? `<span class="badge ${exp.badgeClass}" style="font-size:10.5px; font-weight:600; padding:2px 8px;">${exp.label}</span>`
                 : '';
 
+            const vendorHtml = batch.vendor ? `
+                <div style="grid-column: 1/-1; display:flex; align-items:center; gap:4px; font-size:11px; color:var(--text-body); margin-top:2px;">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.5" style="vertical-align: middle;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                  <span>${batch.vendor}</span>
+                </div>` : '';
+
             return `
             <div class="nested-lot-item">
               <div class="nested-lot-item-header">
-                <span style="font-family:'JetBrains Mono',monospace;">Lot: ${batch.lot_number || '—'}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;">Lot: ${batch.lot_number || '—'}</span>
                 <span class="mono" style="color:var(--text-head); font-weight:700;">${batch.quantity} ${batch.unit}</span>
               </div>
               <div class="nested-lot-item-details">
@@ -404,21 +498,21 @@ function renderMobileCards(groupedList, showLoc) {
                 <div>
                   <span style="color:var(--text-muted);">EXP:</span> <span class="${exp.class}" style="font-weight:600;">${formatDisplayDate(batch.exp_date)} ${expBadgeHtml}</span>
                 </div>
-                <div style="grid-column: 1/-1; display:flex; align-items:center; gap:4px;">
-                  <span style="color:var(--text-muted);">ห้องเก็บ:</span> <span class="badge badge-loc" style="font-size:10px;">${batch.location ? batch.location.split(' ').slice(0,2).join(' ') : '—'}</span>
-                </div>
+                ${vendorHtml}
               </div>
               
               <div class="nested-lot-item-footer">
-                <button class="btn-action btn-action-primary" style="height:32px; padding:0 12px; font-size:12px;" onclick="openTransactionModal(${batch.id})">
+                <button class="btn-lot-action btn-lot-action-recv" onclick="openTransactionModal(${batch.id})">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="pointer-events: none;"><path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/></svg>
                   รับ/จ่าย
                 </button>
-                <button class="btn-action-icon edit" style="width:32px; height:32px;" onclick="editChemical(${batch.id})" title="แก้ไข">
+                <button class="btn-lot-action btn-lot-action-edit" onclick="editChemical(${batch.id})">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="pointer-events: none;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  แก้ไข
                 </button>
-                <button class="btn-action-icon delete" style="width:32px; height:32px;" onclick="deleteChemical(${batch.id})" title="ลบ">
+                <button class="btn-lot-action btn-lot-action-delete" onclick="deleteChemical(${batch.id})">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="pointer-events: none;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                  ลบ
                 </button>
               </div>
             </div>`;
@@ -430,22 +524,25 @@ function renderMobileCards(groupedList, showLoc) {
             ${mainImgHtml}
             <div class="chem-card-info" style="flex: 1; min-width: 0;">
               <div class="chem-name" style="font-size: 15px; font-weight: 700; color: var(--text-head);">${group.chemical_name}</div>
-              <div class="chem-cas" style="font-family:'JetBrains Mono',monospace; font-size: 11.5px; color: var(--text-muted); margin-top: 3px;">Material: ${group.material_number || '—'}</div>
+              <div class="chem-cas" style="font-family:'IBM Plex Mono',monospace; font-size: 11.5px; color: var(--text-muted); margin-top: 3px;">Material: ${group.material_number || '—'}</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">
+                Min: ${group.min_quantity || '—'} | Max: ${group.max_quantity || '—'}
+              </div>
               ${locBadge}
               <div style="margin-top:5px;">
                 ${statusText}
               </div>
             </div>
             <div class="chem-card-qty" style="text-align: right;">
-              <div class="qty-val" style="font-family:'JetBrains Mono',monospace; font-size: 24px; font-weight: 800;">${group.total_quantity}</div>
+              <div class="qty-val" style="font-family:'IBM Plex Mono',monospace; font-size: 24px; font-weight: 800;">${group.total_quantity}</div>
               <div class="qty-unit" style="font-size: 11px; color: var(--text-muted); font-weight: 500;">${group.unit}</div>
             </div>
           </div>
 
           <div class="chem-card-foot" style="padding: 10px 18px 14px; background: linear-gradient(180deg, rgba(250,252,255,0.4), #F4F8FF); border-top: 1px solid var(--border-soft); display: flex; gap: 8px;">
-            <button class="btn btn-outline btn-sm" style="flex:1; border-radius:var(--r-md); font-weight:600; display:inline-flex; align-items:center; justify-content:center; gap:5px;" onclick="openAddLotModal('${group.chemical_name.replace(/'/g, "\\'")}', '${(group.material_number || '').replace(/'/g, "\\'")}'); event.stopPropagation();">
+            <button class="btn btn-add-lot" style="flex:1;" onclick="openTransactionModal(${group.batches[0].id}, true); event.stopPropagation();">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              เพิ่มล็อตใหม่
+              เปิดล็อตใหม่
             </button>
             <button class="btn btn-outline btn-sm" style="border-radius:var(--r-md); font-weight:600; display:inline-flex; align-items:center; justify-content:center; gap:5px;" onclick="toggleLotDrawer('${group.key}')">
               <span>แสดงล็อต (${group.batches.length})</span>
@@ -466,18 +563,26 @@ function renderMobileCards(groupedList, showLoc) {
 function toggleLotGroup(groupId) {
     const row = document.getElementById(`detail-${groupId}`);
     const chevron = document.getElementById(`chevron-${groupId}`);
+    const master = document.getElementById(`master-${groupId}`);
     if (row && chevron) {
         const isOpen = row.classList.toggle('open');
         chevron.classList.toggle('open', isOpen);
+        if (master) {
+            master.classList.toggle('expanded', isOpen);
+        }
     }
 }
 
 function toggleLotDrawer(groupId) {
     const drawer = document.getElementById(`drawer-${groupId}`);
     const chevron = document.getElementById(`chevron-mob-${groupId}`);
+    const card = document.getElementById(`chem-group-${groupId}`);
     if (drawer && chevron) {
         const isOpen = drawer.classList.toggle('open');
         chevron.classList.toggle('open', isOpen);
+        if (card) {
+            card.classList.toggle('expanded', isOpen);
+        }
     }
 }
 
@@ -632,18 +737,14 @@ function removeUploadedImage(index, event) {
 function openAddModal() {
     document.getElementById("chemicalId").value = "";
     document.getElementById("chemicalForm").reset();
+    document.getElementById("location").disabled = false;
     uploadedImagesBase64 = [];
     renderUploadedPreviews();
     document.getElementById("modalTitle").innerText = "เพิ่มสารเคมีเข้าสต็อก";
     document.getElementById('chemModalOverlay').classList.add('open');
 }
 
-function openAddLotModal(chemicalName, materialNumber) {
-    openAddModal();
-    document.getElementById("chemicalName").value = chemicalName;
-    document.getElementById("materialNumber").value = materialNumber || "";
-    document.getElementById("modalTitle").innerText = "เพิ่มล็อตใหม่ของสารเคมี";
-}
+// openAddLotModal retired. Unified into openTransactionModal with new lot configuration.
 
 function editChemical(id) {
     const item = allChemicals.find(c => c.id == id);
@@ -656,8 +757,24 @@ function editChemical(id) {
     document.getElementById("unit").value = item.unit;
     document.getElementById("mfgDate").value = item.mfg_date || "";
     document.getElementById("expDate").value = item.exp_date || "";
-    document.getElementById("location").value = item.location || "";
+    if (item.location) {
+        if (item.location.includes("ห้อง 1")) {
+            document.getElementById("location").value = "ห้อง 1 สารเคมีประเภทออกซิไดซ์ (Oxidizing Agent)";
+        } else if (item.location.includes("ห้อง 2")) {
+            document.getElementById("location").value = "ห้อง 2 สารเคมีประเภทกรด (Acid)";
+        } else if (item.location.includes("ห้อง 3")) {
+            document.getElementById("location").value = "ห้อง 3 สารเคมีประเภทด่าง (Alkali)";
+        } else {
+            document.getElementById("location").value = item.location;
+        }
+    } else {
+        document.getElementById("location").value = "";
+    }
+    document.getElementById("location").disabled = false;
     document.getElementById("pricePerUnit").value = item.price_per_unit || 0.0;
+    document.getElementById("chemicalVendor").value = item.vendor || "";
+    document.getElementById("minQuantity").value = item.min_quantity !== undefined && item.min_quantity !== null ? item.min_quantity : "";
+    document.getElementById("maxQuantity").value = item.max_quantity !== undefined && item.max_quantity !== null ? item.max_quantity : "";
     
     // Load existing images
     uploadedImagesBase64 = item.image_urls ? JSON.parse(item.image_urls) : [];
@@ -680,6 +797,9 @@ async function handleChemicalSubmit(e) {
         exp_date:        document.getElementById("expDate").value || null,
         location:        document.getElementById("location").value,
         price_per_unit:  parseFloat(document.getElementById("pricePerUnit").value) || 0.0,
+        vendor:          document.getElementById("chemicalVendor").value.trim() || null,
+        min_quantity:    parseFloat(document.getElementById("minQuantity").value) || 0.0,
+        max_quantity:    parseFloat(document.getElementById("maxQuantity").value) || 0.0,
         image_urls:      uploadedImagesBase64.length > 0 ? JSON.stringify(uploadedImagesBase64) : null
     };
 
@@ -697,6 +817,7 @@ async function handleChemicalSubmit(e) {
     } else {
         document.getElementById('chemModalOverlay').classList.remove('open');
         showToast(id ? "อัปเดตข้อมูลสำเร็จ" : "เพิ่มสารเคมีสำเร็จ", "success");
+        clearStorageCache();
         fetchData();
     }
 }
@@ -758,6 +879,7 @@ async function executeChemicalDelete() {
     } else {
         console.log("Supabase delete query succeeded");
         showToast("ลบรายการสำเร็จ", "success");
+        clearStorageCache();
         fetchData();
     }
 }
@@ -765,7 +887,7 @@ async function executeChemicalDelete() {
 // ==========================================
 // TRANSACTIONS
 // ==========================================
-function openTransactionModal(id) {
+function openTransactionModal(id, isNewLot = false) {
     const item = allChemicals.find(c => c.id == id);
     if (!item) return;
     document.getElementById("transChemId").value = item.id;
@@ -774,8 +896,29 @@ function openTransactionModal(id) {
     document.getElementById("transQty").value = "";
     document.getElementById("transPricePerUnit").value = item.price_per_unit || 0.0;
     document.getElementById("transFreeQty").value = 0.0;
+    document.getElementById("transPromoToggle").checked = false;
+    document.getElementById("transFreeQtyContainer").style.display = "none";
+    document.getElementById("transSummaryText").style.display = "none";
+    document.getElementById("transSummaryText").innerHTML = "";
+    document.getElementById("transSubmitBtn").disabled = false;
+    document.getElementById("transVendor").value = "";
     document.getElementById("transRemark").value = "";
     document.getElementById("transType").value = "IN";
+
+    // Handle New Lot toggles and inputs
+    const newLotToggle = document.getElementById("transNewLotToggle");
+    const newLotContainer = document.getElementById("transNewLotContainer");
+    if (newLotToggle && newLotContainer) {
+        newLotToggle.checked = isNewLot;
+        newLotContainer.style.display = isNewLot ? "block" : "none";
+        document.getElementById("transLotNumber").required = isNewLot;
+        document.getElementById("transLocation").required = isNewLot;
+        document.getElementById("transLotNumber").value = "";
+        document.getElementById("transLocation").value = item.location || "";
+        document.getElementById("transMfgDate").value = "";
+        document.getElementById("transExpDate").value = "";
+    }
+
     document.getElementById('transModalOverlay').classList.add('open');
     if (typeof selectTransType === 'function') selectTransType('IN');
 }
@@ -788,24 +931,96 @@ async function handleTransactionSubmit(e) {
     const remark = document.getElementById("transRemark").value;
 
     const transPrice = parseFloat(document.getElementById("transPricePerUnit").value) || 0.0;
-    const transFree  = parseFloat(document.getElementById("transFreeQty").value) || 0.0;
+    const isPromo = document.getElementById("transPromoToggle").checked;
+    const transFree  = (type === 'IN' && isPromo) ? (parseFloat(document.getElementById("transFreeQty").value) || 0.0) : 0.0;
     const transSaving = (type === 'IN') ? (transPrice * transFree) : 0.0;
+    const transVendor = (type === 'IN') ? document.getElementById("transVendor").value.trim() : null;
 
     const item = allChemicals.find(c => c.id == id);
-    const newQty = type === 'IN' ? item.quantity + qty : item.quantity - qty;
+    if (!item) { showToast("ไม่พบข้อมูลสารเคมี!", "danger"); return; }
 
-    if (newQty < 0) { showToast("สต็อกคงเหลือไม่เพียงพอ!", "danger"); return; }
+    const isNewLot = (type === 'IN') && document.getElementById("transNewLotToggle").checked;
+    
+    let targetChemId = id;
 
-    await _supabase.from('chemical_stock').update({ quantity: newQty }).eq('id', id);
-    await _supabase.from('chemical_transactions').insert([{ 
-        chemical_id: id, 
+    if (isNewLot) {
+        // Create new lot row in chemical_stock first
+        const lotNum = document.getElementById("transLotNumber").value.trim();
+        const lotLoc = document.getElementById("transLocation").value;
+        const mfgVal = document.getElementById("transMfgDate").value || null;
+        const expVal = document.getElementById("transExpDate").value || null;
+
+        if (!lotNum || !lotLoc) {
+            showToast("กรุณากรอกเลขที่ล็อตและสถานที่จัดเก็บสำหรับล็อตใหม่!", "warning");
+            return;
+        }
+
+        const newLotPayload = {
+            chemical_name:   item.chemical_name,
+            material_number: item.material_number,
+            lot_number:      lotNum,
+            quantity:        qty, // initial quantity of new lot
+            unit:            item.unit,
+            mfg_date:        mfgVal,
+            exp_date:        expVal,
+            location:        lotLoc,
+            price_per_unit:  transPrice,
+            vendor:          transVendor,
+            min_quantity:    item.min_quantity || 0.0,
+            max_quantity:    item.max_quantity || 0.0,
+            image_urls:      null
+        };
+
+        const { data: insertData, error: insertError } = await _supabase
+            .from('chemical_stock')
+            .insert([newLotPayload])
+            .select('id')
+            .single();
+
+        if (insertError) {
+            showToast("สร้างล็อตใหม่ไม่สำเร็จ: " + insertError.message, "danger");
+            return;
+        }
+
+        targetChemId = insertData.id;
+    } else {
+        // Update existing lot quantity
+        const newQty = type === 'IN' ? item.quantity + qty : item.quantity - qty;
+        if (newQty < 0) { showToast("สต็อกคงเหลือไม่เพียงพอ!", "danger"); return; }
+
+        const { error: updateError } = await _supabase
+            .from('chemical_stock')
+            .update({ quantity: newQty })
+            .eq('id', id);
+
+        if (updateError) {
+            showToast("อัปเดตปริมาณสต็อกไม่สำเร็จ: " + updateError.message, "danger");
+            return;
+        }
+    }
+
+    // Insert transaction
+    const { error: transError } = await _supabase.from('chemical_transactions').insert([{ 
+        chemical_id: targetChemId, 
         type, 
         quantity: qty, 
         remark,
         price_per_unit: transPrice,
         free_quantity: transFree,
-        saving: transSaving
+        saving: transSaving,
+        vendor: transVendor
     }]);
+
+    if (transError) {
+        showToast("บันทึกประวัติการทำรายการไม่สำเร็จ: " + transError.message, "danger");
+    } else {
+        showToast(
+            type === 'IN'
+                ? (isNewLot ? `เปิดล็อตใหม่และรับเข้าสำเร็จ` : `รับเข้า ${qty} ${item.unit} สำเร็จ`)
+                : `เบิกจ่าย ${qty} ${item.unit} สำเร็จ`,
+            type === 'IN' ? 'success' : 'warning'
+        );
+    }
 
     document.getElementById('transModalOverlay').classList.remove('open');
 
@@ -819,6 +1034,7 @@ async function handleTransactionSubmit(e) {
         type === 'IN' ? 'success' : 'warning'
     );
 
+    clearStorageCache();
     fetchData();
 }
 
@@ -849,3 +1065,83 @@ function setQuickExp(months) {
     document.getElementById('expDate').value = `${y}-${m}-${day}`;
 }
 window.setQuickExp = setQuickExp;
+
+function setQuickExpTrans(months) {
+    const mfgVal = document.getElementById('transMfgDate').value;
+    let baseDate;
+    if (mfgVal) {
+        const parts = mfgVal.split('-');
+        baseDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    } else {
+        baseDate = new Date();
+    }
+    baseDate.setMonth(baseDate.getMonth() + months);
+    const y = baseDate.getFullYear();
+    const m = String(baseDate.getMonth() + 1).padStart(2, '0');
+    const day = String(baseDate.getDate()).padStart(2, '0');
+    document.getElementById('transExpDate').value = `${y}-${m}-${day}`;
+}
+
+window.deleteChemical = deleteChemical;
+window.closeDeleteModal = closeDeleteModal;
+window.executeChemicalDelete = executeChemicalDelete;
+window.updateTransSummary = updateTransSummary;
+window.setQuickExpTrans = setQuickExpTrans;
+
+function updateTransSummary() {
+    const isPromo = document.getElementById("transPromoToggle")?.checked;
+    const qtyInput = document.getElementById("transQty");
+    const priceInput = document.getElementById("transPricePerUnit");
+    const freeInput = document.getElementById("transFreeQty");
+    const summaryDiv = document.getElementById("transSummaryText");
+    const submitBtn = document.getElementById("transSubmitBtn");
+
+    if (!qtyInput || !priceInput || !freeInput || !summaryDiv || !submitBtn) return;
+
+    const totalQty = parseFloat(qtyInput.value) || 0.0;
+    const unitPrice = parseFloat(priceInput.value) || 0.0;
+    const freeQty = isPromo ? (parseFloat(freeInput.value) || 0.0) : 0.0;
+
+    if (!qtyInput.value) {
+        summaryDiv.style.display = "none";
+        submitBtn.disabled = false;
+        return;
+    }
+
+    // Validation
+    if (isPromo && freeQty > totalQty) {
+        summaryDiv.style.display = "block";
+        summaryDiv.style.borderColor = "var(--danger)";
+        summaryDiv.style.background = "rgba(239, 68, 68, 0.05)";
+        summaryDiv.innerHTML = `<span style="color: var(--danger); font-weight: bold;">⚠️ จำนวนของแถม (${freeQty}) ต้องไม่เกินจำนวนรับเข้าทั้งหมด (${totalQty})</span>`;
+        submitBtn.disabled = true;
+        return;
+    }
+
+    // Calculations
+    const paidQty = Math.max(0, totalQty - freeQty);
+    const totalPaid = paidQty * unitPrice;
+    const totalSaving = freeQty * unitPrice;
+
+    summaryDiv.style.display = "block";
+    summaryDiv.style.borderColor = "var(--primary)";
+    summaryDiv.style.background = "var(--bg-hover)";
+    submitBtn.disabled = false;
+
+    if (isPromo) {
+        summaryDiv.innerHTML = `
+            <div style="font-weight: 700; margin-bottom: 4px; color: var(--primary);">สรุปราคารับเข้าแบบโปรโมชัน:</div>
+            • ซื้อจริง: <span style="font-weight:600; color:var(--text-head);">${paidQty.toLocaleString('th-TH')}</span> | แถมฟรี: <span style="font-weight:600; color:var(--success);">${freeQty.toLocaleString('th-TH')}</span><br>
+            • รวมได้รับเข้าสต็อก: <span style="font-weight:600; color:var(--text-head);">${totalQty.toLocaleString('th-TH')}</span><br>
+            • <span style="color: var(--success); font-weight:600;">ยอดประหยัด (Saving): ${totalSaving.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บาท</span><br>
+            • ยอดจ่ายจริง: <span style="font-weight:600; color:var(--text-head);">${totalPaid.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บาท</span>
+        `;
+    } else {
+        summaryDiv.innerHTML = `
+            <div style="font-weight: 700; margin-bottom: 4px; color: var(--text-head);">สรุปราคารับเข้าปกติ:</div>
+            • จำนวนซื้อจริง: <span style="font-weight:600; color:var(--text-head);">${totalQty.toLocaleString('th-TH')}</span> (ไม่มีของแถม)<br>
+            • ยอดจ่ายรวม: <span style="font-weight:600; color:var(--primary); font-size: 13.5px;">${totalPaid.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บาท</span>
+        `;
+    }
+}
+window.updateTransSummary = updateTransSummary;

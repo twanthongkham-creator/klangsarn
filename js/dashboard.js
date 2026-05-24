@@ -1,13 +1,16 @@
 // ==========================================
-// ChemStock — Dashboard Logic v2.3
+// KlangSarn — Dashboard Logic v2.4
 // Fiscal Year Savings & Charts
 // ==========================================
 const SUPABASE_URL = "https://bdjyxkkzbbzlmxszmvhx.supabase.co";
 const SUPABASE_KEY = "sb_publishable_inYG_le-QyiIvjkaUHXyfQ_Nvm4FpR2";
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+let globalStockData = [];
 let globalTransData = [];
 let savingChartInstance = null;
+let chemTransChartInstance = null;
+let currentPopupType = null;
 
 document.addEventListener("DOMContentLoaded", () => { loadDashboardData(); });
 
@@ -17,29 +20,55 @@ async function loadDashboardData() {
     if (el) el.textContent =
         `อัปเดต: ${now.toLocaleDateString('th-TH',{day:'2-digit',month:'long',year:'numeric'})} ${now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})} น.`;
 
+    const firstDay = new Date();
+    firstDay.setDate(1); firstDay.setHours(0,0,0,0);
+
+    // 1. Load cached data from sessionStorage to render instantly
+    const cachedStock = sessionStorage.getItem('klangsarn_dash_stock');
+    const cachedTrans = sessionStorage.getItem('klangsarn_dash_trans');
+    if (cachedStock && cachedTrans) {
+        try {
+            globalStockData = JSON.parse(cachedStock);
+            globalTransData = JSON.parse(cachedTrans);
+            renderSummaryCards(globalStockData, globalTransData, firstDay);
+            renderLocationChart(globalStockData);
+            renderRecentTransactions(globalTransData.slice(0, 10));
+            renderAlertTable(globalStockData);
+            initSavingDashboard(globalTransData);
+            initChemTransDashboard(globalTransData);
+        } catch (e) {
+            console.warn("Error parsing dashboard cache", e);
+        }
+    }
+
+    // 2. Fetch fresh data in background from Supabase
     const [stockRes, transRes] = await Promise.all([
-        _supabase.from('chemical_stock').select('*'),
+        _supabase.from('chemical_stock').select('id, chemical_name, material_number, quantity, unit, exp_date, location, lot_number, price_per_unit, vendor, min_quantity, max_quantity'),
         _supabase.from('chemical_transactions')
-            .select('id, type, quantity, saving, transaction_date, chemical_stock(chemical_name, unit, lot_number)')
+            .select('id, type, quantity, saving, transaction_date, price_per_unit, free_quantity, vendor, chemical_stock(chemical_name, unit, lot_number)')
             .order('transaction_date', { ascending: false })
     ]);
 
     if (stockRes.error || transRes.error) {
-        showToast("โหลดข้อมูลแดชบอร์ดไม่สำเร็จ", "danger");
+        if (!cachedStock) {
+            showToast("โหลดข้อมูลแดชบอร์ดไม่สำเร็จ", "danger");
+        }
         return;
     }
 
-    const stockData = stockRes.data || [];
+    globalStockData = stockRes.data || [];
     globalTransData = transRes.data || [];
 
-    const firstDay = new Date();
-    firstDay.setDate(1); firstDay.setHours(0,0,0,0);
+    // 3. Cache new data and render updates
+    sessionStorage.setItem('klangsarn_dash_stock', JSON.stringify(globalStockData));
+    sessionStorage.setItem('klangsarn_dash_trans', JSON.stringify(globalTransData));
 
-    renderSummaryCards(stockData, globalTransData, firstDay);
-    renderLocationChart(stockData);
+    renderSummaryCards(globalStockData, globalTransData, firstDay);
+    renderLocationChart(globalStockData);
     renderRecentTransactions(globalTransData.slice(0, 10));
-    renderAlertTable(stockData);
+    renderAlertTable(globalStockData);
     initSavingDashboard(globalTransData);
+    initChemTransDashboard(globalTransData);
 }
 
 // ===== FISCAL YEAR HELPER =====
@@ -73,6 +102,40 @@ function renderSummaryCards(stockData, transData, firstDay) {
         }
     });
     setEl('dashInMonth', inC);
+
+    // Compute Stock Level Alerts (Min/Max)
+    const groups = {};
+    stockData.forEach(c => {
+        const key = `${c.chemical_name}::${c.material_number || ''}`;
+        if (!groups[key]) {
+            groups[key] = {
+                chemical_name: c.chemical_name,
+                material_number: c.material_number,
+                total_quantity: 0,
+                min_quantity: c.min_quantity || 0,
+                max_quantity: c.max_quantity || 0
+            };
+        } else {
+            if (c.min_quantity > 0) groups[key].min_quantity = c.min_quantity;
+            if (c.max_quantity > 0) groups[key].max_quantity = c.max_quantity;
+        }
+        groups[key].total_quantity += c.quantity;
+    });
+
+    let belowMin = 0;
+    let aboveMax = 0;
+    Object.values(groups).forEach(g => {
+        const minVal = parseFloat(g.min_quantity);
+        const maxVal = parseFloat(g.max_quantity);
+        if (minVal > 0 && g.total_quantity < minVal) {
+            belowMin++;
+        } else if (maxVal > 0 && g.total_quantity > maxVal) {
+            aboveMax++;
+        }
+    });
+
+    setEl('dashStockAlerts', belowMin + aboveMax);
+    setEl('dashStockAlertSub', `ต่ำกว่า Min: ${belowMin} | เกิน Max: ${aboveMax}`);
 
     // Compute Fiscal Year Savings
     const currentFiscalYear = getFiscalYear(new Date());
@@ -122,7 +185,7 @@ function renderLocationChart(stockData) {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        font: { family: "'Kanit', sans-serif", size: 12 },
+                        font: { family: "'IBM Plex Sans Thai', sans-serif", size: 12 },
                         padding: 18,
                         color: '#374151',
                         usePointStyle: true,
@@ -331,7 +394,7 @@ function renderFiscalSavingChart(fiscalYear) {
                         display: false
                     },
                     ticks: {
-                        font: { family: "'Kanit', sans-serif", size: 11 },
+                        font: { family: "'IBM Plex Sans Thai', sans-serif", size: 11 },
                         color: '#64748B'
                     }
                 },
@@ -340,7 +403,7 @@ function renderFiscalSavingChart(fiscalYear) {
                         color: '#F1F5F9'
                     },
                     ticks: {
-                        font: { family: "'JetBrains Mono', sans-serif", size: 11 },
+                        font: { family: "'IBM Plex Mono', sans-serif", size: 11 },
                         color: '#64748B',
                         callback: val => val.toLocaleString('th-TH')
                     }
@@ -349,3 +412,532 @@ function renderFiscalSavingChart(fiscalYear) {
         }
     });
 }
+
+// ===== MONTHLY IN/OUT TRANSACTIONS DASHBOARD =====
+function initChemTransDashboard(transData) {
+    const select = document.getElementById('chemFilterSelect');
+    if (!select) return;
+
+    // Get all unique chemical names from transactions
+    const chemNamesSet = new Set();
+    transData.forEach(t => {
+        if (t.chemical_stock?.chemical_name) {
+            chemNamesSet.add(t.chemical_stock.chemical_name);
+        }
+    });
+
+    const sortedChems = Array.from(chemNamesSet).sort((a, b) => a.localeCompare(b, 'th'));
+
+    // Remember current selection
+    const currentVal = select.value;
+
+    // Always prepend the "All chemicals" option
+    const allOption = `<option value="__all__">— ทั้งหมด (รวมทุกสารเคมี) —</option>`;
+    select.innerHTML = allOption + sortedChems.map(name => `<option value="${name}">${name}</option>`).join('');
+
+    // Restore previous selection, or default to "__all__"
+    if (currentVal && (currentVal === '__all__' || sortedChems.includes(currentVal))) {
+        select.value = currentVal;
+    } else {
+        select.value = '__all__';
+    }
+
+    renderChemTransChart(select.value);
+}
+
+function changeChemFilter() {
+    const select = document.getElementById('chemFilterSelect');
+    if (!select) return;
+    renderChemTransChart(select.value);
+}
+
+function renderChemTransChart(chemName) {
+    const ctx = document.getElementById('chemTransChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const isAll = (chemName === '__all__');
+
+    // Generate rolling 12 months (up to the current month)
+    const months = [];
+    const d = new Date();
+    for (let i = 11; i >= 0; i--) {
+        const tempDate = new Date(d.getFullYear(), d.getMonth() - i, 1);
+        months.push({
+            label: tempDate.toLocaleDateString('th-TH', { month: 'short' }),
+            month: tempDate.getMonth(),
+            year: tempDate.getFullYear()
+        });
+    }
+
+    const inData = new Array(12).fill(0.0);
+    const outData = new Array(12).fill(0.0);
+
+    // Determine unit label
+    let unit = '';
+    if (isAll) {
+        unit = 'รายการ';
+    } else {
+        const firstMatch = globalTransData.find(t => t.chemical_stock?.chemical_name === chemName);
+        unit = firstMatch?.chemical_stock?.unit || '';
+    }
+
+    // Sum transactions matching each month slot
+    globalTransData.forEach(t => {
+        // Filter: if not "all", skip non-matching chemicals
+        if (!isAll && (!t.chemical_stock || t.chemical_stock.chemical_name !== chemName)) return;
+        // For "all" mode, still require a valid transaction date
+        if (!t.transaction_date) return;
+
+        const tDate = new Date(t.transaction_date);
+        const tMonth = tDate.getMonth();
+        const tYear = tDate.getFullYear();
+
+        for (let i = 0; i < months.length; i++) {
+            if (months[i].month === tMonth && months[i].year === tYear) {
+                if (t.type === 'IN') {
+                    inData[i] += isAll ? 1 : t.quantity;
+                } else if (t.type === 'OUT') {
+                    outData[i] += isAll ? 1 : t.quantity;
+                }
+                break;
+            }
+        }
+    });
+
+    // Update subtitle text under the chart card title
+    const subtitleEl = document.getElementById('chemTransSubtitle');
+    if (subtitleEl) {
+        if (isAll) {
+            subtitleEl.textContent = 'ภาพรวมทุกสารเคมี — แกน Y แสดงจำนวนรายการ (IN/OUT) ย้อนหลัง 12 เดือน';
+        } else {
+            subtitleEl.textContent = 'ประวัติสรุปความเคลื่อนไหวรับเข้า (สีเขียว) และเบิกจ่าย (สีแดง) ย้อนหลัง 12 เดือน';
+        }
+    }
+
+    if (chemTransChartInstance) {
+        chemTransChartInstance.destroy();
+    }
+
+    const chartLabels = months.map(m => m.label);
+
+    chemTransChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartLabels,
+            datasets: [
+                {
+                    label: 'รับเข้า (IN)',
+                    data: inData,
+                    backgroundColor: 'rgba(16, 185, 129, 0.85)',
+                    borderColor: '#10B981',
+                    borderWidth: 1.5,
+                    borderRadius: 4,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.5
+                },
+                {
+                    label: 'เบิกจ่าย (OUT)',
+                    data: outData,
+                    backgroundColor: 'rgba(239, 68, 68, 0.85)',
+                    borderColor: '#EF4444',
+                    borderWidth: 1.5,
+                    borderRadius: 4,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.5
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: { family: "'IBM Plex Sans Thai', sans-serif", size: 12 },
+                        color: '#64748B'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#0A1628',
+                    titleColor: '#fff',
+                    bodyColor: '#38BDF8',
+                    padding: 12,
+                    cornerRadius: 10,
+                    callbacks: {
+                        label: ctx => `  ${ctx.dataset.label}: ${ctx.raw.toLocaleString('th-TH')} ${unit}`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        font: { family: "'IBM Plex Sans Thai', sans-serif", size: 11 },
+                        color: '#64748B'
+                    }
+                },
+                y: {
+                    grid: { color: '#F1F5F9' },
+                    ticks: {
+                        font: { family: "'IBM Plex Mono', sans-serif", size: 11 },
+                        color: '#64748B',
+                        callback: val => val.toLocaleString('th-TH')
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ===== STATS POPUP DETAILS MODAL =====
+function showStatPopup(type) {
+    currentPopupType = type;
+    document.getElementById("statPopupSearchInput").value = "";
+    
+    const overlay = document.getElementById("statPopupModalOverlay");
+    if (!overlay) return;
+
+    const titleEl = document.getElementById("statPopupTitle");
+    const subtitleEl = document.getElementById("statPopupSubtitle");
+    
+    if (type === 'total') {
+        titleEl.textContent = "สารเคมีทั้งหมดในคลัง";
+        subtitleEl.textContent = "แสดงรายการคงเหลือแบบแยกรายละเอียดตามประเภทและรหัสสารเคมี";
+    } else if (type === 'expiry') {
+        titleEl.textContent = "สารเคมีใกล้หมดอายุ / หมดอายุ";
+        subtitleEl.textContent = "แสดงล็อตสินค้าที่ใกล้จะหมดอายุหรือหมดอายุแล้วภายใน 30 วัน";
+    } else if (type === 'received') {
+        titleEl.textContent = "รายการรับเข้าในเดือนนี้";
+        const now = new Date();
+        const monthYearStr = now.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+        subtitleEl.textContent = `รายการรับเข้าคลัง (IN) ประจำเดือน ${monthYearStr}`;
+    } else if (type === 'saving') {
+        titleEl.textContent = "ประวัติการประหยัดสะสม (Savings)";
+        const currentFiscal = getFiscalYear(new Date());
+        subtitleEl.textContent = `แสดงประวัติของแถมและยอดประหยัดสะสมในปีงบประมาณ ${currentFiscal} (ต.ค. - ก.ย.)`;
+    } else if (type === 'stock_level') {
+        titleEl.textContent = "การแจ้งเตือนระดับสต็อก (Min/Max)";
+        subtitleEl.textContent = "แสดงรายการสารเคมีทั้งหมดที่อยู่นอกเกณฑ์มาตรฐานความปลอดภัย (ต่ำกว่าเกณฑ์ Min หรือเกินกว่าเกณฑ์ Max)";
+    }
+
+    renderStatPopupTable();
+    overlay.classList.add("open");
+}
+
+function closeStatPopupModal() {
+    const overlay = document.getElementById("statPopupModalOverlay");
+    if (overlay) overlay.classList.remove("open");
+    currentPopupType = null;
+}
+window.showStatPopup = showStatPopup;
+window.closeStatPopupModal = closeStatPopupModal;
+
+function renderStatPopupTable() {
+    const q = document.getElementById("statPopupSearchInput").value.toLowerCase().trim();
+    const thead = document.getElementById("statPopupTableHeader");
+    const tbody = document.getElementById("statPopupTableBody");
+
+    if (!thead || !tbody || !currentPopupType) return;
+
+    let headersHtml = "";
+    let bodyHtml = "";
+
+    if (currentPopupType === 'total') {
+        headersHtml = `
+            <tr>
+              <th style="padding-left:20px;">ชื่อสารเคมี</th>
+              <th>Material Number</th>
+              <th>จำนวนล็อต</th>
+              <th>จำนวนคงเหลือทั้งหมด</th>
+              <th style="padding-right:20px;">สถานที่จัดเก็บ</th>
+            </tr>
+        `;
+
+        const groups = {};
+        globalStockData.forEach(c => {
+            const key = `${c.chemical_name}::${c.material_number || ''}`;
+            if (!groups[key]) {
+                groups[key] = {
+                    chemical_name: c.chemical_name,
+                    material_number: c.material_number,
+                    unit: c.unit,
+                    total_quantity: 0,
+                    lot_count: 0,
+                    locations: new Set()
+                };
+            }
+            groups[key].total_quantity += c.quantity;
+            groups[key].lot_count += 1;
+            if (c.location) {
+                groups[key].locations.add(c.location.split(' ').slice(0, 2).join(' '));
+            }
+        });
+
+        const filteredGroups = Object.values(groups).filter(g => {
+            return g.chemical_name.toLowerCase().includes(q) || 
+                   (g.material_number || "").toLowerCase().includes(q) ||
+                   Array.from(g.locations).join(", ").toLowerCase().includes(q);
+        });
+
+        if (filteredGroups.length === 0) {
+            bodyHtml = `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted);">ไม่พบข้อมูลสารเคมี</td></tr>`;
+        } else {
+            bodyHtml = filteredGroups.map(g => {
+                const locs = Array.from(g.locations).map(l => `<span class="badge badge-loc" style="margin-right:4px;">${l}</span>`).join('') || '—';
+                return `<tr>
+                  <td style="padding-left:20px;font-weight:600;color:var(--text-head);">${g.chemical_name}</td>
+                  <td class="mono">${g.material_number || '—'}</td>
+                  <td class="mono">${g.lot_count} ล็อต</td>
+                  <td>
+                    <span class="mono" style="font-weight:700;font-size:14.5px;color:var(--text-head);">${g.total_quantity.toLocaleString('th-TH')}</span>
+                    <span style="font-size:12px;color:var(--text-muted);margin-left:2px;">${g.unit}</span>
+                  </td>
+                  <td style="padding-right:20px;">${locs}</td>
+                </tr>`;
+            }).join('');
+        }
+    } 
+    else if (currentPopupType === 'expiry') {
+        headersHtml = `
+            <tr>
+              <th style="padding-left:20px;">สารเคมี (ล็อต)</th>
+              <th>Material Number</th>
+              <th>วันหมดอายุ (EXP)</th>
+              <th>วันคงเหลือ</th>
+              <th style="padding-right:20px;">สถานที่จัดเก็บ</th>
+            </tr>
+        `;
+
+        const today = new Date();
+        const expiredItems = globalStockData.filter(c => {
+            if (!c.exp_date) return false;
+            const diff = (new Date(c.exp_date) - today) / 864e5;
+            return diff <= 30;
+        });
+
+        const filteredItems = expiredItems.filter(c => {
+            const nameMatches = c.chemical_name.toLowerCase().includes(q);
+            const matMatches = (c.material_number || "").toLowerCase().includes(q);
+            const lotMatches = (c.lot_number || "").toLowerCase().includes(q);
+            const locMatches = (c.location || "").toLowerCase().includes(q);
+            return nameMatches || matMatches || lotMatches || locMatches;
+        });
+
+        if (filteredItems.length === 0) {
+            bodyHtml = `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted);">ไม่พบรายการใกล้/หมดอายุ</td></tr>`;
+        } else {
+            bodyHtml = filteredItems.map(c => {
+                const diff = Math.ceil((new Date(c.exp_date) - today) / 864e5);
+                const statusBadge = diff <= 0
+                    ? `<span class="badge badge-red" style="font-weight:600;">หมดอายุแล้ว (${Math.abs(diff)} วัน)</span>`
+                    : `<span class="badge badge-amber" style="font-weight:600;">เหลือ ${diff} วัน</span>`;
+                
+                const lotStr = c.lot_number ? ` (ล็อต ${c.lot_number})` : '';
+                return `<tr>
+                  <td style="padding-left:20px;">
+                    <div style="font-weight:600;color:var(--text-head);">${c.chemical_name}${lotStr}</div>
+                    <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">คงเหลือ: ${c.quantity} ${c.unit}</div>
+                  </td>
+                  <td class="mono">${c.material_number || '—'}</td>
+                  <td class="mono">${formatDisplayDate(c.exp_date)}</td>
+                  <td>${statusBadge}</td>
+                  <td style="padding-right:20px;">
+                    <span class="badge badge-gray" style="font-size:11.5px;">${c.location ? c.location.split(' ').slice(0,2).join(' ') : '—'}</span>
+                  </td>
+                </tr>`;
+            }).join('');
+        }
+    } 
+    else if (currentPopupType === 'received') {
+        headersHtml = `
+            <tr>
+              <th style="padding-left:20px;">วัน-เวลา</th>
+              <th>สารเคมี</th>
+              <th>จำนวนที่รับเข้า</th>
+              <th>ราคาต่อหน่วย</th>
+              <th>ของแถม (แถมฟรี)</th>
+              <th style="padding-right:20px;">ผู้จัดจำหน่าย (Vendor)</th>
+            </tr>
+        `;
+
+        const firstDay = new Date();
+        firstDay.setDate(1); firstDay.setHours(0,0,0,0);
+        
+        const receivedTrans = globalTransData.filter(t => {
+            return t.type === 'IN' && new Date(t.transaction_date) >= firstDay;
+        });
+
+        const filteredTrans = receivedTrans.filter(t => {
+            const name = t.chemical_stock?.chemical_name || "";
+            const vendor = t.vendor || "";
+            const lot = t.chemical_stock?.lot_number || "";
+            return name.toLowerCase().includes(q) || vendor.toLowerCase().includes(q) || lot.toLowerCase().includes(q);
+        });
+
+        if (filteredTrans.length === 0) {
+            bodyHtml = `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">ไม่พบประวัติรับเข้าของเดือนนี้</td></tr>`;
+        } else {
+            bodyHtml = filteredTrans.map(t => {
+                const date = new Date(t.transaction_date);
+                const dateStr = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')} น.`;
+                
+                const lotStr = t.chemical_stock?.lot_number ? ` (ล็อต ${t.chemical_stock.lot_number})` : '';
+                return `<tr>
+                  <td style="padding-left:20px;font-size:12.5px;color:var(--text-muted);">${dateStr}</td>
+                  <td>
+                    <div style="font-weight:600;color:var(--text-head);">${t.chemical_stock?.chemical_name || 'ลบแล้ว'}${lotStr}</div>
+                  </td>
+                  <td>
+                    <span class="mono" style="font-weight:700;color:var(--success); font-size:14px;">+${t.quantity}</span>
+                    <span style="font-size:11.5px;color:var(--text-muted);margin-left:2px;">${t.chemical_stock?.unit || ''}</span>
+                  </td>
+                  <td class="mono">${t.price_per_unit ? t.price_per_unit.toFixed(2) + ' ฿' : '—'}</td>
+                  <td class="mono">${t.free_quantity ? t.free_quantity + ' ' + (t.chemical_stock?.unit || '') : '—'}</td>
+                  <td style="padding-right:20px;">${t.vendor || '—'}</td>
+                </tr>`;
+            }).join('');
+        }
+    } 
+    else if (currentPopupType === 'saving') {
+        headersHtml = `
+            <tr>
+              <th style="padding-left:20px;">วัน-เวลา</th>
+              <th>สารเคมี</th>
+              <th>จำนวนซื้อจริง</th>
+              <th>จำนวนแถมฟรี</th>
+              <th>ราคาต่อหน่วย</th>
+              <th style="padding-right:20px;">ยอดประหยัด (Savings)</th>
+            </tr>
+        `;
+
+        const currentFiscal = getFiscalYear(new Date());
+        const savingTrans = globalTransData.filter(t => {
+            return t.saving && t.saving > 0 && getFiscalYear(t.transaction_date) === currentFiscal;
+        });
+
+        const filteredTrans = savingTrans.filter(t => {
+            const name = t.chemical_stock?.chemical_name || "";
+            const lot = t.chemical_stock?.lot_number || "";
+            const vendor = t.vendor || "";
+            return name.toLowerCase().includes(q) || lot.toLowerCase().includes(q) || vendor.toLowerCase().includes(q);
+        });
+
+        if (filteredTrans.length === 0) {
+            bodyHtml = `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">ไม่พบประวัติยอดประหยัดในปีงบประมาณนี้</td></tr>`;
+        } else {
+            bodyHtml = filteredTrans.map(t => {
+                const date = new Date(t.transaction_date);
+                const dateStr = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')} น.`;
+                
+                const lotStr = t.chemical_stock?.lot_number ? ` (ล็อต ${t.chemical_stock.lot_number})` : '';
+                const freeQty = t.free_quantity || 0;
+                const paidQty = Math.max(0, t.quantity - freeQty);
+                return `<tr>
+                  <td style="padding-left:20px;font-size:12.5px;color:var(--text-muted);">${dateStr}</td>
+                  <td>
+                    <div style="font-weight:600;color:var(--text-head);">${t.chemical_stock?.chemical_name || 'ลบแล้ว'}${lotStr}</div>
+                    ${t.vendor ? `<div style="font-size:11px;color:var(--text-muted);margin-top:1px;">ผู้จัดจำหน่าย: ${t.vendor}</div>` : ''}
+                  </td>
+                  <td class="mono">${paidQty} ${t.chemical_stock?.unit || ''}</td>
+                  <td class="mono" style="font-weight:600;color:var(--success);">${freeQty} ${t.chemical_stock?.unit || ''}</td>
+                  <td class="mono">${t.price_per_unit ? t.price_per_unit.toFixed(2) + ' ฿' : '—'}</td>
+                  <td style="padding-right:20px;font-weight:700;color:var(--success);" class="mono">
+                    ${t.saving ? t.saving.toLocaleString('th-TH') + ' ฿' : '—'}
+                  </td>
+                </tr>`;
+            }).join('');
+        }
+    }
+    else if (currentPopupType === 'stock_level') {
+        headersHtml = `
+            <tr>
+              <th style="padding-left:20px;">ชื่อสารเคมี</th>
+              <th>Material Number</th>
+              <th>จำนวนคงเหลือ</th>
+              <th>เกณฑ์ Min / Max</th>
+              <th>สถานะแจ้งเตือน</th>
+              <th style="padding-right:20px;">สถานที่จัดเก็บ</th>
+            </tr>
+        `;
+
+        const groups = {};
+        globalStockData.forEach(c => {
+            const key = `${c.chemical_name}::${c.material_number || ''}`;
+            if (!groups[key]) {
+                groups[key] = {
+                    chemical_name: c.chemical_name,
+                    material_number: c.material_number,
+                    unit: c.unit,
+                    total_quantity: 0,
+                    min_quantity: c.min_quantity || 0,
+                    max_quantity: c.max_quantity || 0,
+                    locations: new Set()
+                };
+            } else {
+                if (c.min_quantity > 0) groups[key].min_quantity = c.min_quantity;
+                if (c.max_quantity > 0) groups[key].max_quantity = c.max_quantity;
+            }
+            groups[key].total_quantity += c.quantity;
+            if (c.location) {
+                groups[key].locations.add(c.location.split(' ').slice(0, 2).join(' '));
+            }
+        });
+
+        const alertGroups = Object.values(groups).filter(g => {
+            const minVal = parseFloat(g.min_quantity);
+            const maxVal = parseFloat(g.max_quantity);
+            const isBelowMin = (minVal > 0 && g.total_quantity < minVal);
+            const isAboveMax = (maxVal > 0 && g.total_quantity > maxVal);
+            return isBelowMin || isAboveMax;
+        });
+
+        const filteredGroups = alertGroups.filter(g => {
+            const nameMatches = g.chemical_name.toLowerCase().includes(q);
+            const matMatches = (g.material_number || "").toLowerCase().includes(q);
+            const locMatches = Array.from(g.locations).join(", ").toLowerCase().includes(q);
+            return nameMatches || matMatches || locMatches;
+        });
+
+        if (filteredGroups.length === 0) {
+            bodyHtml = `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">ไม่พบรายการสารเคมีที่อยู่นอกเกณฑ์ Min/Max</td></tr>`;
+        } else {
+            bodyHtml = filteredGroups.map(g => {
+                const minVal = parseFloat(g.min_quantity);
+                const maxVal = parseFloat(g.max_quantity);
+                
+                let badge = "";
+                if (minVal > 0 && g.total_quantity < minVal) {
+                    badge = `<span class="badge badge-red">⚠️ ต่ำกว่า Min</span>`;
+                } else if (maxVal > 0 && g.total_quantity > maxVal) {
+                    badge = `<span class="badge badge-amber">⚠️ เกิน Max</span>`;
+                }
+
+                const locs = Array.from(g.locations).map(l => `<span class="badge badge-loc" style="margin-right:4px;">${l}</span>`).join('') || '—';
+                
+                return `<tr>
+                  <td style="padding-left:20px;font-weight:600;color:var(--text-head);">${g.chemical_name}</td>
+                  <td class="mono">${g.material_number || '—'}</td>
+                  <td>
+                    <span class="mono" style="font-weight:700;font-size:14.5px;color:var(--text-head);">${g.total_quantity.toLocaleString('th-TH')}</span>
+                    <span style="font-size:12px;color:var(--text-muted);margin-left:2px;">${g.unit}</span>
+                  </td>
+                  <td class="mono" style="font-size:12.5px;color:var(--text-body);">
+                    Min: ${g.min_quantity || '0'} | Max: ${g.max_quantity || '0'}
+                  </td>
+                  <td>${badge}</td>
+                  <td style="padding-right:20px;">${locs}</td>
+                </tr>`;
+            }).join('');
+        }
+    }
+
+    thead.innerHTML = headersHtml;
+    tbody.innerHTML = bodyHtml;
+}
+
+function filterStatPopup() {
+    renderStatPopupTable();
+}
+window.filterStatPopup = filterStatPopup;
