@@ -1,6 +1,6 @@
-# Requirements - ระบบจัดการคลังสารเคมี (ChemStock)
+# Requirements - ระบบจัดการคลังสารเคมี (KlangSarn)
 
-เอกสารนี้ระบุความต้องการและขอบเขตของระบบ **ChemStock (Chemical Stock Control System v2.0 Mobile-First)**
+เอกสารนี้ระบุความต้องการและขอบเขตของระบบ **KlangSarn (Chemical Stock Control System v2.0 Mobile-First)**
 
 ---
 
@@ -51,6 +51,8 @@
 | `exp_date` | date | Nullable | วันหมดอายุ (Expiry Date) |
 | `location` | text | Not Null | ห้องจัดเก็บสารเคมี |
 | `price_per_unit` | double precision | Nullable, Default `0.0` | ราคาซื้อต่อหน่วย |
+| `min_quantity` | double precision | Default `0.0` | ปริมาณขั้นต่ำในคลัง (Min Threshold) |
+| `max_quantity` | double precision | Default `0.0` | ปริมาณสูงสุดในคลัง (Max Threshold) |
 | `image_urls` | text (JSON Array) | Nullable | เก็บรูปภาพประกอบ (ในรูปแบบ Array ของ Base64 Data URL) |
 | `created_at` | timestamp | Default `now()` | วันเวลาที่สร้างรายการ |
 
@@ -90,6 +92,11 @@
 - เมื่อมีการบันทึกธุรกรรมรับเข้า (IN) จำนวนคงเหลือใน `chemical_stock` จะต้องเพิ่มขึ้นโดยอัตโนมัติ
 - เมื่อมีการเบิกจ่าย (OUT) จำนวนคงเหลือใน `chemical_stock` จะต้องลดลงโดยอัตโนมัติ
 - **ระบบป้องกันข้อผิดพลาด**: หากจำนวนที่เบิกจ่าย (OUT) มากกว่าจำนวนคงเหลือในสต็อก ระบบต้องแสดงข้อความแจ้งเตือนด้วยสีแดงว่า "สต็อกคงเหลือไม่เพียงพอ!" และไม่อนุญาตให้บันทึกธุรกรรมนั้น
+
+### 4.4 ระบบแจ้งเตือนเกณฑ์ขั้นต่ำและสูงสุด (Min/Max Quantity Alerts)
+- ระบบต้องแสดงการแจ้งเตือนระดับคลังสินค้า (Min/Max) เมื่อตรวจสอบพบความไม่สมดุลของปริมาณสารเคมี:
+  - **ต่ำกว่าเกณฑ์ขั้นต่ำ (Below Min)**: หากปริมาณสารเคมีทั้งหมดรวมกันต่ำกว่า `min_quantity` ที่ระบุ ระบบต้องแสดงป้ายแจ้งเตือนสีแดงว่า `⚠️ ต่ำกว่า Min`
+  - **เกินเกณฑ์สูงสุด (Above Max)**: หากปริมาณสารเคมีทั้งหมดรวมกันสูงกว่า `max_quantity` ที่ระบุ ระบบต้องแสดงป้ายแจ้งเตือนสีส้มว่า `⚠️ เกิน Max`
 
 ---
 

@@ -1,6 +1,6 @@
 # Developer Manual & System Skills (skill.md)
 
-เอกสารสำหรับนักพัฒนาเพื่อเรียนรู้ทักษะที่จำเป็นในการตั้งค่าระบบ พัฒนาต่อยอด และทดสอบระบบจัดการคลังสารเคมี **ChemStock**
+เอกสารสำหรับนักพัฒนาเพื่อเรียนรู้ทักษะที่จำเป็นในการตั้งค่าระบบ พัฒนาต่อยอด และทดสอบระบบจัดการคลังสารเคมี **KlangSarn**
 
 ---
 
@@ -33,6 +33,8 @@ CREATE TABLE chemical_stock (
     exp_date date,
     location text NOT NULL,
     price_per_unit double precision DEFAULT 0.0,
+    min_quantity double precision DEFAULT 0.0,
+    max_quantity double precision DEFAULT 0.0,
     image_urls text, -- จัดเก็บ Base64 ในรูปแบบ JSON String [ "base64_img1", "base64_img2" ]
     created_at timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -95,8 +97,8 @@ reader.onload = ev => {
 
 ### 3.3 ระบบการล็อกอินของ Admin (Admin Session Management)
 เพื่อรักษาความปลอดภัยขั้นพื้นฐาน ระบบควบคุมสิทธิ์ผ่าน LocalStorage:
-- **ตัวแปรสิทธิ์ Admin**: `chemstock_admin` (เก็บค่าเป็น `'true'` เมื่อเข้าสู่ระบบสำเร็จ)
-- **ตัวแปรรหัสผ่าน**: `chemstock_admin_pwd` (รหัสผ่านเริ่มต้นหากไม่มีการเปลี่ยนคือ `chem@admin`)
+- **ตัวแปรสิทธิ์ Admin**: `klangsarn_admin` (เก็บค่าเป็น `'true'` เมื่อเข้าสู่ระบบสำเร็จ)
+- **ตัวแปรรหัสผ่าน**: `klangsarn_admin_pwd` (รหัสผ่านเริ่มต้นหากไม่มีการเปลี่ยนคือ `chem@admin`)
 - **การอัปเดต UI**: การซ่อนหรือแสดงปุ่มควบคุมแบบ Admin จะขึ้นกับค่าที่รีเทิร์นจากฟังก์ชัน `isAdminLoggedIn()` ในไฟล์ `js/ui.js`
 
 ---
