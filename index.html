@@ -1,526 +1,630 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>จัดการสต็อก — KlangSarn</title>
   <link rel="stylesheet" href="css/theme.css?v=3.9">
 </head>
+
 <body>
 
-<!-- Sidebar Overlay -->
-<div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <!-- Sidebar Overlay -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-<!-- ===== SIDEBAR ===== -->
-<aside id="sidebar" class="sidebar">
-  <div class="sidebar-brand">
-    <div class="sidebar-logo-wrap">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #ffffff; flex-shrink: 0;">
+  <!-- ===== SIDEBAR ===== -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo-wrap">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" style="color: #ffffff; flex-shrink: 0;">
           <path d="M3 10L12 3l9 7" />
-          <path d="M10.5 9h3v3l3.2 5.5a1 1 0 0 1-.86 1.5H8.2a1 1 0 0 1-.86-1.5l3.2-5.5V9z" fill="rgba(255,255,255,0.15)" />
+          <path d="M10.5 9h3v3l3.2 5.5a1 1 0 0 1-.86 1.5H8.2a1 1 0 0 1-.86-1.5l3.2-5.5V9z"
+            fill="rgba(255,255,255,0.15)" />
           <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none" />
         </svg>
+      </div>
+      <div>
+        <div class="sidebar-title">KlangSarn</div>
+        <div class="sidebar-subtitle">ระบบจัดการคลังสารเคมี (KlangSarn)</div>
+      </div>
     </div>
-    <div>
-      <div class="sidebar-title">KlangSarn</div>
-      <div class="sidebar-subtitle">ระบบจัดการคลังสารเคมี (KlangSarn)</div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">เมนูหลัก</div>
+
+      <a class="nav-link active" href="index.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" />
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+        </svg>
+        จัดการสต็อก
+      </a>
+
+      <a class="nav-link" href="transaction.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4" />
+        </svg>
+        ประวัติ รับ-จ่าย
+      </a>
+
+      <a class="nav-link" href="dashboard.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 3v18h18" />
+          <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+        </svg>
+        แดชบอร์ด
+      </a>
+
+      <div class="nav-section-label">ระบบ</div>
+
+      <a class="nav-link" href="admin.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+        Admin Panel
+        <span class="nav-pill admin-indicator" style="display:none">ADMIN</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-ava">K</div>
+        <div>
+          <div class="user-name">KlangSarn</div>
+          <div class="user-role" id="sidebarRole">ผู้ใช้ทั่วไป</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== TOP BAR (Mobile) ===== -->
+  <div class="top-bar">
+    <button id="sidebarOpenBtn" class="btn btn-ghost btn-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </button>
+    <div class="top-bar-brand">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"
+        style="color: var(--primary); margin-right: 6px; flex-shrink: 0;">
+        <path d="M3 10L12 3l9 7" />
+        <path d="M10.5 9h3v3l3.2 5.5a1 1 0 0 1-.86 1.5H8.2a1 1 0 0 1-.86-1.5l3.2-5.5V9z" fill="rgba(14,165,233,0.15)" />
+        <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none" />
+      </svg>
+      KlangSarn
+    </div>
+    <div style="width:36px;"></div>
+  </div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="main-content">
+    <div class="page-wrapper">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <div class="page-title">รายการสารเคมีในคลัง</div>
+          <div class="page-subtitle">จัดการสต็อก รับ-จ่าย และข้อมูลสารเคมีทั้งหมด</div>
+        </div>
+        <button class="btn btn-primary" onclick="openAddModal()" id="addBtnDesktop" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          เพิ่มรายการ
+        </button>
+      </div>
+
+      <!-- Filter & Search Bar -->
+      <div class="filter-card" style="padding: 16px 20px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center;">
+
+          <!-- Location filter chips -->
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+            <div class="filter-label" style="margin-bottom: 0; white-space: nowrap;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 2px;">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+              </svg>
+              ตัวกรองสถานที่
+            </div>
+            <div class="filter-row" id="filterBar">
+              <button class="filter-chip active" onclick="filterByLocation('All', this)">
+                ทั้งหมด
+              </button>
+              <button class="filter-chip" onclick="filterByLocation('ห้อง 1', this)">
+                <span class="loc-dot" style="background:#F59E0B;"></span> ห้อง 1 (ออกซิไดซ์)
+              </button>
+              <button class="filter-chip" onclick="filterByLocation('ห้อง 2', this)">
+                <span class="loc-dot" style="background:#EF4444;"></span> ห้อง 2 (กรด)
+              </button>
+              <button class="filter-chip" onclick="filterByLocation('ห้อง 3', this)">
+                <span class="loc-dot" style="background:#0EA5E9;"></span> ห้อง 3 (ด่าง)
+              </button>
+            </div>
+          </div>
+
+          <!-- Search Bar -->
+          <div style="position: relative; flex: 1; max-width: 320px; width: 100%;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5"
+              stroke-linecap="round"
+              style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input type="text" class="form-control" id="searchStock" placeholder="ค้นหาชื่อสารเคมี หรือ Material..."
+              oninput="applyStockFilters()"
+              style="padding-left: 36px; font-size: 13.5px; height: 40px; border-radius: var(--r-md);">
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Desktop Table -->
+      <div class="table-card desktop-only">
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="padding-left:22px; min-width:260px;">สารเคมี</th>
+                <th>จำนวนคงเหลือ</th>
+                <th>สถานะวันหมดอายุ</th>
+                <th id="th-location">สถานที่เก็บ</th>
+                <th style="text-align:right; padding-right:22px;">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="chemicalTableBody">
+              <tr>
+                <td colspan="5">
+                  <div class="empty-state" style="padding:40px 24px;">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.4"
+                      stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px; display:block;">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <div class="empty-title">กำลังโหลดข้อมูล...</div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Mobile Cards -->
+      <div id="chemicalCardsBody" class="mobile-flex chem-cards-list"></div>
+
     </div>
   </div>
 
-  <nav class="sidebar-nav">
-    <div class="nav-section-label">เมนูหลัก</div>
-
-    <a class="nav-link active" href="index.html">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-      จัดการสต็อก
-    </a>
-
-    <a class="nav-link" href="transaction.html">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/></svg>
-      ประวัติ รับ-จ่าย
-    </a>
-
-    <a class="nav-link" href="dashboard.html">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
-      แดชบอร์ด
-    </a>
-
-    <div class="nav-section-label">ระบบ</div>
-
-    <a class="nav-link" href="admin.html">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Admin Panel
-      <span class="nav-pill admin-indicator" style="display:none">ADMIN</span>
-    </a>
+  <!-- ===== BOTTOM NAV (Mobile) ===== -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a class="bottom-nav-item active" href="index.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" />
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+        </svg>
+        สต็อก
+      </a>
+      <a class="bottom-nav-item" href="transaction.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4" />
+        </svg>
+        ประวัติการรับ-จ่าย
+      </a>
+      <a class="bottom-nav-item" href="dashboard.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 3v18h18" />
+          <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+        </svg>
+        แดชบอร์ด
+      </a>
+      <a class="bottom-nav-item" href="admin.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+        Admin
+      </a>
+    </div>
   </nav>
 
-  <div class="sidebar-footer">
-    <div class="sidebar-user">
-      <div class="user-ava">K</div>
-      <div>
-        <div class="user-name">KlangSarn</div>
-        <div class="user-role" id="sidebarRole">ผู้ใช้ทั่วไป</div>
-      </div>
-    </div>
-  </div>
-</aside>
-
-<!-- ===== TOP BAR (Mobile) ===== -->
-<div class="top-bar">
-  <button id="sidebarOpenBtn" class="btn btn-ghost btn-icon">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-      <line x1="3" y1="6"  x2="21" y2="6"/>
-      <line x1="3" y1="12" x2="21" y2="12"/>
-      <line x1="3" y1="18" x2="21" y2="18"/>
-    </svg>
-  </button>
-  <div class="top-bar-brand">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary); margin-right: 6px; flex-shrink: 0;">
-      <path d="M3 10L12 3l9 7" />
-      <path d="M10.5 9h3v3l3.2 5.5a1 1 0 0 1-.86 1.5H8.2a1 1 0 0 1-.86-1.5l3.2-5.5V9z" fill="rgba(14,165,233,0.15)" />
-      <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none" />
-    </svg>
-    KlangSarn
-  </div>
-  <div style="width:36px;"></div>
-</div>
-
-<!-- ===== MAIN CONTENT ===== -->
-<div class="main-content">
-  <div class="page-wrapper">
-
-    <!-- Page Header -->
-    <div class="page-header">
-      <div>
-        <div class="page-title">รายการสารเคมีในคลัง</div>
-        <div class="page-subtitle">จัดการสต็อก รับ-จ่าย และข้อมูลสารเคมีทั้งหมด</div>
-      </div>
-      <button class="btn btn-primary" onclick="openAddModal()" id="addBtnDesktop" style="display:none;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        เพิ่มรายการ
-      </button>
-    </div>
-
-    <!-- Filter & Search Bar -->
-    <div class="filter-card" style="padding: 16px 20px;">
-      <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center;">
-        
-        <!-- Location filter chips -->
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-          <div class="filter-label" style="margin-bottom: 0; white-space: nowrap;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 2px;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-            ตัวกรองสถานที่
-          </div>
-          <div class="filter-row" id="filterBar">
-            <button class="filter-chip active" onclick="filterByLocation('All', this)">
-              ทั้งหมด
-            </button>
-            <button class="filter-chip" onclick="filterByLocation('ห้อง 1', this)">
-              <span class="loc-dot" style="background:#F59E0B;"></span> ห้อง 1 (ออกซิไดซ์)
-            </button>
-            <button class="filter-chip" onclick="filterByLocation('ห้อง 2', this)">
-              <span class="loc-dot" style="background:#EF4444;"></span> ห้อง 2 (กรด)
-            </button>
-            <button class="filter-chip" onclick="filterByLocation('ห้อง 3', this)">
-              <span class="loc-dot" style="background:#0EA5E9;"></span> ห้อง 3 (ด่าง)
-            </button>
-          </div>
+  <!-- ===== MODAL: เพิ่ม/แก้ไข ===== -->
+  <div class="modal-overlay" id="chemModalOverlay" onclick="if(event.target===this)closeChemModal()">
+    <div class="modal-box modal-lg">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="modalTitle">เพิ่มสารเคมีเข้าสต็อก</div>
+          <div class="modal-subtitle">กรอกข้อมูลสารเคมีให้ครบถ้วน</div>
         </div>
-
-        <!-- Search Bar -->
-        <div style="position: relative; flex: 1; max-width: 320px; width: 100%;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        <button class="btn-close-x" onclick="closeChemModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
-          <input type="text" class="form-control" id="searchStock"
-            placeholder="ค้นหาชื่อสารเคมี หรือ Material..."
-            oninput="applyStockFilters()"
-            style="padding-left: 36px; font-size: 13.5px; height: 40px; border-radius: var(--r-md);">
-        </div>
-
+        </button>
       </div>
-    </div>
-
-    <!-- Desktop Table -->
-    <div class="table-card desktop-only">
-      <div style="overflow-x:auto;">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th style="padding-left:22px; min-width:260px;">สารเคมี</th>
-              <th>จำนวนคงเหลือ</th>
-              <th>สถานะวันหมดอายุ</th>
-              <th id="th-location">สถานที่เก็บ</th>
-              <th style="text-align:right; padding-right:22px;">จัดการ</th>
-            </tr>
-          </thead>
-          <tbody id="chemicalTableBody">
-            <tr><td colspan="5">
-              <div class="empty-state" style="padding:40px 24px;">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px; display:block;">
-                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
-                <div class="empty-title">กำลังโหลดข้อมูล...</div>
-              </div>
-            </td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Mobile Cards -->
-    <div id="chemicalCardsBody" class="mobile-flex chem-cards-list"></div>
-
-  </div>
-</div>
-
-<!-- ===== BOTTOM NAV (Mobile) ===== -->
-<nav class="bottom-nav">
-  <div class="bottom-nav-inner">
-    <a class="bottom-nav-item active" href="index.html">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-      สต็อก
-    </a>
-    <a class="bottom-nav-item" href="transaction.html">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/></svg>
-      ประวัติการรับ-จ่าย
-    </a>
-    <a class="bottom-nav-item" href="dashboard.html">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
-      แดชบอร์ด
-    </a>
-    <a class="bottom-nav-item" href="admin.html">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Admin
-    </a>
-  </div>
-</nav>
-
-<!-- ===== MODAL: เพิ่ม/แก้ไข ===== -->
-<div class="modal-overlay" id="chemModalOverlay" onclick="if(event.target===this)closeChemModal()">
-  <div class="modal-box modal-lg">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title" id="modalTitle">เพิ่มสารเคมีเข้าสต็อก</div>
-        <div class="modal-subtitle">กรอกข้อมูลสารเคมีให้ครบถ้วน</div>
-      </div>
-      <button class="btn-close-x" onclick="closeChemModal()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form id="chemicalForm">
-        <input type="hidden" id="chemicalId">
-        <div class="grid-2">
-          <div class="form-group" style="grid-column:1/-1;">
-            <label class="form-label">ชื่อสารเคมี <span style="color:var(--danger);">*</span></label>
-            <input type="text" class="form-control" id="chemicalName" required placeholder="เช่น Sodium Hydroxide, Hydrochloric Acid">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Material Number</label>
-            <input type="text" class="form-control" id="materialNumber" placeholder="เช่น MAT-001" style="font-family:'IBM Plex Mono',monospace;">
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">สถานที่จัดเก็บ <span style="color:var(--danger);">*</span></label>
-            <select class="form-select" id="location" required>
-              <option value="" disabled selected>— เลือกห้องจัดเก็บ —</option>
-              <option value="ห้อง 1 สารเคมีประเภทออกซิไดซ์ (Oxidizing Agent)">ห้อง 1 (ออกซิไดซ์)</option>
-              <option value="ห้อง 2 สารเคมีประเภทกรด (Acid)">ห้อง 2 (กรด)</option>
-              <option value="ห้อง 3 สารเคมีประเภทด่าง (Alkali)">ห้อง 3 (ด่าง)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">จำนวนคงเหลือ <span style="color:var(--danger);">*</span></label>
-            <input type="number" step="0.01" min="0" class="form-control" id="quantity" required placeholder="0.00">
-          </div>
-          <div class="form-group">
-            <label class="form-label">ราคาต่อหน่วย (บาท)</label>
-            <input type="number" step="0.01" min="0" class="form-control" id="pricePerUnit" placeholder="0.00">
-          </div>
-          <div class="form-group">
-            <label class="form-label">หน่วยนับ <span style="color:var(--danger);">*</span></label>
-            <input type="text" class="form-control" id="unit" required placeholder="เช่น kg, L, ขวด, กระป๋อง">
-          </div>
-          <div class="form-group" style="grid-column: 1/-1;">
-            <label class="form-label">ผู้จัดจำหน่าย (Vendor)</label>
-            <input type="text" class="form-control" id="chemicalVendor" placeholder="ระบุชื่อบริษัท, ผู้จัดจำหน่าย หรือแหล่งที่มา">
-          </div>
-          <div class="form-group">
-            <label class="form-label" style="color:var(--text-body);">จำนวนขั้นต่ำ (Min)</label>
-            <input type="number" step="0.01" min="0" class="form-control" id="minQuantity" placeholder="เช่น 5.00">
-          </div>
-          <div class="form-group">
-            <label class="form-label" style="color:var(--text-body);">จำนวนสูงสุด (Max)</label>
-            <input type="number" step="0.01" min="0" class="form-control" id="maxQuantity" placeholder="เช่น 100.00">
-          </div>
-          <div class="form-group">
-            <label class="form-label green">วันที่ผลิต (MFG)</label>
-            <input type="date" class="form-control" id="mfgDate">
-          </div>
-          <div class="form-group">
-            <label class="form-label red">วันหมดอายุ (EXP)</label>
-            <input type="date" class="form-control" id="expDate">
-            <div class="quick-exp-btns">
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(6)">+6 เดือน</button>
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(12)">+1 ปี</button>
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(24)">+2 ปี</button>
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(36)">+3 ปี</button>
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(60)">+5 ปี</button>
+      <div class="modal-body">
+        <form id="chemicalForm">
+          <input type="hidden" id="chemicalId">
+          <div class="grid-2">
+            <div class="form-group" style="grid-column:1/-1;">
+              <label class="form-label">ชื่อสารเคมี <span style="color:var(--danger);">*</span></label>
+              <input type="text" class="form-control" id="chemicalName" required
+                placeholder="เช่น Sodium Hydroxide, Hydrochloric Acid">
             </div>
-          </div>
-          <div class="form-group" style="grid-column:1/-1;">
-            <label class="form-label">ภาพถ่ายสารเคมี (สูงสุด 3 รูป)</label>
-            
-            <input type="file" id="imageInput" accept="image/*" multiple style="display: none;" onchange="handleImageSelection(event)">
-            
-            <div id="imageUploadZone" class="upload-zone" onclick="document.getElementById('imageInput').click()">
-              <div class="upload-zone-inner">
-                <div class="upload-icon-wrap">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17 8 12 3 7 8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
-                  </svg>
-                </div>
-                <div style="text-align: left;">
-                  <span class="upload-title" style="display:inline-block; font-size:12px; font-weight:600;">คลิกเพื่อเลือกไฟล์ หรือลากรูปภาพมาวางที่นี่</span>
-                  <span class="upload-subtitle" style="display:block; font-size:10.5px; color:var(--text-muted); margin-top:2px;">(อัปโหลดได้สูงสุด 3 รูป ย่อขนาดและบีบอัดอัตโนมัติ)</span>
-                </div>
-              </div>
+            <div class="form-group">
+              <label class="form-label">Material Number</label>
+              <input type="text" class="form-control" id="materialNumber" placeholder="เช่น MAT-001"
+                style="font-family:'IBM Plex Mono',monospace;">
             </div>
-            
-            <div id="imagePreviewContainer" class="img-preview-row" style="margin-top: 12px;"></div>
-          </div>
-        </div>
-      </form>
-    </div>
-    <div class="modal-foot">
-      <button type="button" class="btn btn-outline" onclick="closeChemModal()">ยกเลิก</button>
-      <button type="button" class="btn btn-primary" onclick="document.getElementById('chemicalForm').requestSubmit()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        บันทึกข้อมูล
-      </button>
-    </div>
-  </div>
-</div>
 
-<!-- ===== MODAL: รับ-จ่าย ===== -->
-<div class="modal-overlay" id="transModalOverlay" onclick="if(event.target===this)closeTransModal()">
-  <div class="modal-box modal-sm">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title">บันทึก รับ-จ่าย สารเคมี</div>
-        <div class="modal-subtitle" id="transChemName">กำลังโหลด...</div>
-      </div>
-      <button class="btn-close-x" onclick="closeTransModal()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form id="transactionForm">
-        <input type="hidden" id="transChemId">
-        <input type="hidden" id="transType" value="IN">
-        <div class="form-group">
-          <label class="form-label">ประเภทรายการ</label>
-          <div class="trans-type-grid">
-            <!-- IN Button -->
-            <div class="trans-btn sel-in" id="btnIN" onclick="selectTransType('IN')">
-              <div class="trans-btn-icon ico-in">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-              </div>
-              <div class="trans-btn-label" style="color:var(--success);">รับเข้า</div>
-              <div class="trans-btn-sub">เพิ่มปริมาณสต็อก</div>
-            </div>
-            <!-- OUT Button -->
-            <div class="trans-btn" id="btnOUT" onclick="selectTransType('OUT')">
-              <div class="trans-btn-icon ico-out">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
-              </div>
-              <div class="trans-btn-label" style="color:var(--text-muted);">เบิกจ่าย</div>
-              <div class="trans-btn-sub">ลดปริมาณสต็อก</div>
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">จำนวน</label>
-          <div class="input-group">
-            <input type="number" step="0.01" min="0.01" class="form-control" id="transQty" required placeholder="0.00">
-            <span class="input-addon" id="transUnitLabel">หน่วย</span>
-          </div>
-        </div>
-        <!-- Promo Fields for Receive (IN) only -->
-        <div id="transPromoFields" style="display:none; margin-bottom: 16px;">
-          <!-- New Lot Toggle (Shown only for IN) -->
-          <div class="form-group" id="transNewLotToggleGroup" style="margin-bottom: 12px;">
-            <label class="checkbox-container" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-head); user-select: none;">
-              <input type="checkbox" id="transNewLotToggle" style="width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;">
-              รับเข้าเป็นล็อตใหม่ (เปิดล็อตใหม่)
-            </label>
-          </div>
-
-          <!-- New Lot Container (Hidden by default) -->
-          <div id="transNewLotContainer" style="display:none; padding: 14px; border-radius: var(--r-md); background: rgba(14,165,233,0.04); border: 1px solid rgba(14,165,233,0.1); margin-bottom: 16px;">
-
-            <div class="form-group" style="margin-bottom: 12px;">
+            <div class="form-group">
               <label class="form-label">สถานที่จัดเก็บ <span style="color:var(--danger);">*</span></label>
-              <select class="form-select" id="transLocation">
+              <select class="form-select" id="location" required>
                 <option value="" disabled selected>— เลือกห้องจัดเก็บ —</option>
                 <option value="ห้อง 1 สารเคมีประเภทออกซิไดซ์ (Oxidizing Agent)">ห้อง 1 (ออกซิไดซ์)</option>
                 <option value="ห้อง 2 สารเคมีประเภทกรด (Acid)">ห้อง 2 (กรด)</option>
                 <option value="ห้อง 3 สารเคมีประเภทด่าง (Alkali)">ห้อง 3 (ด่าง)</option>
               </select>
             </div>
-            <div class="grid-2" style="margin-bottom: 0;">
-              <div class="form-group" style="margin-bottom:0;">
-                <label class="form-label green">วันที่ผลิต (MFG)</label>
-                <input type="date" class="form-control" id="transMfgDate">
+            <div class="form-group">
+              <label class="form-label">จำนวนคงเหลือ <span style="color:var(--danger);">*</span></label>
+              <input type="number" step="0.01" min="0" class="form-control" id="quantity" required placeholder="0.00">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ราคาต่อหน่วย (บาท)</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="pricePerUnit" placeholder="0.00">
+            </div>
+            <div class="form-group">
+              <label class="form-label">หน่วยนับ <span style="color:var(--danger);">*</span></label>
+              <input type="text" class="form-control" id="unit" required placeholder="เช่น kg, L, ขวด, กระป๋อง">
+            </div>
+            <div class="form-group" style="grid-column: 1/-1;">
+              <label class="form-label">ผู้จัดจำหน่าย (Vendor)</label>
+              <input type="text" class="form-control" id="chemicalVendor"
+                placeholder="ระบุชื่อบริษัท, ผู้จัดจำหน่าย หรือแหล่งที่มา">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="color:var(--text-body);">จำนวนขั้นต่ำ (Min)</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="minQuantity" placeholder="เช่น 5.00">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="color:var(--text-body);">จำนวนสูงสุด (Max)</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="maxQuantity" placeholder="เช่น 100.00">
+            </div>
+            <div class="form-group">
+              <label class="form-label green">วันที่ผลิต (MFG)</label>
+              <input type="date" class="form-control" id="mfgDate">
+            </div>
+            <div class="form-group">
+              <label class="form-label red">วันหมดอายุ (EXP)</label>
+              <input type="date" class="form-control" id="expDate">
+              <div class="quick-exp-btns">
+                <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(6)">+6 เดือน</button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(12)">+1 ปี</button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(24)">+2 ปี</button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(36)">+3 ปี</button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(60)">+5 ปี</button>
               </div>
-              <div class="form-group" style="margin-bottom:0;">
-                <label class="form-label red">วันหมดอายุ (EXP)</label>
-                <input type="date" class="form-control" id="transExpDate">
-                <div class="quick-exp-btns" style="display: flex; gap: 4px; margin-top: 4px;">
-                  <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExpTrans(12)">+1 ปี</button>
-                  <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExpTrans(24)">+2 ปี</button>
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+              <label class="form-label">ภาพถ่ายสารเคมี (สูงสุด 3 รูป)</label>
+
+              <input type="file" id="imageInput" accept="image/*" multiple style="display: none;"
+                onchange="handleImageSelection(event)">
+
+              <div id="imageUploadZone" class="upload-zone" onclick="document.getElementById('imageInput').click()">
+                <div class="upload-zone-inner">
+                  <div class="upload-icon-wrap">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                  </div>
+                  <div style="text-align: left;">
+                    <span class="upload-title"
+                      style="display:inline-block; font-size:12px; font-weight:600;">คลิกเพื่อเลือกไฟล์
+                      หรือลากรูปภาพมาวางที่นี่</span>
+                    <span class="upload-subtitle"
+                      style="display:block; font-size:10.5px; color:var(--text-muted); margin-top:2px;">(อัปโหลดได้สูงสุด
+                      3 รูป ย่อขนาดและบีบอัดอัตโนมัติ)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div id="imagePreviewContainer" class="img-preview-row" style="margin-top: 12px;"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" onclick="closeChemModal()">ยกเลิก</button>
+        <button type="button" class="btn btn-primary" onclick="document.getElementById('chemicalForm').requestSubmit()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          บันทึกข้อมูล
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: รับ-จ่าย ===== -->
+  <div class="modal-overlay" id="transModalOverlay" onclick="if(event.target===this)closeTransModal()">
+    <div class="modal-box modal-sm">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">บันทึก รับ-จ่าย สารเคมี</div>
+          <div class="modal-subtitle" id="transChemName">กำลังโหลด...</div>
+        </div>
+        <button class="btn-close-x" onclick="closeTransModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="transactionForm">
+          <input type="hidden" id="transChemId">
+          <input type="hidden" id="transType" value="IN">
+          <div class="form-group">
+            <label class="form-label">ประเภทรายการ</label>
+            <div class="trans-type-grid">
+              <!-- IN Button -->
+              <div class="trans-btn sel-in" id="btnIN" onclick="selectTransType('IN')">
+                <div class="trans-btn-icon ico-in">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <polyline points="19 12 12 19 5 12" />
+                  </svg>
+                </div>
+                <div class="trans-btn-label" style="color:var(--success);">รับเข้า</div>
+                <div class="trans-btn-sub">เพิ่มปริมาณสต็อก</div>
+              </div>
+              <!-- OUT Button -->
+              <div class="trans-btn" id="btnOUT" onclick="selectTransType('OUT')">
+                <div class="trans-btn-icon ico-out">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="19" x2="12" y2="5" />
+                    <polyline points="5 12 12 5 19 12" />
+                  </svg>
+                </div>
+                <div class="trans-btn-label" style="color:var(--text-muted);">เบิกจ่าย</div>
+                <div class="trans-btn-sub">ลดปริมาณสต็อก</div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">จำนวน</label>
+            <div class="input-group">
+              <input type="number" step="0.01" min="0.01" class="form-control" id="transQty" required
+                placeholder="0.00">
+              <span class="input-addon" id="transUnitLabel">หน่วย</span>
+            </div>
+          </div>
+          <!-- Promo Fields for Receive (IN) only -->
+          <div id="transPromoFields" style="display:none; margin-bottom: 16px;">
+            <!-- New Lot Toggle (Shown only for IN) -->
+            <div class="form-group" id="transNewLotToggleGroup" style="margin-bottom: 12px;">
+              <label class="checkbox-container"
+                style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-head); user-select: none;">
+                <input type="checkbox" id="transNewLotToggle"
+                  style="width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;">
+                รับเข้าเป็นล็อตใหม่ (เปิดล็อตใหม่)
+              </label>
+            </div>
+
+            <!-- New Lot Container (Hidden by default) -->
+            <div id="transNewLotContainer"
+              style="display:none; padding: 14px; border-radius: var(--r-md); background: rgba(14,165,233,0.04); border: 1px solid rgba(14,165,233,0.1); margin-bottom: 16px;">
+
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">สถานที่จัดเก็บ <span style="color:var(--danger);">*</span></label>
+                <select class="form-select" id="transLocation">
+                  <option value="" disabled selected>— เลือกห้องจัดเก็บ —</option>
+                  <option value="ห้อง 1 สารเคมีประเภทออกซิไดซ์ (Oxidizing Agent)">ห้อง 1 (ออกซิไดซ์)</option>
+                  <option value="ห้อง 2 สารเคมีประเภทกรด (Acid)">ห้อง 2 (กรด)</option>
+                  <option value="ห้อง 3 สารเคมีประเภทด่าง (Alkali)">ห้อง 3 (ด่าง)</option>
+                </select>
+              </div>
+              <div class="grid-2" style="margin-bottom: 0;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label green">วันที่ผลิต (MFG)</label>
+                  <input type="date" class="form-control" id="transMfgDate">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label red">วันหมดอายุ (EXP)</label>
+                  <input type="date" class="form-control" id="transExpDate">
+                  <div class="quick-exp-btns" style="display: flex; gap: 4px; margin-top: 4px;">
+                    <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExpTrans(12)">+1 ปี</button>
+                    <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExpTrans(24)">+2 ปี</button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="grid-2" style="margin-bottom: 12px;">
-            <div class="form-group" style="margin-bottom:0;">
-              <label class="form-label">ราคาซื้อต่อหน่วย (บาท)</label>
-              <input type="number" step="0.01" min="0" class="form-control" id="transPricePerUnit" placeholder="0.00">
+            <div class="grid-2" style="margin-bottom: 12px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">ราคาซื้อต่อหน่วย (บาท)</label>
+                <input type="number" step="0.01" min="0" class="form-control" id="transPricePerUnit" placeholder="0.00">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">ผู้จัดจำหน่าย (Vendor)</label>
+                <input type="text" class="form-control" id="transVendor"
+                  placeholder="ระบุชื่อบริษัท, ผู้จัดจำหน่าย หรือแหล่งที่มา">
+              </div>
             </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label class="form-label">ผู้จัดจำหน่าย (Vendor)</label>
-              <input type="text" class="form-control" id="transVendor" placeholder="ระบุชื่อบริษัท, ผู้จัดจำหน่าย หรือแหล่งที่มา">
+
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="checkbox-container"
+                style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-head); user-select: none;">
+                <input type="checkbox" id="transPromoToggle"
+                  style="width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;">
+                รายการนี้มีโปรโมชันของแถม (แถมฟรี)
+              </label>
+            </div>
+
+            <div class="form-group" id="transFreeQtyContainer" style="display:none; margin-bottom: 12px;">
+              <label class="form-label">จำนวนของแถม (แถมฟรี)</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="transFreeQty" placeholder="0.00"
+                value="0">
+            </div>
+
+            <div id="transSummaryText"
+              style="padding: 12px; border-radius: 8px; background: var(--bg-hover); border: 1px dashed var(--primary); font-size: 12.5px; line-height: 1.5; color: var(--text-body); display: none; margin-bottom: 12px;">
             </div>
           </div>
-          
-          <div class="form-group" style="margin-bottom: 12px;">
-            <label class="checkbox-container" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-head); user-select: none;">
-              <input type="checkbox" id="transPromoToggle" style="width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;">
-              รายการนี้มีโปรโมชันของแถม (แถมฟรี)
-            </label>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">หมายเหตุ / แผนกที่เบิก</label>
+            <input type="text" class="form-control" id="transRemark"
+              placeholder="ระบุแผนก, เหตุผลการเบิก หรือรายละเอียดเพิ่มเติม">
           </div>
-
-          <div class="form-group" id="transFreeQtyContainer" style="display:none; margin-bottom: 12px;">
-            <label class="form-label">จำนวนของแถม (แถมฟรี)</label>
-            <input type="number" step="0.01" min="0" class="form-control" id="transFreeQty" placeholder="0.00" value="0">
-          </div>
-
-          <div id="transSummaryText" style="padding: 12px; border-radius: 8px; background: var(--bg-hover); border: 1px dashed var(--primary); font-size: 12.5px; line-height: 1.5; color: var(--text-body); display: none; margin-bottom: 12px;">
-          </div>
-        </div>
-        <div class="form-group" style="margin-bottom:0;">
-          <label class="form-label">หมายเหตุ / แผนกที่เบิก</label>
-          <input type="text" class="form-control" id="transRemark" placeholder="ระบุแผนก, เหตุผลการเบิก หรือรายละเอียดเพิ่มเติม">
-        </div>
-      </form>
-    </div>
-    <div class="modal-foot">
-      <button type="button" class="btn btn-outline" onclick="closeTransModal()">ยกเลิก</button>
-      <button type="button" class="btn btn-primary" onclick="document.getElementById('transactionForm').requestSubmit()" id="transSubmitBtn">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-        ยืนยัน
-      </button>
-    </div>
-  </div>
-</div>
-<!-- ===== MODAL: ยืนยันการลบ ===== -->
-<div class="modal-overlay" id="confirmDeleteModalOverlay" onclick="if(event.target===this)closeDeleteModal()">
-  <div class="modal-box modal-sm" style="border-radius: var(--r-xl); overflow: hidden;">
-    <div class="modal-head" style="background: linear-gradient(135deg, #FFF5F5, #FFEBEB); border-bottom: 1px solid rgba(239,68,68,0.1);">
-      <div>
-        <div class="modal-title" style="color: var(--danger); display: flex; align-items: center; gap: 8px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          ยืนยันการลบรายการ
-        </div>
-        <div class="modal-subtitle" style="color: #F87171;">โปรดตรวจสอบข้อมูลก่อนยืนยัน</div>
+        </form>
       </div>
-      <button class="btn-close-x" onclick="closeDeleteModal()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body" style="padding: 24px; text-align: center;">
-      <div style="font-size: 14.5px; font-weight: 500; color: var(--text-head); margin-bottom: 8px;" id="deleteItemName">คุณกำลังจะลบสารเคมีนี้</div>
-      <div style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">
-        การลบจะทำให้ข้อมูลสารเคมีคงค้างและประวัติธุรกรรมที่เกี่ยวข้องทั้งหมดถูกลบออกจากฐานข้อมูลอย่างถาวรและไม่สามารถกู้คืนได้
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" onclick="closeTransModal()">ยกเลิก</button>
+        <button type="button" class="btn btn-primary"
+          onclick="document.getElementById('transactionForm').requestSubmit()" id="transSubmitBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          ยืนยัน
+        </button>
       </div>
     </div>
-    <div class="modal-foot" style="background: #FAFCFF; border-top: 1px solid var(--border-soft); padding: 12px 22px;">
-      <button type="button" class="btn btn-outline" onclick="closeDeleteModal()">ยกเลิก</button>
-      <button type="button" class="btn btn-danger" id="confirmDeleteBtn" onclick="executeChemicalDelete()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-        ยืนยันการลบ
-      </button>
+  </div>
+  <!-- ===== MODAL: ยืนยันการลบ ===== -->
+  <div class="modal-overlay" id="confirmDeleteModalOverlay" onclick="if(event.target===this)closeDeleteModal()">
+    <div class="modal-box modal-sm" style="border-radius: var(--r-xl); overflow: hidden;">
+      <div class="modal-head"
+        style="background: linear-gradient(135deg, #FFF5F5, #FFEBEB); border-bottom: 1px solid rgba(239,68,68,0.1);">
+        <div>
+          <div class="modal-title" style="color: var(--danger); display: flex; align-items: center; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            ยืนยันการลบรายการ
+          </div>
+          <div class="modal-subtitle" style="color: #F87171;">โปรดตรวจสอบข้อมูลก่อนยืนยัน</div>
+        </div>
+        <button class="btn-close-x" onclick="closeDeleteModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 24px; text-align: center;">
+        <div style="font-size: 14.5px; font-weight: 500; color: var(--text-head); margin-bottom: 8px;"
+          id="deleteItemName">คุณกำลังจะลบสารเคมีนี้</div>
+        <div style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">
+          การลบจะทำให้ข้อมูลสารเคมีคงค้างและประวัติธุรกรรมที่เกี่ยวข้องทั้งหมดถูกลบออกจากฐานข้อมูลอย่างถาวรและไม่สามารถกู้คืนได้
+        </div>
+      </div>
+      <div class="modal-foot"
+        style="background: #FAFCFF; border-top: 1px solid var(--border-soft); padding: 12px 22px;">
+        <button type="button" class="btn btn-outline" onclick="closeDeleteModal()">ยกเลิก</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn" onclick="executeChemicalDelete()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+          </svg>
+          ยืนยันการลบ
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="toastContainer" class="toast-container"></div>
+  <div id="toastContainer" class="toast-container"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/ui.js?v=3.9"></script>
-<script src="js/script.js?v=3.9"></script>
-<script>
-  // Admin UI init
-  document.addEventListener('DOMContentLoaded', () => {
-    if (isAdminLoggedIn()) {
-      document.getElementById('sidebarRole').textContent = '🔑 Admin Mode';
-      document.getElementById('addBtnDesktop').style.display = '';
-      document.querySelectorAll('.admin-indicator').forEach(el => el.style.display = '');
-    }
-  });
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/ui.js?v=3.9"></script>
+  <script src="js/script.js?v=3.9"></script>
+  <script>
+    // Admin UI init
+    document.addEventListener('DOMContentLoaded', () => {
+      if (isAdminLoggedIn()) {
+        document.getElementById('sidebarRole').textContent = '🔑 Admin Mode';
+        document.getElementById('addBtnDesktop').style.display = '';
+        document.querySelectorAll('.admin-indicator').forEach(el => el.style.display = '');
+      }
+    });
 
-  // Trans type toggle
-  function selectTransType(type) {
-    document.getElementById('transType').value = type;
-    const btnIN  = document.getElementById('btnIN');
-    const btnOUT = document.getElementById('btnOUT');
-    const lblIN  = btnIN.querySelector('.trans-btn-label');
-    const lblOUT = btnOUT.querySelector('.trans-btn-label');
-    const subBtn = document.getElementById('transSubmitBtn');
-    const promoFields = document.getElementById('transPromoFields');
+    // Trans type toggle
+    function selectTransType(type) {
+      document.getElementById('transType').value = type;
+      const btnIN = document.getElementById('btnIN');
+      const btnOUT = document.getElementById('btnOUT');
+      const lblIN = btnIN.querySelector('.trans-btn-label');
+      const lblOUT = btnOUT.querySelector('.trans-btn-label');
+      const subBtn = document.getElementById('transSubmitBtn');
+      const promoFields = document.getElementById('transPromoFields');
 
-    const newLotToggleGroup = document.getElementById("transNewLotToggleGroup");
-    const newLotContainer = document.getElementById("transNewLotContainer");
-    const newLotToggle = document.getElementById("transNewLotToggle");
+      const newLotToggleGroup = document.getElementById("transNewLotToggleGroup");
+      const newLotContainer = document.getElementById("transNewLotContainer");
+      const newLotToggle = document.getElementById("transNewLotToggle");
 
-    if (type === 'IN') {
-      btnIN.className  = 'trans-btn sel-in';
-      btnOUT.className = 'trans-btn';
-      lblIN.style.color  = 'var(--success)';
-      lblOUT.style.color = 'var(--text-muted)';
-      subBtn.style.background = 'var(--ok-grad)';
-      if (promoFields) promoFields.style.display = 'block';
-      if (newLotToggleGroup) newLotToggleGroup.style.display = 'block';
-      if (newLotToggle && newLotToggle.checked && newLotContainer) newLotContainer.style.display = 'block';
-      if (typeof updateTransSummary === 'function') updateTransSummary();
-    } else {
-      btnOUT.className = 'trans-btn sel-out';
-      btnIN.className  = 'trans-btn';
-      lblOUT.style.color = 'var(--danger)';
-      lblIN.style.color  = 'var(--text-muted)';
-      subBtn.style.background = 'var(--over-grad)';
-      if (promoFields) promoFields.style.display = 'none';
-      if (newLotToggleGroup) newLotToggleGroup.style.display = 'none';
-      if (newLotContainer) newLotContainer.style.display = 'none';
-      if (newLotToggle) {
+      if (type === 'IN') {
+        btnIN.className = 'trans-btn sel-in';
+        btnOUT.className = 'trans-btn';
+        lblIN.style.color = 'var(--success)';
+        lblOUT.style.color = 'var(--text-muted)';
+        subBtn.style.background = 'var(--ok-grad)';
+        if (promoFields) promoFields.style.display = 'block';
+        if (newLotToggleGroup) newLotToggleGroup.style.display = 'block';
+        if (newLotToggle && newLotToggle.checked && newLotContainer) newLotContainer.style.display = 'block';
+        if (typeof updateTransSummary === 'function') updateTransSummary();
+      } else {
+        btnOUT.className = 'trans-btn sel-out';
+        btnIN.className = 'trans-btn';
+        lblOUT.style.color = 'var(--danger)';
+        lblIN.style.color = 'var(--text-muted)';
+        subBtn.style.background = 'var(--over-grad)';
+        if (promoFields) promoFields.style.display = 'none';
+        if (newLotToggleGroup) newLotToggleGroup.style.display = 'none';
+        if (newLotContainer) newLotContainer.style.display = 'none';
+        if (newLotToggle) {
           newLotToggle.checked = false;
           document.getElementById("transLocation").required = false;
+        }
+        const summaryDiv = document.getElementById("transSummaryText");
+        if (summaryDiv) summaryDiv.style.display = "none";
       }
-      const summaryDiv = document.getElementById("transSummaryText");
-      if (summaryDiv) summaryDiv.style.display = "none";
     }
-  }
-</script>
+  </script>
 </body>
+
 </html>
