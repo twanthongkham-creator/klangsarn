@@ -224,10 +224,7 @@
             <label class="form-label">Material Number</label>
             <input type="text" class="form-control" id="materialNumber" placeholder="เช่น MAT-001" style="font-family:'IBM Plex Mono',monospace;">
           </div>
-          <div class="form-group">
-            <label class="form-label">เลขที่ล็อต (Lot Number)</label>
-            <input type="text" class="form-control" id="lotNumber" placeholder="เช่น LOT-01, Batch-02" style="font-family:'IBM Plex Mono',monospace;">
-          </div>
+
           <div class="form-group">
             <label class="form-label">สถานที่จัดเก็บ <span style="color:var(--danger);">*</span></label>
             <select class="form-select" id="location" required>
@@ -370,10 +367,7 @@
 
           <!-- New Lot Container (Hidden by default) -->
           <div id="transNewLotContainer" style="display:none; padding: 14px; border-radius: var(--r-md); background: rgba(14,165,233,0.04); border: 1px solid rgba(14,165,233,0.1); margin-bottom: 16px;">
-            <div class="form-group" style="margin-bottom: 12px;">
-              <label class="form-label">เลขที่ล็อต (Lot Number) <span style="color:var(--danger);">*</span></label>
-              <input type="text" class="form-control" id="transLotNumber" placeholder="เช่น LOT-02, Batch-03" style="font-family:'IBM Plex Mono',monospace;">
-            </div>
+
             <div class="form-group" style="margin-bottom: 12px;">
               <label class="form-label">สถานที่จัดเก็บ <span style="color:var(--danger);">*</span></label>
               <select class="form-select" id="transLocation">
@@ -439,6 +433,7 @@
       </button>
     </div>
   </div>
+</div>
 <!-- ===== MODAL: ยืนยันการลบ ===== -->
 <div class="modal-overlay" id="confirmDeleteModalOverlay" onclick="if(event.target===this)closeDeleteModal()">
   <div class="modal-box modal-sm" style="border-radius: var(--r-xl); overflow: hidden;">
@@ -520,7 +515,6 @@
       if (newLotContainer) newLotContainer.style.display = 'none';
       if (newLotToggle) {
           newLotToggle.checked = false;
-          document.getElementById("transLotNumber").required = false;
           document.getElementById("transLocation").required = false;
       }
       const summaryDiv = document.getElementById("transSummaryText");

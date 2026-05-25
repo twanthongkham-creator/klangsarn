@@ -382,7 +382,6 @@
               <th style="padding-left:22px; width:80px;">ID</th>
               <th>ชื่อสารเคมี</th>
               <th>Material No.</th>
-              <th>เลขที่ล็อต</th>
               <th>จำนวนคงเหลือ</th>
               <th>วันผลิต / วันหมดอายุ</th>
               <th>สถานที่จัดเก็บ</th>
@@ -628,10 +627,7 @@
             <label class="form-label">Material Number</label>
             <input type="text" class="form-control" id="materialNumber" placeholder="เช่น MAT-001" style="font-family:'IBM Plex Mono',monospace;">
           </div>
-          <div class="form-group">
-            <label class="form-label">เลขที่ล็อต (Lot Number)</label>
-            <input type="text" class="form-control" id="lotNumber" placeholder="เช่น LOT-01, Batch-02" style="font-family:'IBM Plex Mono',monospace;">
-          </div>
+
           <div class="form-group">
             <label class="form-label">สถานที่จัดเก็บ <span style="color:var(--danger);">*</span></label>
             <select class="form-select" id="location" required>
@@ -772,10 +768,7 @@
 
           <!-- New Lot Container (Hidden by default) -->
           <div id="adminTransNewLotContainer" style="display:none; padding: 14px; border-radius: var(--r-md); background: rgba(14,165,233,0.04); border: 1px solid rgba(14,165,233,0.1); margin-bottom: 16px;">
-            <div class="form-group" style="margin-bottom: 12px;">
-              <label class="form-label">เลขที่ล็อต (Lot Number) <span style="color:var(--danger);">*</span></label>
-              <input type="text" class="form-control" id="adminTransLotNumber" placeholder="เช่น LOT-02, Batch-03" style="font-family:'IBM Plex Mono',monospace;">
-            </div>
+
             <div class="form-group" style="margin-bottom: 12px;">
               <label class="form-label">สถานที่จัดเก็บ <span style="color:var(--danger);">*</span></label>
               <select class="form-select" id="adminTransLocation">
