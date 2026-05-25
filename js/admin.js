@@ -186,7 +186,11 @@ function renderAdminChems() {
           ${lotThumb}
         </td>
         <td style="padding-right:22px;text-align:right;">
-          <div style="display:inline-flex;gap:6px;">
+          <div style="display:inline-flex;gap:6px;align-items:center;">
+            <button class="btn btn-add-lot btn-xs" onclick="openAddTransModal(${item.id}, true)" title="เปิดล็อตใหม่" style="font-size:11px; height:28px; padding:0 8px; border-radius:var(--r-sm);">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              เปิดล็อตใหม่
+            </button>
             <button class="btn btn-outline btn-sm btn-icon" onclick="openEditChemModal(${item.id})" title="แก้ไข">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -486,7 +490,7 @@ function viewImage(src) {
 }
 
 // ===== TRANSACTION MODAL CRUD =====
-function openAddTransModal() {
+function openAddTransModal(chemId = null, isNewLot = false) {
     document.getElementById("adminTransId").value = "";
     document.getElementById("adminTransForm").reset();
     document.getElementById("adminTransDate").value = getLocalISOString(new Date());
@@ -501,13 +505,23 @@ function openAddTransModal() {
     if (submitBtn) submitBtn.disabled = false;
     document.getElementById("adminTransVendor").value = "";
 
+    // Set chemical selection if passed
+    if (chemId) {
+        document.getElementById("adminTransChemId").value = chemId;
+        const chem = adminChems.find(c => c.id == chemId);
+        if (chem) {
+            document.getElementById("adminTransPricePerUnit").value = chem.price_per_unit || 0.0;
+        }
+    }
+
     // Handle New Lot toggles and inputs
     const newLotToggle = document.getElementById("adminTransNewLotToggle");
     const newLotContainer = document.getElementById("adminTransNewLotContainer");
     if (newLotToggle && newLotContainer) {
-        newLotToggle.checked = false;
-        newLotContainer.style.display = "none";
-        document.getElementById("adminTransLocation").value = "";
+        newLotToggle.checked = isNewLot;
+        newLotContainer.style.display = isNewLot ? "block" : "none";
+        document.getElementById("adminTransLocation").required = isNewLot;
+        document.getElementById("adminTransLocation").value = chemId ? (adminChems.find(c => c.id == chemId)?.location || "") : "";
         document.getElementById("adminTransMfgDate").value = "";
         document.getElementById("adminTransExpDate").value = "";
     }
