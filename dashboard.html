@@ -1,394 +1,466 @@
 <!DOCTYPE html>
 
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>แดชบอร์ด — KlangSarn</title>
   <link rel="stylesheet" href="css/theme.css?v=3.9">
 </head>
+
 <body>
 
-<div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-<!-- ===== SIDEBAR ===== -->
+  <!-- ===== SIDEBAR ===== -->
 
-<aside id="sidebar" class="sidebar">
-  <div class="sidebar-brand">
-    <div class="sidebar-logo-wrap">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #ffffff; flex-shrink: 0;">
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo-wrap">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" style="color: #ffffff; flex-shrink: 0;">
+          <path d="M3 10L12 3l9 7" />
+          <path d="M10.5 9h3v3l3.2 5.5a1 1 0 0 1-.86 1.5H8.2a1 1 0 0 1-.86-1.5l3.2-5.5V9z"
+            fill="rgba(255,255,255,0.15)" />
+          <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none" />
+        </svg>
+      </div>
+      <div>
+        <div class="sidebar-title">KlangSarn</div>
+        <div class="sidebar-subtitle">ระบบจัดการคลังสารเคมี (KlangSarn)</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">เมนูหลัก</div>
+      <a class="nav-link" href="index.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" />
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+        </svg>
+        จัดการสต็อก
+      </a>
+      <a class="nav-link" href="transaction.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4" />
+        </svg>
+        ประวัติ รับ-จ่าย
+      </a>
+      <a class="nav-link active" href="dashboard.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 3v18h18" />
+          <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+        </svg>
+        แดชบอร์ด
+      </a>
+      <div class="nav-section-label">ระบบ</div>
+      <a class="nav-link" href="admin.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+        Admin Panel
+        <span class="nav-pill admin-indicator" style="display:none">ADMIN</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-ava">K</div>
+        <div>
+          <div class="user-name">KlangSarn</div>
+          <div class="user-role" id="sidebarRole">ผู้ใช้ทั่วไป</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== TOP BAR (Mobile) ===== -->
+
+  <div class="top-bar">
+    <button id="sidebarOpenBtn" class="btn btn-ghost btn-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </button>
+    <div class="top-bar-brand">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"
+        style="color: var(--primary); margin-right: 6px; flex-shrink: 0;">
         <path d="M3 10L12 3l9 7" />
-        <path d="M10.5 9h3v3l3.2 5.5a1 1 0 0 1-.86 1.5H8.2a1 1 0 0 1-.86-1.5l3.2-5.5V9z" fill="rgba(255,255,255,0.15)" />
+        <path d="M10.5 9h3v3l3.2 5.5a1 1 0 0 1-.86 1.5H8.2a1 1 0 0 1-.86-1.5l3.2-5.5V9z" fill="rgba(14,165,233,0.15)" />
         <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none" />
       </svg>
+      KlangSarn
     </div>
-    <div>
-      <div class="sidebar-title">KlangSarn</div>
-      <div class="sidebar-subtitle">ระบบจัดการคลังสารเคมี (KlangSarn)</div>
-    </div>
+    <button class="btn btn-outline btn-sm btn-icon" onclick="loadDashboardData()" title="รีเฟรช">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round">
+        <polyline points="23 4 23 10 17 10" />
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+      </svg>
+    </button>
   </div>
 
-  <nav class="sidebar-nav">
-    <div class="nav-section-label">เมนูหลัก</div>
-    <a class="nav-link" href="index.html">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-      </svg>
-      จัดการสต็อก
-    </a>
-    <a class="nav-link" href="transaction.html">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/>
-      </svg>
-      ประวัติ รับ-จ่าย
-    </a>
-    <a class="nav-link active" href="dashboard.html">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-      </svg>
-      แดชบอร์ด
-    </a>
-    <div class="nav-section-label">ระบบ</div>
-    <a class="nav-link" href="admin.html">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      </svg>
-      Admin Panel
-      <span class="nav-pill admin-indicator" style="display:none">ADMIN</span>
-    </a>
-  </nav>
+  <!-- ===== MAIN ===== -->
 
-  <div class="sidebar-footer">
-    <div class="sidebar-user">
-      <div class="user-ava">K</div>
-      <div>
-        <div class="user-name">KlangSarn</div>
-        <div class="user-role" id="sidebarRole">ผู้ใช้ทั่วไป</div>
+  <div class="main-content">
+    <div class="page-wrapper">
+
+      <!-- Header -->
+      <div class="page-header">
+        <div>
+          <div class="page-title">ภาพรวมคลังสารเคมี</div>
+          <div class="page-subtitle" id="dashUpdateTime">กำลังโหลดข้อมูล...</div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="loadDashboardData()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round">
+            <polyline points="23 4 23 10 17 10" />
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+          </svg>
+          รีเฟรช
+        </button>
       </div>
-    </div>
-  </div>
-</aside>
 
-<!-- ===== TOP BAR (Mobile) ===== -->
-
-<div class="top-bar">
-  <button id="sidebarOpenBtn" class="btn btn-ghost btn-icon">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-    </svg>
-  </button>
-  <div class="top-bar-brand">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary); margin-right: 6px; flex-shrink: 0;">
-      <path d="M3 10L12 3l9 7" />
-      <path d="M10.5 9h3v3l3.2 5.5a1 1 0 0 1-.86 1.5H8.2a1 1 0 0 1-.86-1.5l3.2-5.5V9z" fill="rgba(14,165,233,0.15)" />
-      <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none" />
-    </svg>
-    KlangSarn
-  </div>
-  <button class="btn btn-outline btn-sm btn-icon" onclick="loadDashboardData()" title="รีเฟรช">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-      <polyline points="23 4 23 10 17 10"/>
-      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-    </svg>
-  </button>
-</div>
-
-<!-- ===== MAIN ===== -->
-
-<div class="main-content">
-  <div class="page-wrapper">
-
-<!-- Header -->
-<div class="page-header">
-  <div>
-    <div class="page-title">ภาพรวมคลังสารเคมี</div>
-    <div class="page-subtitle" id="dashUpdateTime">กำลังโหลดข้อมูล...</div>
-  </div>
-  <button class="btn btn-outline btn-sm" onclick="loadDashboardData()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-      <polyline points="23 4 23 10 17 10"/>
-      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-    </svg>
-    รีเฟรช
-  </button>
-</div>
-
-<!-- Gradient Stat Cards -->
-<div class="stat-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-  <div class="stat-card blue" onclick="showStatPopup('total')" style="cursor: pointer;">
-    <div class="stat-icon">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
-      </svg>
-    </div>
-    <div class="stat-val" id="dashTotalItems">—</div>
-    <div class="stat-lbl">สารเคมีทั้งหมด</div>
-    <div class="stat-sub">รายการในระบบ</div>
-  </div>
-  <div class="stat-card amber" onclick="showStatPopup('expiry')" style="cursor: pointer;">
-    <div class="stat-icon">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-      </svg>
-    </div>
-    <div class="stat-val" id="dashAlertItems">—</div>
-    <div class="stat-lbl">แจ้งเตือน EXP</div>
-    <div class="stat-sub">ใกล้/หมดอายุ 30 วัน</div>
-  </div>
-  <div class="stat-card rose" onclick="showStatPopup('stock_level')" style="cursor: pointer;">
-    <div class="stat-icon">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        <line x1="12" y1="8" x2="12" y2="12"/>
-        <line x1="12" y1="16" x2="12.01" y2="16"/>
-      </svg>
-    </div>
-    <div class="stat-val" id="dashStockAlerts">—</div>
-    <div class="stat-lbl">แจ้งเตือนระดับคลัง</div>
-    <div class="stat-sub" id="dashStockAlertSub">ต่ำกว่า/เกินเกณฑ์ Min/Max</div>
-  </div>
-  <div class="stat-card green" onclick="showStatPopup('received')" style="cursor: pointer;">
-    <div class="stat-icon">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
-      </svg>
-    </div>
-    <div class="stat-val" id="dashInMonth">—</div>
-    <div class="stat-lbl">รับเข้าเดือนนี้</div>
-    <div class="stat-sub">จำนวนรายการ</div>
-  </div>
-  <div class="stat-card blue" onclick="showStatPopup('saving')" style="cursor: pointer; background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);">
-    <div class="stat-icon">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-      </svg>
-    </div>
-    <div class="stat-val" id="dashFiscalSaving">—</div>
-    <div class="stat-lbl">ประหยัดปีงบประมาณ</div>
-    <div class="stat-sub" id="dashFiscalLabel">ปีงบประมาณ —</div>
-  </div>
-</div>
-
-<!-- Chart + Recent Transactions Row -->
-<div id="dashMainRow" style="display:grid;grid-template-columns:1fr 1.9fr;gap:20px;margin-bottom:20px;">
-
-  <!-- Donut Chart -->
-  <div class="table-card" style="display:flex;flex-direction:column;">
-    <div style="padding:18px 20px 12px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div style="font-size:14px;font-weight:700;color:var(--text-head);">สัดส่วนตามสถานที่</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">แยกตามห้องจัดเก็บ</div>
+      <!-- Gradient Stat Cards -->
+      <div class="stat-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div class="stat-card blue" onclick="showStatPopup('total')" style="cursor: pointer;">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+              <line x1="12" y1="22.08" x2="12" y2="12" />
+            </svg>
+          </div>
+          <div class="stat-val" id="dashTotalItems">—</div>
+          <div class="stat-lbl">สารเคมีทั้งหมด</div>
+          <div class="stat-sub">รายการในระบบ</div>
+        </div>
+        <div class="stat-card amber" onclick="showStatPopup('expiry')" style="cursor: pointer;">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </div>
+          <div class="stat-val" id="dashAlertItems">—</div>
+          <div class="stat-lbl">แจ้งเตือน EXP</div>
+          <div class="stat-sub">ใกล้/หมดอายุ 30 วัน</div>
+        </div>
+        <div class="stat-card rose" onclick="showStatPopup('stock_level')" style="cursor: pointer;">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </div>
+          <div class="stat-val" id="dashStockAlerts">—</div>
+          <div class="stat-lbl">แจ้งเตือนระดับคลัง</div>
+          <div class="stat-sub" id="dashStockAlertSub">ต่ำกว่า/เกินเกณฑ์ Min/Max</div>
+        </div>
+        <div class="stat-card green" onclick="showStatPopup('received')" style="cursor: pointer;">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <polyline points="19 12 12 19 5 12" />
+            </svg>
+          </div>
+          <div class="stat-val" id="dashInMonth">—</div>
+          <div class="stat-lbl">รับเข้าเดือนนี้</div>
+          <div class="stat-sub">จำนวนรายการ</div>
+        </div>
+        <div class="stat-card blue" onclick="showStatPopup('saving')"
+          style="cursor: pointer; background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          </div>
+          <div class="stat-val" id="dashFiscalSaving">—</div>
+          <div class="stat-lbl">ประหยัดปีงบประมาณ</div>
+          <div class="stat-sub" id="dashFiscalLabel">ปีงบประมาณ —</div>
+        </div>
       </div>
-      <div style="width:30px;height:30px;border-radius:var(--r-sm);background:var(--primary-light,rgba(14,165,233,0.1));display:flex;align-items:center;justify-content:center;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round">
-          <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>
+
+      <!-- Chart + Recent Transactions Row -->
+      <div id="dashMainRow" style="display:grid;grid-template-columns:1fr 1.9fr;gap:20px;margin-bottom:20px;">
+
+        <!-- Donut Chart -->
+        <div class="table-card" style="display:flex;flex-direction:column;">
+          <div
+            style="padding:18px 20px 12px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--text-head);">สัดส่วนตามสถานที่</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">แยกตามห้องจัดเก็บ</div>
+            </div>
+            <div
+              style="width:30px;height:30px;border-radius:var(--r-sm);background:var(--primary-light,rgba(14,165,233,0.1));display:flex;align-items:center;justify-content:center;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"
+                stroke-linecap="round">
+                <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+                <path d="M22 12A10 10 0 0 0 12 2v10z" />
+              </svg>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:20px;">
+            <div style="position:relative;width:100%;max-height:260px;">
+              <canvas id="locationChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="table-card" style="display:flex;flex-direction:column;">
+          <div
+            style="padding:18px 20px 12px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--text-head);">รายการล่าสุด</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">10 รายการล่าสุดในระบบ</div>
+            </div>
+            <a href="transaction.html"
+              style="display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--primary);text-decoration:none;font-weight:500;">
+              ดูทั้งหมด
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </div>
+          <div style="overflow-x:auto;flex:1;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="padding-left:20px;">วันที่</th>
+                  <th>สารเคมี</th>
+                  <th>ประเภท</th>
+                  <th style="padding-right:20px;">จำนวน</th>
+                </tr>
+              </thead>
+              <tbody id="dashRecentTrans">
+                <tr>
+                  <td colspan="4" style="text-align:center;padding:30px;color:var(--text-muted);">กำลังโหลด...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fiscal Year Savings Report Card -->
+      <div class="table-card" style="margin-bottom:20px;">
+        <div
+          style="padding:18px 20px 12px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--text-head);">รายงานยอดประหยัดสะสมจากการจัดซื้อ
+              (Fiscal Year Savings)</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">ยอดประหยัดรวมในแต่ละเดือนของปีงบประมาณ
+              (ตุลาคม - กันยายน)</div>
+          </div>
+          <div style="display:inline-flex;align-items:center;gap:8px;">
+            <span style="font-size:13px;color:var(--text-muted);">เลือกปีงบประมาณ:</span>
+            <select class="form-select" id="savingYearSelect" onchange="changeFiscalYear()"
+              style="width:140px;height:36px;padding:6px 12px;font-size:13px;">
+              <!-- Years filled dynamically -->
+            </select>
+          </div>
+        </div>
+        <div style="padding:20px;height:280px;position:relative;">
+          <canvas id="savingChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Monthly Chemical IN/OUT Transactions Card -->
+      <div class="table-card" style="margin-bottom:20px;">
+        <div
+          style="padding:18px 20px 12px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--text-head);">
+              รายงานปริมาณการรับเข้าและเบิกจ่ายรายเดือน</div>
+            <div id="chemTransSubtitle" style="font-size:12px;color:var(--text-muted);margin-top:1px;">
+              ประวัติสรุปความเคลื่อนไหวรับเข้า (สีเขียว) และเบิกจ่าย (สีแดง) ย้อนหลัง 12 เดือน</div>
+          </div>
+          <div style="display:inline-flex;align-items:center;gap:8px;">
+            <span style="font-size:13px;color:var(--text-muted);">เลือกสารเคมี:</span>
+            <select class="form-select" id="chemFilterSelect" onchange="changeChemFilter()"
+              style="width:260px;height:36px;padding:6px 12px;font-size:13px;border-radius:var(--r-md);">
+              <!-- Filled dynamically — default is "ทั้งหมด" -->
+            </select>
+          </div>
+        </div>
+        <div style="padding:20px;height:280px;position:relative;">
+          <canvas id="chemTransChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Alert Table -->
+      <div class="table-card" id="alertCard" style="display:none;margin-bottom:20px;">
+        <div
+          style="padding:18px 20px 12px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:10px;">
+          <div
+            style="width:34px;height:34px;border-radius:var(--r-sm);background:rgba(245,158,11,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"
+              stroke-linecap="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--warning);">รายการที่ต้องดูแล</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">สารเคมีที่ใกล้หมดหรือหมดอายุแล้ว</div>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="padding-left:20px;">สารเคมี</th>
+                <th>สถานที่</th>
+                <th>วันหมดอายุ</th>
+                <th style="padding-right:20px;">สถานะ</th>
+              </tr>
+            </thead>
+            <tbody id="dashAlertTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== BOTTOM NAV ===== -->
+
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a class="bottom-nav-item" href="index.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" />
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
         </svg>
-      </div>
-    </div>
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:20px;">
-      <div style="position:relative;width:100%;max-height:260px;">
-        <canvas id="locationChart"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- Recent Transactions -->
-  <div class="table-card" style="display:flex;flex-direction:column;">
-    <div style="padding:18px 20px 12px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div style="font-size:14px;font-weight:700;color:var(--text-head);">รายการล่าสุด</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">10 รายการล่าสุดในระบบ</div>
-      </div>
-      <a href="transaction.html" style="display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--primary);text-decoration:none;font-weight:500;">
-        ดูทั้งหมด
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        สต็อก
+      </a>
+      <a class="bottom-nav-item" href="transaction.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4" />
+        </svg>
+        ประวัติการรับ-จ่าย
+      </a>
+      <a class="bottom-nav-item active" href="dashboard.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 3v18h18" />
+          <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+        </svg>
+        แดชบอร์ด
+      </a>
+      <a class="bottom-nav-item" href="admin.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+        Admin
       </a>
     </div>
-    <div style="overflow-x:auto;flex:1;">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th style="padding-left:20px;">วันที่</th>
-            <th>สารเคมี</th>
-            <th>ประเภท</th>
-            <th style="padding-right:20px;">จำนวน</th>
-          </tr>
-        </thead>
-        <tbody id="dashRecentTrans">
-          <tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-muted);">กำลังโหลด...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+  </nav>
 
-<!-- Fiscal Year Savings Report Card -->
-<div class="table-card" style="margin-bottom:20px;">
-  <div style="padding:18px 20px 12px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-    <div>
-      <div style="font-size:14px;font-weight:700;color:var(--text-head);">รายงานยอดประหยัดสะสมจากการจัดซื้อ (Fiscal Year Savings)</div>
-      <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">ยอดประหยัดรวมในแต่ละเดือนของปีงบประมาณ (ตุลาคม - กันยายน)</div>
-    </div>
-    <div style="display:inline-flex;align-items:center;gap:8px;">
-      <span style="font-size:13px;color:var(--text-muted);">เลือกปีงบประมาณ:</span>
-      <select class="form-select" id="savingYearSelect" onchange="changeFiscalYear()" style="width:140px;height:36px;padding:6px 12px;font-size:13px;">
-        <!-- Years filled dynamically -->
-      </select>
-    </div>
-  </div>
-  <div style="padding:20px;height:280px;position:relative;">
-    <canvas id="savingChart"></canvas>
-  </div>
-</div>
-
-<!-- Monthly Chemical IN/OUT Transactions Card -->
-<div class="table-card" style="margin-bottom:20px;">
-  <div style="padding:18px 20px 12px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-    <div>
-      <div style="font-size:14px;font-weight:700;color:var(--text-head);">รายงานปริมาณการรับเข้าและเบิกจ่ายรายเดือน</div>
-      <div id="chemTransSubtitle" style="font-size:12px;color:var(--text-muted);margin-top:1px;">ประวัติสรุปความเคลื่อนไหวรับเข้า (สีเขียว) และเบิกจ่าย (สีแดง) ย้อนหลัง 12 เดือน</div>
-    </div>
-    <div style="display:inline-flex;align-items:center;gap:8px;">
-      <span style="font-size:13px;color:var(--text-muted);">เลือกสารเคมี:</span>
-      <select class="form-select" id="chemFilterSelect" onchange="changeChemFilter()" style="width:260px;height:36px;padding:6px 12px;font-size:13px;border-radius:var(--r-md);">
-        <!-- Filled dynamically — default is "ทั้งหมด" -->
-      </select>
-    </div>
-  </div>
-  <div style="padding:20px;height:280px;position:relative;">
-    <canvas id="chemTransChart"></canvas>
-  </div>
-</div>
-
-<!-- Alert Table -->
-<div class="table-card" id="alertCard" style="display:none;margin-bottom:20px;">
-  <div style="padding:18px 20px 12px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:10px;">
-    <div style="width:34px;height:34px;border-radius:var(--r-sm);background:rgba(245,158,11,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round">
-        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-      </svg>
-    </div>
-    <div>
-      <div style="font-size:14px;font-weight:700;color:var(--warning);">รายการที่ต้องดูแล</div>
-      <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">สารเคมีที่ใกล้หมดหรือหมดอายุแล้ว</div>
-    </div>
-  </div>
-  <div style="overflow-x:auto;">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th style="padding-left:20px;">สารเคมี</th>
-          <th>สถานที่</th>
-          <th>วันหมดอายุ</th>
-          <th style="padding-right:20px;">สถานะ</th>
-        </tr>
-      </thead>
-      <tbody id="dashAlertTable"></tbody>
-    </table>
-  </div>
-</div>
-
-  </div>
-</div>
-
-<!-- ===== BOTTOM NAV ===== -->
-
-<nav class="bottom-nav">
-  <div class="bottom-nav-inner">
-    <a class="bottom-nav-item" href="index.html">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-      </svg>
-      สต็อก
-    </a>
-    <a class="bottom-nav-item" href="transaction.html">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/>
-      </svg>
-      ประวัติการรับ-จ่าย
-    </a>
-    <a class="bottom-nav-item active" href="dashboard.html">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-      </svg>
-      แดชบอร์ด
-    </a>
-    <a class="bottom-nav-item" href="admin.html">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      </svg>
-      Admin
-    </a>
-  </div>
-</nav>
-
-<!-- ===== MODAL: รายละเอียดสถิติ (Stat Detail Modal) ===== -->
-<div class="modal-overlay" id="statPopupModalOverlay" onclick="if(event.target===this)closeStatPopupModal()">
-  <div class="modal-box modal-lg" style="border-radius: var(--r-xl); overflow: hidden; max-width: 860px;">
-    <div class="modal-head" style="background: linear-gradient(135deg, #F0F6FF, #E0EEFF); border-bottom: 1px solid var(--border-soft);">
-      <div>
-        <div class="modal-title" id="statPopupTitle">รายละเอียดสถิติ</div>
-        <div class="modal-subtitle" id="statPopupSubtitle">ข้อมูลแสดงรายละเอียดเพิ่มเติมจากหน้าแดชบอร์ด</div>
+  <!-- ===== MODAL: รายละเอียดสถิติ (Stat Detail Modal) ===== -->
+  <div class="modal-overlay" id="statPopupModalOverlay" onclick="if(event.target===this)closeStatPopupModal()">
+    <div class="modal-box modal-lg" style="border-radius: var(--r-xl); overflow: hidden; max-width: 860px;">
+      <div class="modal-head"
+        style="background: linear-gradient(135deg, #F0F6FF, #E0EEFF); border-bottom: 1px solid var(--border-soft);">
+        <div>
+          <div class="modal-title" id="statPopupTitle">รายละเอียดสถิติ</div>
+          <div class="modal-subtitle" id="statPopupSubtitle">ข้อมูลแสดงรายละเอียดเพิ่มเติมจากหน้าแดชบอร์ด</div>
+        </div>
+        <button class="btn-close-x" onclick="closeStatPopupModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
       </div>
-      <button class="btn-close-x" onclick="closeStatPopupModal()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body" style="padding: 24px;">
-      <!-- Search inside Popup -->
-      <div style="position: relative; margin-bottom: 16px;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-        <input type="text" class="form-control" id="statPopupSearchInput" placeholder="ค้นหาข้อมูลในตารางนี้..." style="padding-left: 36px; font-size: 13.5px; height: 40px; border-radius: var(--r-md);" oninput="filterStatPopup()">
+      <div class="modal-body" style="padding: 24px;">
+        <!-- Search inside Popup -->
+        <div style="position: relative; margin-bottom: 16px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5"
+            stroke-linecap="round"
+            style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input type="text" class="form-control" id="statPopupSearchInput" placeholder="ค้นหาข้อมูลในตารางนี้..."
+            style="padding-left: 36px; font-size: 13.5px; height: 40px; border-radius: var(--r-md);"
+            oninput="filterStatPopup()">
+        </div>
+        <div
+          style="overflow-x: auto; max-height: 52vh; border-radius: var(--r-md); border: 1px solid var(--border-soft);">
+          <table class="data-table" style="margin-bottom: 0;">
+            <thead id="statPopupTableHeader"
+              style="position: sticky; top: 0; z-index: 10; background: var(--bg-hover);">
+              <!-- Populated dynamically -->
+            </thead>
+            <tbody id="statPopupTableBody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div style="overflow-x: auto; max-height: 52vh; border-radius: var(--r-md); border: 1px solid var(--border-soft);">
-        <table class="data-table" style="margin-bottom: 0;">
-          <thead id="statPopupTableHeader" style="position: sticky; top: 0; z-index: 10; background: var(--bg-hover);">
-            <!-- Populated dynamically -->
-          </thead>
-          <tbody id="statPopupTableBody">
-            <!-- Populated dynamically -->
-          </tbody>
-        </table>
+      <div class="modal-foot"
+        style="background: #FAFCFF; border-top: 1px solid var(--border-soft); padding: 14px 24px;">
+        <button type="button" class="btn btn-primary" onclick="closeStatPopupModal()">ปิดหน้าต่าง</button>
       </div>
     </div>
-    <div class="modal-foot" style="background: #FAFCFF; border-top: 1px solid var(--border-soft); padding: 14px 24px;">
-      <button type="button" class="btn btn-primary" onclick="closeStatPopupModal()">ปิดหน้าต่าง</button>
-    </div>
   </div>
-</div>
 
-<div id="toastContainer" class="toast-container"></div>
+  <div id="toastContainer" class="toast-container"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script src="js/ui.js?v=3.4"></script>
+  <script src="js/ui.js?v=3.4"></script>
 
-<script src="js/dashboard.js?v=3.4"></script>
+  <script src="js/dashboard.js?v=3.4"></script>
 
-<script>
-  // Responsive grid
-  function adjustGrid() {
-    const row = document.getElementById('dashMainRow');
-    if (!row) return;
-    row.style.gridTemplateColumns = window.innerWidth < 769 ? '1fr' : '1fr 1.9fr';
-  }
-  adjustGrid();
-  window.addEventListener('resize', adjustGrid);
-
-  document.addEventListener('DOMContentLoaded', () => {
-    if (isAdminLoggedIn()) {
-      document.getElementById('sidebarRole').textContent = '🔑 Admin Mode';
-      document.querySelectorAll('.admin-indicator').forEach(el => el.style.display = '');
+  <script>
+    // Responsive grid
+    function adjustGrid() {
+      const row = document.getElementById('dashMainRow');
+      if (!row) return;
+      row.style.gridTemplateColumns = window.innerWidth < 769 ? '1fr' : '1fr 1.9fr';
     }
-  });
-</script>
+    adjustGrid();
+    window.addEventListener('resize', adjustGrid);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (isAdminLoggedIn()) {
+        document.getElementById('sidebarRole').textContent = '🔑 Admin Mode';
+        document.querySelectorAll('.admin-indicator').forEach(el => el.style.display = '');
+      }
+    });
+  </script>
 
 </body>
+
 </html>
