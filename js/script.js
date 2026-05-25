@@ -19,14 +19,14 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchData();
     document.getElementById("chemicalForm").addEventListener("submit", handleChemicalSubmit);
     document.getElementById("transactionForm").addEventListener("submit", handleTransactionSubmit);
-    
+
     // Bind Drag & Drop Events to custom Upload Zone
     initDragAndDrop();
 
     // Promotion fields behavior in main transaction modal
     const promoToggle = document.getElementById("transPromoToggle");
     const freeQtyContainer = document.getElementById("transFreeQtyContainer");
-    
+
     promoToggle?.addEventListener("change", (e) => {
         if (e.target.checked) {
             freeQtyContainer.style.display = "block";
@@ -45,15 +45,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // New Lot fields behavior in transaction modal
     const transNewLotToggle = document.getElementById("transNewLotToggle");
     const transNewLotContainer = document.getElementById("transNewLotContainer");
-    
+
     transNewLotToggle?.addEventListener("change", (e) => {
         if (e.target.checked) {
             transNewLotContainer.style.display = "block";
-            document.getElementById("transLotNumber").required = true;
             document.getElementById("transLocation").required = true;
         } else {
             transNewLotContainer.style.display = "none";
-            document.getElementById("transLotNumber").required = false;
             document.getElementById("transLocation").required = false;
         }
     });
@@ -110,14 +108,14 @@ async function fetchData() {
             .order('transaction_date', { ascending: false })
     ]);
 
-    if (stockRes.error) { 
+    if (stockRes.error) {
         if (!allChemicals.length) {
-            showToast("โหลดข้อมูลไม่สำเร็จ", "danger"); 
+            showToast("โหลดข้อมูลไม่สำเร็จ", "danger");
         }
-        return; 
+        return;
     }
 
-    allChemicals    = stockRes.data || [];
+    allChemicals = stockRes.data || [];
     allTransactions = transRes.data || [];
 
     // 3. Cache new data and render updates
@@ -146,7 +144,7 @@ function updateStatCards() {
     if (alertEl) alertEl.textContent = alertCount;
 
     // IN/OUT this month
-    const firstDay = new Date(); firstDay.setDate(1); firstDay.setHours(0,0,0,0);
+    const firstDay = new Date(); firstDay.setDate(1); firstDay.setHours(0, 0, 0, 0);
     let inCount = 0, outCount = 0;
     allTransactions.forEach(t => {
         if (new Date(t.transaction_date) >= firstDay) {
@@ -154,9 +152,9 @@ function updateStatCards() {
             else outCount++;
         }
     });
-    const inEl  = document.getElementById('dashInMonth');
+    const inEl = document.getElementById('dashInMonth');
     const outEl = document.getElementById('dashOutMonth');
-    if (inEl)  inEl.textContent  = inCount;
+    if (inEl) inEl.textContent = inCount;
     if (outEl) outEl.textContent = outCount;
 }
 
@@ -192,8 +190,7 @@ function renderAll() {
         if (searchVal) {
             const name = (c.chemical_name || "").toLowerCase();
             const mat = (c.material_number || "").toLowerCase();
-            const lot = (c.lot_number || "").toLowerCase();
-            if (!name.includes(searchVal) && !mat.includes(searchVal) && !lot.includes(searchVal)) {
+            if (!name.includes(searchVal) && !mat.includes(searchVal)) {
                 return false;
             }
         }
@@ -226,7 +223,7 @@ function renderAll() {
         }
         groups[key].batches.push(c);
     });
-    
+
     // Sort groups alphabetically by chemical name
     const groupedList = Object.values(groups).sort((a, b) => a.chemical_name.localeCompare(b.chemical_name));
 
@@ -267,7 +264,7 @@ function renderDesktopTable(groupedList, showLoc) {
               <path d="M9 3h6M10 3v6.6L6.1 17.2A2 2 0 0 0 8 20h8a2 2 0 0 0 1.9-2.8L14 9.6V3"/>
             </svg>
           </div>`;
-        
+
         for (const batch of group.batches) {
             const imgs = batch.image_urls ? JSON.parse(batch.image_urls) : [];
             if (imgs.length > 0) {
@@ -302,8 +299,8 @@ function renderDesktopTable(groupedList, showLoc) {
         }
 
         const locationsArray = Array.from(group.locations);
-        const locationsText = locationsArray.length > 0 
-            ? locationsArray.map(l => `<span class="badge badge-loc" style="margin-right:4px;">${l.split(' ').slice(0,2).join(' ')}</span>`).join('')
+        const locationsText = locationsArray.length > 0
+            ? locationsArray.map(l => `<span class="badge badge-loc" style="margin-right:4px;">${l.split(' ').slice(0, 2).join(' ')}</span>`).join('')
             : '—';
 
         const subTableRows = group.batches.map(batch => {
@@ -314,11 +311,6 @@ function renderDesktopTable(groupedList, showLoc) {
 
             return `
             <div class="nested-lot-item-row">
-              <!-- Lot info -->
-              <div class="lot-info" style="width: 160px; font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--text-head);">
-                <span style="font-size: 11px; color:var(--text-muted); font-weight:normal; margin-right:4px;">Lot:</span> ${batch.lot_number || '—'}
-              </div>
-              
               <!-- Dates -->
               <div class="lot-dates" style="width: 250px;">
                 <div style="font-size:12px;color:var(--text-muted);">
@@ -430,7 +422,7 @@ function renderMobileCards(groupedList, showLoc) {
                 <path d="M7.5 16h9"/><circle cx="10.5" cy="15.5" r="0.8" fill="#0EA5E9"/>
               </svg>
             </div>`;
-        
+
         for (const batch of group.batches) {
             const imgs = batch.image_urls ? JSON.parse(batch.image_urls) : [];
             if (imgs.length > 0) {
@@ -469,7 +461,7 @@ function renderMobileCards(groupedList, showLoc) {
 
         const locationsArray = Array.from(group.locations);
         const locBadge = showLoc && locationsArray.length > 0
-            ? `<span class="badge badge-loc" style="margin-top:4px;display:inline-flex;">${locationsArray.map(l => l.split(' ').slice(0,2).join(' ')).join(', ')}</span>`
+            ? `<span class="badge badge-loc" style="margin-top:4px;display:inline-flex;">${locationsArray.map(l => l.split(' ').slice(0, 2).join(' ')).join(', ')}</span>`
             : '';
 
         // Nested batches list for mobile drawer
@@ -488,7 +480,6 @@ function renderMobileCards(groupedList, showLoc) {
             return `
             <div class="nested-lot-item">
               <div class="nested-lot-item-header">
-                <span style="font-family:'IBM Plex Mono',monospace;">Lot: ${batch.lot_number || '—'}</span>
                 <span class="mono" style="color:var(--text-head); font-weight:700;">${batch.quantity} ${batch.unit}</span>
               </div>
               <div class="nested-lot-item-details">
@@ -593,7 +584,7 @@ function buildImageGallery(urls) {
     if (!urls || urls.length === 0) return '';
     const count = Math.min(urls.length, 3);
     const imgs = urls.slice(0, count).map((url, i) =>
-        `<img src="${url}" class="gal-img${i === 0 ? ' gallery-main' : ''}" onclick="viewImage('${url}')" alt="ภาพที่ ${i+1}">`
+        `<img src="${url}" class="gal-img${i === 0 ? ' gallery-main' : ''}" onclick="viewImage('${url}')" alt="ภาพที่ ${i + 1}">`
     ).join('');
     return `<div class="img-gallery-wrap" style="margin: 0 18px 12px; border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--border-soft);">
       <div class="img-gallery count-${count}">${imgs}</div>
@@ -619,15 +610,15 @@ function flashCard(chemId, type) {
         card.classList.remove('flash-in', 'flash-out');
         void card.offsetWidth; // reflow
         card.classList.add(type === 'IN' ? 'flash-in' : 'flash-out');
-        setTimeout(() => card.classList.remove('flash-in','flash-out'), 1300);
+        setTimeout(() => card.classList.remove('flash-in', 'flash-out'), 1300);
     }
     // Desktop row
     const row = document.getElementById(`row-${chemId}`);
     if (row) {
-        row.classList.remove('row-flash-in','row-flash-out');
+        row.classList.remove('row-flash-in', 'row-flash-out');
         void row.offsetWidth;
         row.classList.add(type === 'IN' ? 'row-flash-in' : 'row-flash-out');
-        setTimeout(() => row.classList.remove('row-flash-in','row-flash-out'), 1300);
+        setTimeout(() => row.classList.remove('row-flash-in', 'row-flash-out'), 1300);
     }
 }
 
@@ -695,7 +686,7 @@ function processImageFiles(files) {
                 canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                 const b64 = canvas.toDataURL('image/jpeg', 0.72);
                 uploadedImagesBase64.push(b64);
-                
+
                 processedCount++;
                 if (processedCount === filesToProcess.length) {
                     renderUploadedPreviews();
@@ -716,7 +707,7 @@ function renderUploadedPreviews() {
     uploadedImagesBase64.forEach((b64, index) => {
         container.innerHTML += `
           <div class="img-thumb-wrap" style="margin-right: 8px; margin-bottom: 8px;">
-            <img src="${b64}" class="img-thumb" onclick="viewImage('${b64}')" alt="ภาพพรีวิวที่ ${index+1}">
+            <img src="${b64}" class="img-thumb" onclick="viewImage('${b64}')" alt="ภาพพรีวิวที่ ${index + 1}">
             <div class="img-thumb-remove" onclick="removeUploadedImage(${index}, event)">×</div>
           </div>`;
     });
@@ -752,7 +743,6 @@ function editChemical(id) {
     document.getElementById("chemicalId").value = item.id;
     document.getElementById("chemicalName").value = item.chemical_name;
     document.getElementById("materialNumber").value = item.material_number || "";
-    document.getElementById("lotNumber").value = item.lot_number || "";
     document.getElementById("quantity").value = item.quantity;
     document.getElementById("unit").value = item.unit;
     document.getElementById("mfgDate").value = item.mfg_date || "";
@@ -775,11 +765,11 @@ function editChemical(id) {
     document.getElementById("chemicalVendor").value = item.vendor || "";
     document.getElementById("minQuantity").value = item.min_quantity !== undefined && item.min_quantity !== null ? item.min_quantity : "";
     document.getElementById("maxQuantity").value = item.max_quantity !== undefined && item.max_quantity !== null ? item.max_quantity : "";
-    
+
     // Load existing images
     uploadedImagesBase64 = item.image_urls ? JSON.parse(item.image_urls) : [];
     renderUploadedPreviews();
-    
+
     document.getElementById("modalTitle").innerText = "แก้ไขข้อมูลเคมีภัณฑ์";
     document.getElementById('chemModalOverlay').classList.add('open');
 }
@@ -788,19 +778,18 @@ async function handleChemicalSubmit(e) {
     e.preventDefault();
     const id = document.getElementById("chemicalId").value;
     const payload = {
-        chemical_name:   document.getElementById("chemicalName").value,
+        chemical_name: document.getElementById("chemicalName").value,
         material_number: document.getElementById("materialNumber").value,
-        lot_number:      document.getElementById("lotNumber").value || null,
-        quantity:        parseFloat(document.getElementById("quantity").value),
-        unit:            document.getElementById("unit").value,
-        mfg_date:        document.getElementById("mfgDate").value || null,
-        exp_date:        document.getElementById("expDate").value || null,
-        location:        document.getElementById("location").value,
-        price_per_unit:  parseFloat(document.getElementById("pricePerUnit").value) || 0.0,
-        vendor:          document.getElementById("chemicalVendor").value.trim() || null,
-        min_quantity:    parseFloat(document.getElementById("minQuantity").value) || 0.0,
-        max_quantity:    parseFloat(document.getElementById("maxQuantity").value) || 0.0,
-        image_urls:      uploadedImagesBase64.length > 0 ? JSON.stringify(uploadedImagesBase64) : null
+        quantity: parseFloat(document.getElementById("quantity").value),
+        unit: document.getElementById("unit").value,
+        mfg_date: document.getElementById("mfgDate").value || null,
+        exp_date: document.getElementById("expDate").value || null,
+        location: document.getElementById("location").value,
+        price_per_unit: parseFloat(document.getElementById("pricePerUnit").value) || 0.0,
+        vendor: document.getElementById("chemicalVendor").value.trim() || null,
+        min_quantity: parseFloat(document.getElementById("minQuantity").value) || 0.0,
+        max_quantity: parseFloat(document.getElementById("maxQuantity").value) || 0.0,
+        image_urls: uploadedImagesBase64.length > 0 ? JSON.stringify(uploadedImagesBase64) : null
     };
 
     let error;
@@ -842,10 +831,10 @@ function deleteChemical(id) {
     console.log("deleteChemical called with id:", id);
     // Use string conversion to ensure safety across number/string representations
     const item = allChemicals.find(c => String(c.id) === String(id));
-    
+
     pendingDeleteId = id;
     const nameEl = document.getElementById("deleteItemName");
-    
+
     if (!item) {
         console.warn("Chemical item not found in local cache for id:", id);
         if (nameEl) nameEl.innerHTML = `คุณต้องการลบสารเคมีรายการนี้ใช่หรือไม่?`;
@@ -853,7 +842,7 @@ function deleteChemical(id) {
         pendingDeleteId = item.id;
         if (nameEl) nameEl.innerHTML = `คุณต้องการลบสารเคมี <strong>"${item.chemical_name}"</strong> ใช่หรือไม่?`;
     }
-    
+
     const modal = document.getElementById("confirmDeleteModalOverlay");
     if (modal) {
         modal.classList.add("open");
@@ -870,7 +859,7 @@ async function executeChemicalDelete() {
     }
     const id = pendingDeleteId;
     closeDeleteModal();
-    
+
     console.log("Executing delete query on Supabase for chemical id:", id);
     const { error } = await _supabase.from('chemical_stock').delete().eq('id', id);
     if (error) {
@@ -911,9 +900,7 @@ function openTransactionModal(id, isNewLot = false) {
     if (newLotToggle && newLotContainer) {
         newLotToggle.checked = isNewLot;
         newLotContainer.style.display = isNewLot ? "block" : "none";
-        document.getElementById("transLotNumber").required = isNewLot;
         document.getElementById("transLocation").required = isNewLot;
-        document.getElementById("transLotNumber").value = "";
         document.getElementById("transLocation").value = item.location || "";
         document.getElementById("transMfgDate").value = "";
         document.getElementById("transExpDate").value = "";
@@ -925,14 +912,14 @@ function openTransactionModal(id, isNewLot = false) {
 
 async function handleTransactionSubmit(e) {
     e.preventDefault();
-    const id   = document.getElementById("transChemId").value;
+    const id = document.getElementById("transChemId").value;
     const type = document.getElementById("transType").value;
-    const qty  = parseFloat(document.getElementById("transQty").value);
+    const qty = parseFloat(document.getElementById("transQty").value);
     const remark = document.getElementById("transRemark").value;
 
     const transPrice = parseFloat(document.getElementById("transPricePerUnit").value) || 0.0;
     const isPromo = document.getElementById("transPromoToggle").checked;
-    const transFree  = (type === 'IN' && isPromo) ? (parseFloat(document.getElementById("transFreeQty").value) || 0.0) : 0.0;
+    const transFree = (type === 'IN' && isPromo) ? (parseFloat(document.getElementById("transFreeQty").value) || 0.0) : 0.0;
     const transSaving = (type === 'IN') ? (transPrice * transFree) : 0.0;
     const transVendor = (type === 'IN') ? document.getElementById("transVendor").value.trim() : null;
 
@@ -940,35 +927,33 @@ async function handleTransactionSubmit(e) {
     if (!item) { showToast("ไม่พบข้อมูลสารเคมี!", "danger"); return; }
 
     const isNewLot = (type === 'IN') && document.getElementById("transNewLotToggle").checked;
-    
+
     let targetChemId = id;
 
     if (isNewLot) {
         // Create new lot row in chemical_stock first
-        const lotNum = document.getElementById("transLotNumber").value.trim();
         const lotLoc = document.getElementById("transLocation").value;
         const mfgVal = document.getElementById("transMfgDate").value || null;
         const expVal = document.getElementById("transExpDate").value || null;
 
-        if (!lotNum || !lotLoc) {
-            showToast("กรุณากรอกเลขที่ล็อตและสถานที่จัดเก็บสำหรับล็อตใหม่!", "warning");
+        if (!lotLoc) {
+            showToast("กรุณากรอกสถานที่จัดเก็บสำหรับล็อตใหม่!", "warning");
             return;
         }
 
         const newLotPayload = {
-            chemical_name:   item.chemical_name,
+            chemical_name: item.chemical_name,
             material_number: item.material_number,
-            lot_number:      lotNum,
-            quantity:        qty, // initial quantity of new lot
-            unit:            item.unit,
-            mfg_date:        mfgVal,
-            exp_date:        expVal,
-            location:        lotLoc,
-            price_per_unit:  transPrice,
-            vendor:          transVendor,
-            min_quantity:    item.min_quantity || 0.0,
-            max_quantity:    item.max_quantity || 0.0,
-            image_urls:      null
+            quantity: qty, // initial quantity of new lot
+            unit: item.unit,
+            mfg_date: mfgVal,
+            exp_date: expVal,
+            location: lotLoc,
+            price_per_unit: transPrice,
+            vendor: transVendor,
+            min_quantity: item.min_quantity || 0.0,
+            max_quantity: item.max_quantity || 0.0,
+            image_urls: null
         };
 
         const { data: insertData, error: insertError } = await _supabase
@@ -1000,10 +985,10 @@ async function handleTransactionSubmit(e) {
     }
 
     // Insert transaction
-    const { error: transError } = await _supabase.from('chemical_transactions').insert([{ 
-        chemical_id: targetChemId, 
-        type, 
-        quantity: qty, 
+    const { error: transError } = await _supabase.from('chemical_transactions').insert([{
+        chemical_id: targetChemId,
+        type,
+        quantity: qty,
         remark,
         price_per_unit: transPrice,
         free_quantity: transFree,
@@ -1044,7 +1029,7 @@ async function handleTransactionSubmit(e) {
 function getExpiryStatus(date) {
     if (!date) return { class: '', label: '', cardClass: '', badgeClass: '' };
     const diff = (new Date(date) - new Date()) / 864e5;
-    if (diff <= 0)  return { class: 'exp-over', label: 'หมดอายุ', cardClass: 'status-over', badgeClass: 'badge-red' };
+    if (diff <= 0) return { class: 'exp-over', label: 'หมดอายุ', cardClass: 'status-over', badgeClass: 'badge-red' };
     if (diff <= 30) return { class: 'exp-near', label: `${Math.ceil(diff)}วัน`, cardClass: 'status-near', badgeClass: 'badge-amber' };
     return { class: '', label: 'ปกติ', cardClass: '', badgeClass: 'badge-green' };
 }
@@ -1133,14 +1118,14 @@ function updateTransSummary() {
             <div style="font-weight: 700; margin-bottom: 4px; color: var(--primary);">สรุปราคารับเข้าแบบโปรโมชัน:</div>
             • ซื้อจริง: <span style="font-weight:600; color:var(--text-head);">${paidQty.toLocaleString('th-TH')}</span> | แถมฟรี: <span style="font-weight:600; color:var(--success);">${freeQty.toLocaleString('th-TH')}</span><br>
             • รวมได้รับเข้าสต็อก: <span style="font-weight:600; color:var(--text-head);">${totalQty.toLocaleString('th-TH')}</span><br>
-            • <span style="color: var(--success); font-weight:600;">ยอดประหยัด (Saving): ${totalSaving.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บาท</span><br>
-            • ยอดจ่ายจริง: <span style="font-weight:600; color:var(--text-head);">${totalPaid.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บาท</span>
+            • <span style="color: var(--success); font-weight:600;">ยอดประหยัด (Saving): ${totalSaving.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท</span><br>
+            • ยอดจ่ายจริง: <span style="font-weight:600; color:var(--text-head);">${totalPaid.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท</span>
         `;
     } else {
         summaryDiv.innerHTML = `
             <div style="font-weight: 700; margin-bottom: 4px; color: var(--text-head);">สรุปราคารับเข้าปกติ:</div>
             • จำนวนซื้อจริง: <span style="font-weight:600; color:var(--text-head);">${totalQty.toLocaleString('th-TH')}</span> (ไม่มีของแถม)<br>
-            • ยอดจ่ายรวม: <span style="font-weight:600; color:var(--primary); font-size: 13.5px;">${totalPaid.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บาท</span>
+            • ยอดจ่ายรวม: <span style="font-weight:600; color:var(--primary); font-size: 13.5px;">${totalPaid.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท</span>
         `;
     }
 }

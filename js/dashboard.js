@@ -18,10 +18,10 @@ async function loadDashboardData() {
     const now = new Date();
     const el = document.getElementById('dashUpdateTime');
     if (el) el.textContent =
-        `อัปเดต: ${now.toLocaleDateString('th-TH',{day:'2-digit',month:'long',year:'numeric'})} ${now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})} น.`;
+        `อัปเดต: ${now.toLocaleDateString('th-TH', { day: '2-digit', month: 'long', year: 'numeric' })} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น.`;
 
     const firstDay = new Date();
-    firstDay.setDate(1); firstDay.setHours(0,0,0,0);
+    firstDay.setDate(1); firstDay.setHours(0, 0, 0, 0);
 
     // 1. Load cached data from sessionStorage to render instantly
     const cachedStock = sessionStorage.getItem('klangsarn_dash_stock');
@@ -43,9 +43,9 @@ async function loadDashboardData() {
 
     // 2. Fetch fresh data in background from Supabase
     const [stockRes, transRes] = await Promise.all([
-        _supabase.from('chemical_stock').select('id, chemical_name, material_number, quantity, unit, exp_date, location, lot_number, price_per_unit, vendor, min_quantity, max_quantity'),
+        _supabase.from('chemical_stock').select('id, chemical_name, material_number, quantity, unit, exp_date, location, price_per_unit, vendor, min_quantity, max_quantity'),
         _supabase.from('chemical_transactions')
-            .select('id, type, quantity, saving, transaction_date, price_per_unit, free_quantity, vendor, chemical_stock(chemical_name, unit, lot_number)')
+            .select('id, type, quantity, saving, transaction_date, price_per_unit, free_quantity, vendor, chemical_stock(chemical_name, unit)')
             .order('transaction_date', { ascending: false })
     ]);
 
@@ -83,7 +83,7 @@ function getFiscalYear(date) {
 // ===== STAT CARDS =====
 function renderSummaryCards(stockData, transData, firstDay) {
     const setEl = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
-    
+
     // Count unique chemical products (by name and material number)
     const uniqueChemicals = new Set(stockData.map(c => `${c.chemical_name}::${c.material_number || ''}`));
     setEl('dashTotalItems', uniqueChemicals.size);
@@ -153,7 +153,7 @@ function renderSummaryCards(stockData, transData, firstDay) {
 function renderLocationChart(stockData) {
     const counts = {};
     stockData.forEach(c => {
-        const loc = c.location ? c.location.split(' ').slice(0,2).join(' ') : 'ไม่ระบุ';
+        const loc = c.location ? c.location.split(' ').slice(0, 2).join(' ') : 'ไม่ระบุ';
         counts[loc] = (counts[loc] || 0) + 1;
     });
 
@@ -220,7 +220,7 @@ function renderRecentTransactions(data) {
 
     tbody.innerHTML = data.map(t => {
         const d = new Date(t.transaction_date);
-        const ds = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+        const ds = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
 
         const badge = t.type === 'IN'
             ? `<span class="badge badge-green"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg> รับเข้า</span>`
@@ -250,7 +250,7 @@ function renderAlertTable(stockData) {
         .filter(c => c.exp_date && (new Date(c.exp_date) - today) / 864e5 <= 30)
         .sort((a, b) => new Date(a.exp_date) - new Date(b.exp_date));
 
-    const card  = document.getElementById('alertCard');
+    const card = document.getElementById('alertCard');
     const tbody = document.getElementById('dashAlertTable');
     if (!card || !tbody) return;
     if (alerts.length === 0) { card.style.display = 'none'; return; }
@@ -266,10 +266,10 @@ function renderAlertTable(stockData) {
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 เหลือ ${diff} วัน</span>`;
 
-        const nameText = item.lot_number ? `${item.chemical_name} (ล็อต ${item.lot_number})` : item.chemical_name;
+        const nameText = item.chemical_name;
         return `<tr>
           <td style="padding-left:20px;font-weight:600;color:var(--text-head);">${nameText}</td>
-          <td><span class="badge badge-gray" style="font-size:11px;">${item.location ? item.location.split(' ').slice(0,2).join(' ') : '—'}</span></td>
+          <td><span class="badge badge-gray" style="font-size:11px;">${item.location ? item.location.split(' ').slice(0, 2).join(' ') : '—'}</span></td>
           <td><span class="mono" style="font-size:13px;">${formatDisplayDate(item.exp_date)}</span></td>
           <td style="padding-right:20px;">${statusBadge}</td>
         </tr>`;
@@ -285,7 +285,7 @@ function initSavingDashboard(transData) {
     const yearsSet = new Set();
     // Always include current fiscal year as fallback
     yearsSet.add(getFiscalYear(new Date()));
-    
+
     transData.forEach(t => {
         if (t.saving > 0) {
             yearsSet.add(getFiscalYear(t.transaction_date));
@@ -293,10 +293,10 @@ function initSavingDashboard(transData) {
     });
 
     const sortedYears = Array.from(yearsSet).sort((a, b) => b - a); // descending order
-    
+
     const currentVal = select.value;
     select.innerHTML = sortedYears.map(yr => `<option value="${yr}">ปีงบประมาณ ${yr}</option>`).join('');
-    
+
     if (currentVal && sortedYears.includes(parseInt(currentVal))) {
         select.value = currentVal;
     } else {
@@ -595,13 +595,13 @@ function renderChemTransChart(chemName) {
 function showStatPopup(type) {
     currentPopupType = type;
     document.getElementById("statPopupSearchInput").value = "";
-    
+
     const overlay = document.getElementById("statPopupModalOverlay");
     if (!overlay) return;
 
     const titleEl = document.getElementById("statPopupTitle");
     const subtitleEl = document.getElementById("statPopupSubtitle");
-    
+
     if (type === 'total') {
         titleEl.textContent = "สารเคมีทั้งหมดในคลัง";
         subtitleEl.textContent = "แสดงรายการคงเหลือแบบแยกรายละเอียดตามประเภทและรหัสสารเคมี";
@@ -676,9 +676,9 @@ function renderStatPopupTable() {
         });
 
         const filteredGroups = Object.values(groups).filter(g => {
-            return g.chemical_name.toLowerCase().includes(q) || 
-                   (g.material_number || "").toLowerCase().includes(q) ||
-                   Array.from(g.locations).join(", ").toLowerCase().includes(q);
+            return g.chemical_name.toLowerCase().includes(q) ||
+                (g.material_number || "").toLowerCase().includes(q) ||
+                Array.from(g.locations).join(", ").toLowerCase().includes(q);
         });
 
         if (filteredGroups.length === 0) {
@@ -698,11 +698,11 @@ function renderStatPopupTable() {
                 </tr>`;
             }).join('');
         }
-    } 
+    }
     else if (currentPopupType === 'expiry') {
         headersHtml = `
             <tr>
-              <th style="padding-left:20px;">สารเคมี (ล็อต)</th>
+              <th style="padding-left:20px;">สารเคมี</th>
               <th>Material Number</th>
               <th>วันหมดอายุ (EXP)</th>
               <th>วันคงเหลือ</th>
@@ -720,9 +720,8 @@ function renderStatPopupTable() {
         const filteredItems = expiredItems.filter(c => {
             const nameMatches = c.chemical_name.toLowerCase().includes(q);
             const matMatches = (c.material_number || "").toLowerCase().includes(q);
-            const lotMatches = (c.lot_number || "").toLowerCase().includes(q);
             const locMatches = (c.location || "").toLowerCase().includes(q);
-            return nameMatches || matMatches || lotMatches || locMatches;
+            return nameMatches || matMatches || locMatches;
         });
 
         if (filteredItems.length === 0) {
@@ -733,23 +732,22 @@ function renderStatPopupTable() {
                 const statusBadge = diff <= 0
                     ? `<span class="badge badge-red" style="font-weight:600;">หมดอายุแล้ว (${Math.abs(diff)} วัน)</span>`
                     : `<span class="badge badge-amber" style="font-weight:600;">เหลือ ${diff} วัน</span>`;
-                
-                const lotStr = c.lot_number ? ` (ล็อต ${c.lot_number})` : '';
+
                 return `<tr>
                   <td style="padding-left:20px;">
-                    <div style="font-weight:600;color:var(--text-head);">${c.chemical_name}${lotStr}</div>
+                    <div style="font-weight:600;color:var(--text-head);">${c.chemical_name}</div>
                     <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">คงเหลือ: ${c.quantity} ${c.unit}</div>
                   </td>
                   <td class="mono">${c.material_number || '—'}</td>
                   <td class="mono">${formatDisplayDate(c.exp_date)}</td>
                   <td>${statusBadge}</td>
                   <td style="padding-right:20px;">
-                    <span class="badge badge-gray" style="font-size:11.5px;">${c.location ? c.location.split(' ').slice(0,2).join(' ') : '—'}</span>
+                    <span class="badge badge-gray" style="font-size:11.5px;">${c.location ? c.location.split(' ').slice(0, 2).join(' ') : '—'}</span>
                   </td>
                 </tr>`;
             }).join('');
         }
-    } 
+    }
     else if (currentPopupType === 'received') {
         headersHtml = `
             <tr>
@@ -763,8 +761,8 @@ function renderStatPopupTable() {
         `;
 
         const firstDay = new Date();
-        firstDay.setDate(1); firstDay.setHours(0,0,0,0);
-        
+        firstDay.setDate(1); firstDay.setHours(0, 0, 0, 0);
+
         const receivedTrans = globalTransData.filter(t => {
             return t.type === 'IN' && new Date(t.transaction_date) >= firstDay;
         });
@@ -772,8 +770,7 @@ function renderStatPopupTable() {
         const filteredTrans = receivedTrans.filter(t => {
             const name = t.chemical_stock?.chemical_name || "";
             const vendor = t.vendor || "";
-            const lot = t.chemical_stock?.lot_number || "";
-            return name.toLowerCase().includes(q) || vendor.toLowerCase().includes(q) || lot.toLowerCase().includes(q);
+            return name.toLowerCase().includes(q) || vendor.toLowerCase().includes(q);
         });
 
         if (filteredTrans.length === 0) {
@@ -782,12 +779,11 @@ function renderStatPopupTable() {
             bodyHtml = filteredTrans.map(t => {
                 const date = new Date(t.transaction_date);
                 const dateStr = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')} น.`;
-                
-                const lotStr = t.chemical_stock?.lot_number ? ` (ล็อต ${t.chemical_stock.lot_number})` : '';
+
                 return `<tr>
                   <td style="padding-left:20px;font-size:12.5px;color:var(--text-muted);">${dateStr}</td>
                   <td>
-                    <div style="font-weight:600;color:var(--text-head);">${t.chemical_stock?.chemical_name || 'ลบแล้ว'}${lotStr}</div>
+                    <div style="font-weight:600;color:var(--text-head);">${t.chemical_stock?.chemical_name || 'ลบแล้ว'}</div>
                   </td>
                   <td>
                     <span class="mono" style="font-weight:700;color:var(--success); font-size:14px;">+${t.quantity}</span>
@@ -799,7 +795,7 @@ function renderStatPopupTable() {
                 </tr>`;
             }).join('');
         }
-    } 
+    }
     else if (currentPopupType === 'saving') {
         headersHtml = `
             <tr>
@@ -819,9 +815,8 @@ function renderStatPopupTable() {
 
         const filteredTrans = savingTrans.filter(t => {
             const name = t.chemical_stock?.chemical_name || "";
-            const lot = t.chemical_stock?.lot_number || "";
             const vendor = t.vendor || "";
-            return name.toLowerCase().includes(q) || lot.toLowerCase().includes(q) || vendor.toLowerCase().includes(q);
+            return name.toLowerCase().includes(q) || vendor.toLowerCase().includes(q);
         });
 
         if (filteredTrans.length === 0) {
@@ -830,14 +825,13 @@ function renderStatPopupTable() {
             bodyHtml = filteredTrans.map(t => {
                 const date = new Date(t.transaction_date);
                 const dateStr = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')} น.`;
-                
-                const lotStr = t.chemical_stock?.lot_number ? ` (ล็อต ${t.chemical_stock.lot_number})` : '';
+
                 const freeQty = t.free_quantity || 0;
                 const paidQty = Math.max(0, t.quantity - freeQty);
                 return `<tr>
                   <td style="padding-left:20px;font-size:12.5px;color:var(--text-muted);">${dateStr}</td>
                   <td>
-                    <div style="font-weight:600;color:var(--text-head);">${t.chemical_stock?.chemical_name || 'ลบแล้ว'}${lotStr}</div>
+                    <div style="font-weight:600;color:var(--text-head);">${t.chemical_stock?.chemical_name || 'ลบแล้ว'}</div>
                     ${t.vendor ? `<div style="font-size:11px;color:var(--text-muted);margin-top:1px;">ผู้จัดจำหน่าย: ${t.vendor}</div>` : ''}
                   </td>
                   <td class="mono">${paidQty} ${t.chemical_stock?.unit || ''}</td>
@@ -906,7 +900,7 @@ function renderStatPopupTable() {
             bodyHtml = filteredGroups.map(g => {
                 const minVal = parseFloat(g.min_quantity);
                 const maxVal = parseFloat(g.max_quantity);
-                
+
                 let badge = "";
                 if (minVal > 0 && g.total_quantity < minVal) {
                     badge = `<span class="badge badge-red">⚠️ ต่ำกว่า Min</span>`;
@@ -915,7 +909,7 @@ function renderStatPopupTable() {
                 }
 
                 const locs = Array.from(g.locations).map(l => `<span class="badge badge-loc" style="margin-right:4px;">${l}</span>`).join('') || '—';
-                
+
                 return `<tr>
                   <td style="padding-left:20px;font-weight:600;color:var(--text-head);">${g.chemical_name}</td>
                   <td class="mono">${g.material_number || '—'}</td>

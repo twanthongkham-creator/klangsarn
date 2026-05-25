@@ -66,7 +66,7 @@ function isAdminLoggedIn() {
 function updateAdminUI() {
   const adminLinks = document.querySelectorAll('[data-admin-only]');
   const adminBadges = document.querySelectorAll('.admin-indicator');
-  
+
   if (isAdminLoggedIn()) {
     adminLinks.forEach(el => el.style.display = '');
     adminBadges.forEach(el => el.style.display = '');
