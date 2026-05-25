@@ -633,6 +633,7 @@ body {
   padding: 8px 12px;
   font-size: 10px;
 }
+
 .data-table.compact td {
   padding: 8px 12px;
   font-size: 13px;
@@ -642,9 +643,11 @@ body {
 .tr-in {
   background-color: rgba(16, 185, 129, 0.015);
 }
+
 .tr-in:hover {
   background-color: rgba(16, 185, 129, 0.05) !important;
 }
+
 .tr-in td {
   border-bottom: 1.5px solid rgba(16, 185, 129, 0.12) !important;
 }
@@ -652,9 +655,11 @@ body {
 .tr-out {
   background-color: rgba(239, 68, 68, 0.015);
 }
+
 .tr-out:hover {
   background-color: rgba(239, 68, 68, 0.05) !important;
 }
+
 .tr-out td {
   border-bottom: 1.5px solid rgba(239, 68, 68, 0.12) !important;
 }
@@ -663,6 +668,7 @@ body {
   color: #059669 !important;
   font-weight: 700;
 }
+
 .text-out {
   color: #DC2626 !important;
   font-weight: 700;
@@ -1462,80 +1468,99 @@ body {
 .modal-box.modal-lg .modal-head {
   padding: 12px 18px;
 }
+
 .modal-box.modal-lg .modal-title {
   font-size: 15px;
 }
+
 .modal-box.modal-lg .modal-subtitle {
   font-size: 11px;
 }
+
 .modal-box.modal-lg .modal-body {
   padding: 12px 18px 8px;
 }
+
 .modal-box.modal-lg .modal-foot {
   padding: 10px 18px;
 }
+
 .modal-box.modal-lg .form-group {
   margin-bottom: 8px;
 }
+
 .modal-box.modal-lg .form-label {
   margin-bottom: 3px;
   font-size: 11.5px;
 }
+
 .modal-box.modal-lg .form-control,
 .modal-box.modal-lg .form-select {
   padding: 6px 10px;
   font-size: 13px;
   height: 34px;
 }
+
 .modal-box.modal-lg textarea.form-control {
   height: auto;
 }
+
 .modal-box.modal-lg .grid-2 {
   gap: 8px 12px;
 }
+
 /* Shrunk upload zone */
 .modal-box.modal-lg .upload-zone {
   padding: 8px 12px;
   border-radius: var(--r-md);
   min-height: auto;
 }
+
 .modal-box.modal-lg .upload-zone-inner {
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 10px;
 }
+
 .modal-box.modal-lg .upload-icon-wrap {
   width: 28px;
   height: 28px;
   border-radius: 6px;
   background: rgba(14, 165, 233, 0.08);
 }
+
 .modal-box.modal-lg .upload-icon-wrap svg {
   width: 14px;
   height: 14px;
 }
+
 .modal-box.modal-lg .upload-title {
   font-size: 12px;
   font-weight: 600;
 }
+
 .modal-box.modal-lg .upload-subtitle {
   font-size: 10.5px;
 }
+
 /* Previews row spacing */
 .modal-box.modal-lg .img-preview-row {
   margin-top: 6px;
   gap: 6px;
 }
+
 .modal-box.modal-lg .img-thumb-wrap {
   width: 50px;
   height: 50px;
 }
+
 .modal-box.modal-lg .img-thumb-remove {
   width: 16px;
   height: 16px;
   font-size: 10px;
 }
+
 /* Date picker quick links row */
 .modal-box.modal-lg .quick-exp-btns {
   display: flex;
@@ -1543,6 +1568,7 @@ body {
   margin-top: 3px;
   flex-wrap: wrap;
 }
+
 .modal-box.modal-lg .quick-exp-btns .btn-xs {
   font-size: 9.5px;
   padding: 1px 5px;
@@ -2077,7 +2103,8 @@ body {
 
 /* Expanded state highlight for Master Row (Desktop) */
 .master-row.expanded td {
-  background: #EBF4FF !important; /* Soft premium blue background */
+  background: #EBF4FF !important;
+  /* Soft premium blue background */
   border-top: 1.5px solid rgba(14, 165, 233, 0.3) !important;
   border-bottom: 1.5px solid transparent !important;
 }
@@ -2088,19 +2115,24 @@ body {
 
 .master-row.expanded .cell-name {
   color: var(--primary);
-  font-weight: 800; /* Extra bold and primary colored */
+  font-weight: 800;
+  /* Extra bold and primary colored */
 }
 
 .nested-lot-row.open td {
-  background: rgba(240, 246, 255, 0.65) !important; /* Continuous soft background */
+  background: rgba(240, 246, 255, 0.65) !important;
+  /* Continuous soft background */
   border-bottom: 1.5px solid rgba(14, 165, 233, 0.3) !important;
 }
 
 /* Expanded state highlight for Chemical Card (Mobile) */
 .chem-card.expanded {
-  background: linear-gradient(180deg, #FFFFFF 0%, #F0F6FF 100%) !important; /* Richer soft blue background gradient */
-  border: 2px solid var(--primary) !important; /* Thicker premium border */
-  box-shadow: 0 10px 25px rgba(14, 165, 233, 0.16), 0 0 0 4px rgba(14, 165, 233, 0.22) !important; /* Richer glow shadow */
+  background: linear-gradient(180deg, #FFFFFF 0%, #F0F6FF 100%) !important;
+  /* Richer soft blue background gradient */
+  border: 2px solid var(--primary) !important;
+  /* Thicker premium border */
+  box-shadow: 0 10px 25px rgba(14, 165, 233, 0.16), 0 0 0 4px rgba(14, 165, 233, 0.22) !important;
+  /* Richer glow shadow */
   transform: translateY(-2px);
 }
 
@@ -2138,7 +2170,8 @@ body {
 /* Indented Branching Items on Desktop (Aligned & Tabbed under Chemical Name) */
 .nested-lot-item-row {
   position: relative;
-  padding-left: 124px; /* Indented like Tab relative to Chemical Name which starts at 104px */
+  padding-left: 124px;
+  /* Indented like Tab relative to Chemical Name which starts at 104px */
   padding-right: 22px;
   display: flex;
   align-items: center;
@@ -2174,7 +2207,8 @@ body {
   content: '';
   position: absolute;
   left: 104px;
-  top: 25px; /* Vertical center of the row */
+  top: 25px;
+  /* Vertical center of the row */
   width: 14px;
   height: 1.5px;
   background: var(--text-muted);
@@ -2190,7 +2224,8 @@ body {
 .nested-lot-drawer {
   display: none;
   background: transparent;
-  padding: 0 18px 12px 100px; /* Align indent with chemical name left edge (100px) */
+  padding: 0 18px 12px 100px;
+  /* Align indent with chemical name left edge (100px) */
 }
 
 .nested-lot-drawer.open {
@@ -2199,7 +2234,8 @@ body {
 
 .nested-lot-item {
   position: relative;
-  padding-left: 18px; /* Indented for sub-item (Tab) */
+  padding-left: 18px;
+  /* Indented for sub-item (Tab) */
   background: transparent;
   border: none;
   box-shadow: none;
@@ -2231,7 +2267,8 @@ body {
   content: '';
   position: absolute;
   left: 0;
-  top: 24px; /* Align with lot header */
+  top: 24px;
+  /* Align with lot header */
   width: 10px;
   height: 1.5px;
   background: var(--text-muted);
