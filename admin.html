@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,873 +11,1152 @@
     /* ===== LOGIN SCREEN ===== */
     .login-screen {
       min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 24px;
       background: linear-gradient(160deg, #060D1E 0%, #0B1729 40%, #081524 70%, #0E2140 100%);
-      position: relative; overflow: hidden;
+      position: relative;
+      overflow: hidden;
     }
+
     /* ambient glow blobs */
     .login-screen::before {
       content: '';
-      position: absolute; left: -15%; top: -10%;
-      width: 500px; height: 500px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(14,165,233,0.12) 0%, transparent 70%);
+      position: absolute;
+      left: -15%;
+      top: -10%;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, transparent 70%);
       pointer-events: none;
     }
+
     .login-screen::after {
       content: '';
-      position: absolute; right: -10%; bottom: -10%;
-      width: 400px; height: 400px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(99,102,241,0.10) 0%, transparent 70%);
+      position: absolute;
+      right: -10%;
+      bottom: -10%;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.10) 0%, transparent 70%);
       pointer-events: none;
     }
+
     .login-box {
-      width: 100%; max-width: 400px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.10);
+      width: 100%;
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.10);
       border-radius: 24px;
       padding: 40px 36px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(14,165,233,0.08);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(14, 165, 233, 0.08);
       backdrop-filter: blur(12px);
-      position: relative; z-index: 1;
+      position: relative;
+      z-index: 1;
     }
+
     .login-logo {
-      width: 64px; height: 64px; border-radius: 18px;
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
       background: linear-gradient(135deg, #0EA5E9, #6366F1);
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       margin: 0 auto 22px;
-      box-shadow: 0 8px 28px rgba(14,165,233,0.40), 0 0 0 1px rgba(255,255,255,0.12);
+      box-shadow: 0 8px 28px rgba(14, 165, 233, 0.40), 0 0 0 1px rgba(255, 255, 255, 0.12);
     }
-    .login-title    { color: #EFF6FF; font-size: 22px; font-weight: 700; text-align: center; letter-spacing: -0.3px; }
-    .login-subtitle { color: rgba(255,255,255,0.35); font-size: 13px; text-align: center; margin-top: 4px; }
-    .login-box .form-label { color: rgba(255,255,255,0.55); }
+
+    .login-title {
+      color: #EFF6FF;
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: -0.3px;
+    }
+
+    .login-subtitle {
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    .login-box .form-label {
+      color: rgba(255, 255, 255, 0.55);
+    }
+
     .login-box .form-control {
-      background: rgba(255,255,255,0.06);
-      border-color: rgba(255,255,255,0.10);
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.10);
       color: #F0F7FF;
     }
-    .login-box .form-control::placeholder { color: rgba(255,255,255,0.18); }
+
+    .login-box .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.18);
+    }
+
     .login-box .form-control:focus {
-      background: rgba(255,255,255,0.09);
+      background: rgba(255, 255, 255, 0.09);
       border-color: var(--primary);
     }
+
     .login-hint {
       margin-top: 20px;
       padding: 12px 14px;
-      background: rgba(14,165,233,0.08);
-      border: 1px solid rgba(14,165,233,0.18);
+      background: rgba(14, 165, 233, 0.08);
+      border: 1px solid rgba(14, 165, 233, 0.18);
       border-radius: var(--r-md);
       text-align: center;
     }
-    .login-hint-label { font-size: 11px; color: rgba(255,255,255,0.3); }
-    .login-hint-val   { font-size: 13.5px; color: #38BDF8; font-family: 'IBM Plex Mono', monospace; font-weight: 600; margin-top: 2px; }
 
-.login-err {
-  display: none; margin-top: 12px;
-  padding: 10px 14px; border-radius: var(--r-md);
-  background: rgba(239,68,68,0.12);
-  border: 1px solid rgba(239,68,68,0.22);
-  color: #FCA5A5; font-size: 13px;
-  display: none; align-items: center; gap: 8px;
-}
-.login-err.show { display: flex; }
+    .login-hint-label {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.3);
+    }
 
-/* ===== ADMIN TABS ===== */
-.admin-tabs {
-  display: flex; gap: 2px;
-  border-bottom: 1px solid var(--border-soft);
-  padding: 0 20px;
-  overflow-x: auto;
-}
-.admin-tabs::-webkit-scrollbar { height: 0; }
-.admin-tab {
-  padding: 12px 18px; font-size: 13.5px; font-weight: 500;
-  color: var(--text-muted); cursor: pointer;
-  border: none; background: none;
-  border-bottom: 2px solid transparent;
-  font-family: 'IBM Plex Sans Thai', sans-serif;
-  transition: all var(--t-fast);
-  margin-bottom: -1px; white-space: nowrap;
-  display: inline-flex; align-items: center; gap: 7px;
-}
-.admin-tab:hover { color: var(--text-body); }
-.admin-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
-.admin-tab svg { opacity: 0.7; }
-.admin-tab.active svg { opacity: 1; }
+    .login-hint-val {
+      font-size: 13.5px;
+      color: #38BDF8;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 600;
+      margin-top: 2px;
+    }
 
-.tab-pane { display: none; }
-.tab-pane.active { display: block; }
+    .login-err {
+      display: none;
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: var(--r-md);
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.22);
+      color: #FCA5A5;
+      font-size: 13px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
 
-/* ===== SETTINGS ROWS ===== */
-.setting-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 22px; border-bottom: 1px solid var(--border-soft); gap: 16px;
-}
-.setting-row:last-child { border-bottom: none; }
-.setting-label { font-size: 14px; font-weight: 600; color: var(--text-head); }
-.setting-desc  { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+    .login-err.show {
+      display: flex;
+    }
 
-/* ===== EXPORT CARDS ===== */
-.export-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 16px; padding: 20px; }
-.export-card {
-  background: var(--bg-hover); border: 1px solid var(--border-soft);
-  border-radius: var(--r-lg); padding: 22px 20px;
-  text-align: center;
-}
-.export-card-icon {
-  width: 52px; height: 52px; border-radius: var(--r-md);
-  background: var(--grad-brand);
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 14px;
-  box-shadow: 0 4px 12px rgba(14,165,233,0.28);
-}
-.export-card-title { font-size: 15px; font-weight: 700; color: var(--text-head); }
-.export-card-desc  { font-size: 12px; color: var(--text-muted); margin: 6px 0 16px; }
+    /* ===== ADMIN TABS ===== */
+    .admin-tabs {
+      display: flex;
+      gap: 2px;
+      border-bottom: 1px solid var(--border-soft);
+      padding: 0 20px;
+      overflow-x: auto;
+    }
+
+    .admin-tabs::-webkit-scrollbar {
+      height: 0;
+    }
+
+    .admin-tab {
+      padding: 12px 18px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+      transition: all var(--t-fast);
+      margin-bottom: -1px;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .admin-tab:hover {
+      color: var(--text-body);
+    }
+
+    .admin-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .admin-tab svg {
+      opacity: 0.7;
+    }
+
+    .admin-tab.active svg {
+      opacity: 1;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* ===== SETTINGS ROWS ===== */
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border-soft);
+      gap: 16px;
+    }
+
+    .setting-row:last-child {
+      border-bottom: none;
+    }
+
+    .setting-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-head);
+    }
+
+    .setting-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* ===== EXPORT CARDS ===== */
+    .export-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      padding: 20px;
+    }
+
+    .export-card {
+      background: var(--bg-hover);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--r-lg);
+      padding: 22px 20px;
+      text-align: center;
+    }
+
+    .export-card-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--r-md);
+      background: var(--grad-brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.28);
+    }
+
+    .export-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-head);
+    }
+
+    .export-card-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin: 6px 0 16px;
+    }
   </style>
 </head>
+
 <body>
 
-<!-- ===========================
+  <!-- ===========================
      LOGIN SCREEN
 ============================== -->
 
-<div id="loginScreen" class="login-screen">
-  <div class="login-box">
-    <div class="login-logo">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
-          stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M9 12l2 2 4-4" stroke="#7DD3FC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <div class="login-title">Admin Panel</div>
-    <div class="login-subtitle">KlangSarn — เข้าสู่ระบบผู้ดูแล</div>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-box">
+      <div class="login-logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="white" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M9 12l2 2 4-4" stroke="#7DD3FC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="login-title">Admin Panel</div>
+      <div class="login-subtitle">KlangSarn — เข้าสู่ระบบผู้ดูแล</div>
 
-<div style="margin-top:28px;">
-  <div class="form-group">
-    <label class="form-label">รหัสผ่าน Admin</label>
-    <div style="position:relative;">
-      <input type="password" class="form-control" id="adminPassword"
-        placeholder="กรอกรหัสผ่าน..."
-        onkeydown="if(event.key==='Enter')attemptLogin()"
-        style="padding-right:44px;">
-      <button onclick="togglePwd()" tabindex="-1" style="
+      <div style="margin-top:28px;">
+        <div class="form-group">
+          <label class="form-label">รหัสผ่าน Admin</label>
+          <div style="position:relative;">
+            <input type="password" class="form-control" id="adminPassword" placeholder="กรอกรหัสผ่าน..."
+              onkeydown="if(event.key==='Enter')attemptLogin()" style="padding-right:44px;">
+            <button onclick="togglePwd()" tabindex="-1" style="
         position:absolute;right:11px;top:50%;transform:translateY(-50%);
         background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.3);
         padding:4px; display:flex; align-items:center; justify-content:center;
         transition:color 0.15s;
-      " onmouseenter="this.style.color='rgba(255,255,255,0.7)'" onmouseleave="this.style.color='rgba(255,255,255,0.3)'">
-        <svg id="eyeIconShow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-        </svg>
-        <svg id="eyeIconHide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;">
-          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-          <line x1="1" y1="1" x2="23" y2="23"/>
-        </svg>
-      </button>
+      " onmouseenter="this.style.color='rgba(255,255,255,0.7)'"
+              onmouseleave="this.style.color='rgba(255,255,255,0.3)'">
+              <svg id="eyeIconShow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <svg id="eyeIconHide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" style="display:none;">
+                <path
+                  d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                <line x1="1" y1="1" x2="23" y2="23" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="login-err" id="loginError">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="15" y1="9" x2="9" y2="15" />
+            <line x1="9" y1="9" x2="15" y2="15" />
+          </svg>
+          รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่
+        </div>
+
+        <button class="btn btn-primary btn-block btn-lg" onclick="attemptLogin()" style="margin-top:16px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+            <polyline points="10 17 15 12 10 7" />
+            <line x1="15" y1="12" x2="3" y2="12" />
+          </svg>
+          เข้าสู่ระบบ Admin
+        </button>
+
+        <div style="margin-top:18px;text-align:center;">
+          <a href="index.html"
+            style="font-size:13px;color:rgba(255,255,255,0.28);text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:color 0.15s;"
+            onmouseenter="this.style.color='rgba(255,255,255,0.6)'"
+            onmouseleave="this.style.color='rgba(255,255,255,0.28)'">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            กลับหน้าหลัก
+          </a>
+        </div>
+
+        <div class="login-hint">
+          <div class="login-hint-label">รหัสผ่านเริ่มต้น</div>
+          <div class="login-hint-val">chem@admin</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="login-err" id="loginError">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-      <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
-    </svg>
-    รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่
-  </div>
-
-  <button class="btn btn-primary btn-block btn-lg" onclick="attemptLogin()" style="margin-top:16px;">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-      <polyline points="10 17 15 12 10 7"/>
-      <line x1="15" y1="12" x2="3" y2="12"/>
-    </svg>
-    เข้าสู่ระบบ Admin
-  </button>
-
-  <div style="margin-top:18px;text-align:center;">
-    <a href="index.html" style="font-size:13px;color:rgba(255,255,255,0.28);text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:color 0.15s;"
-      onmouseenter="this.style.color='rgba(255,255,255,0.6)'" onmouseleave="this.style.color='rgba(255,255,255,0.28)'">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      กลับหน้าหลัก
-    </a>
-  </div>
-
-  <div class="login-hint">
-    <div class="login-hint-label">รหัสผ่านเริ่มต้น</div>
-    <div class="login-hint-val">chem@admin</div>
-  </div>
-</div>
-  </div>
-</div>
-
-<!-- ===========================
+  <!-- ===========================
      ADMIN PANEL
 ============================== -->
 
-<div id="adminPanel" style="display:none;">
+  <div id="adminPanel" style="display:none;">
 
-  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-  <!-- SIDEBAR -->
+    <!-- SIDEBAR -->
 
-  <aside id="sidebar" class="sidebar">
-    <div class="sidebar-brand">
-      <div class="sidebar-logo-wrap">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #ffffff; flex-shrink: 0;">
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" style="color: #ffffff; flex-shrink: 0;">
+            <path d="M3 10L12 3l9 7" />
+            <path d="M10.5 9h3v3l3.2 5.5a1 1 0 0 1-.86 1.5H8.2a1 1 0 0 1-.86-1.5l3.2-5.5V9z"
+              fill="rgba(255,255,255,0.15)" />
+            <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none" />
+          </svg>
+        </div>
+        <div>
+          <div class="sidebar-title">KlangSarn</div>
+          <div class="sidebar-subtitle" style="color:rgba(239,68,68,0.6);">Admin Mode</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">เมนูหลัก</div>
+        <a class="nav-link" href="index.html">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" />
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+          </svg>
+          จัดการสต็อก
+        </a>
+        <a class="nav-link" href="transaction.html">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4" />
+          </svg>
+          ประวัติ รับ-จ่าย
+        </a>
+        <a class="nav-link" href="dashboard.html">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18" />
+            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+          </svg>
+          แดชบอร์ด
+        </a>
+        <div class="nav-section-label">Admin</div>
+        <a class="nav-link active" href="admin.html">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          Admin Panel
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user" style="border-color:rgba(239,68,68,0.18);background:rgba(239,68,68,0.06);">
+          <div class="user-ava" style="background:linear-gradient(135deg,#DC2626,#EF4444);">A</div>
+          <div>
+            <div class="user-name">Administrator</div>
+            <div style="font-size:10.5px;display:inline-flex;align-items:center;gap:4px;color:#FCA5A5;margin-top:1px;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              Admin Session
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- TOP BAR (Mobile) -->
+
+    <div class="top-bar">
+      <button id="sidebarOpenBtn" class="btn btn-ghost btn-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+      <div class="top-bar-brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"
+          style="color: var(--primary); margin-right: 6px; flex-shrink: 0;">
           <path d="M3 10L12 3l9 7" />
-          <path d="M10.5 9h3v3l3.2 5.5a1 1 0 0 1-.86 1.5H8.2a1 1 0 0 1-.86-1.5l3.2-5.5V9z" fill="rgba(255,255,255,0.15)" />
+          <path d="M10.5 9h3v3l3.2 5.5a1 1 0 0 1-.86 1.5H8.2a1 1 0 0 1-.86-1.5l3.2-5.5V9z"
+            fill="rgba(14,165,233,0.15)" />
           <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none" />
         </svg>
+        Admin Panel
       </div>
-      <div>
-        <div class="sidebar-title">KlangSarn</div>
-        <div class="sidebar-subtitle" style="color:rgba(239,68,68,0.6);">Admin Mode</div>
-      </div>
-    </div>
-
-<nav class="sidebar-nav">
-  <div class="nav-section-label">เมนูหลัก</div>
-  <a class="nav-link" href="index.html">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-    </svg>
-    จัดการสต็อก
-  </a>
-  <a class="nav-link" href="transaction.html">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/>
-    </svg>
-    ประวัติ รับ-จ่าย
-  </a>
-  <a class="nav-link" href="dashboard.html">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-    </svg>
-    แดชบอร์ด
-  </a>
-  <div class="nav-section-label">Admin</div>
-  <a class="nav-link active" href="admin.html">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-    </svg>
-    Admin Panel
-  </a>
-</nav>
-
-<div class="sidebar-footer">
-  <div class="sidebar-user" style="border-color:rgba(239,68,68,0.18);background:rgba(239,68,68,0.06);">
-    <div class="user-ava" style="background:linear-gradient(135deg,#DC2626,#EF4444);">A</div>
-    <div>
-      <div class="user-name">Administrator</div>
-      <div style="font-size:10.5px;display:inline-flex;align-items:center;gap:4px;color:#FCA5A5;margin-top:1px;">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      <button class="btn btn-outline-danger btn-sm" onclick="adminLogout()" style="font-size:11px;padding:5px 9px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
         </svg>
-        Admin Session
-      </div>
-    </div>
-  </div>
-</div>
-  </aside>
-
-  <!-- TOP BAR (Mobile) -->
-
-  <div class="top-bar">
-    <button id="sidebarOpenBtn" class="btn btn-ghost btn-icon">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-      </svg>
-    </button>
-    <div class="top-bar-brand">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary); margin-right: 6px; flex-shrink: 0;">
-        <path d="M3 10L12 3l9 7" />
-        <path d="M10.5 9h3v3l3.2 5.5a1 1 0 0 1-.86 1.5H8.2a1 1 0 0 1-.86-1.5l3.2-5.5V9z" fill="rgba(14,165,233,0.15)" />
-        <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none" />
-      </svg>
-      Admin Panel
-    </div>
-    <button class="btn btn-outline-danger btn-sm" onclick="adminLogout()" style="font-size:11px;padding:5px 9px;">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-        <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-      </svg>
-      ออก
-    </button>
-  </div>
-
-  <!-- MAIN -->
-
-  <div class="main-content">
-    <div class="page-wrapper">
-
-  <!-- Header -->
-  <div class="page-header">
-    <div>
-      <div class="page-title">Admin Panel</div>
-      <div class="page-subtitle">จัดการระบบ KlangSarn ระดับผู้ดูแล</div>
-    </div>
-    <button class="btn btn-outline-danger btn-sm" onclick="adminLogout()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-        <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-      </svg>
-      ออกจากระบบ
-    </button>
-  </div>
-
-  <!-- Quick Stats Removed -->
-
-  <!-- Tab Panel -->
-  <div class="table-card">
-
-    <!-- Tabs -->
-    <div class="admin-tabs">
-      <button class="admin-tab active" onclick="switchTab('chemicals',this)">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <path d="M9 3h6M10 3v6.6L6.1 17.2A2 2 0 0 0 8 20h8a2 2 0 0 0 1.9-2.8L14 9.6V3"/>
-        </svg>
-        จัดการสารเคมี
-      </button>
-      <button class="admin-tab" onclick="switchTab('transactions',this)">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/>
-        </svg>
-        ประวัติรายการ
-      </button>
-      <button class="admin-tab" onclick="switchTab('export',this)">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        ส่งออกข้อมูล
-      </button>
-      <button class="admin-tab" onclick="switchTab('settings',this)">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-        </svg>
-        ตั้งค่า
+        ออก
       </button>
     </div>
 
-    <!-- Tab: Chemicals -->
-    <div id="tab-chemicals" class="tab-pane active">
-      <div style="padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--border-soft);">
-        <div style="position:relative;flex:1;max-width:260px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <input type="text" class="form-control" id="adminSearch"
-            placeholder="ค้นหาสารเคมี..." oninput="renderAdminChems()"
-            style="padding-left:34px;font-size:13px;">
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="openAddChemModal()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          เพิ่มสารเคมี
-        </button>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th style="padding-left:22px; width:80px;">ID</th>
-              <th>ชื่อสารเคมี</th>
-              <th>Material No.</th>
-              <th>จำนวนคงเหลือ</th>
-              <th>วันผลิต / วันหมดอายุ</th>
-              <th>สถานที่จัดเก็บ</th>
-              <th>ราคา/หน่วย</th>
-              <th>รูปภาพ</th>
-              <th style="padding-right:22px; text-align:right; width:160px;">จัดการ</th>
-            </tr>
-          </thead>
-          <tbody id="adminChemsTable">
-            <tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-muted);">กำลังโหลด...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <!-- MAIN -->
 
-    <!-- Tab: Transactions -->
-    <div id="tab-transactions" class="tab-pane">
-      <div style="padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--border-soft);">
-        <div style="font-size:13px;color:var(--text-muted);" id="transCount">กำลังโหลด...</div>
-        <div style="display:inline-flex;gap:8px;">
-          <button class="btn btn-primary btn-sm" onclick="openAddTransModal()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            เพิ่มประวัติธุรกรรม
-          </button>
-          <button class="btn btn-outline-danger btn-sm" onclick="confirmClearTrans()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-              <path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-            </svg>
-            ล้างประวัติทั้งหมด
-          </button>
-        </div>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th style="padding-left:22px; width:80px;">ID</th>
-              <th>Chemical ID / สารเคมี</th>
-              <th>ประเภท</th>
-              <th>จำนวน</th>
-              <th>ราคา/หน่วย</th>
-              <th>ยอดประหยัด (Saving)</th>
-              <th>วัน-เวลา</th>
-              <th>หมายเหตุ</th>
-              <th style="padding-right:22px; text-align:right; width:120px;">จัดการ</th>
-            </tr>
-          </thead>
-          <tbody id="adminTransTable">
-            <tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted);">กำลังโหลด...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <div class="main-content">
+      <div class="page-wrapper">
 
-    <!-- Tab: Export -->
-    <div id="tab-export" class="tab-pane">
-      <div class="export-grid">
-        <div class="export-card">
-          <div class="export-card-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-            </svg>
+        <!-- Header -->
+        <div class="page-header">
+          <div>
+            <div class="page-title">Admin Panel</div>
+            <div class="page-subtitle">จัดการระบบ KlangSarn ระดับผู้ดูแล</div>
           </div>
-          <div class="export-card-title">รายการสารเคมี</div>
-          <div class="export-card-desc">ส่งออกข้อมูลสต็อกทั้งหมด</div>
-          <button class="btn btn-primary btn-sm btn-block" onclick="exportCSV('chemicals')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          <button class="btn btn-outline-danger btn-sm" onclick="adminLogout()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
             </svg>
-            ดาวน์โหลด CSV
+            ออกจากระบบ
           </button>
         </div>
-        <div class="export-card">
-          <div class="export-card-icon" style="background:var(--grad-green);">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
-            </svg>
-          </div>
-          <div class="export-card-title">ประวัติรายการ</div>
-          <div class="export-card-desc">ส่งออกประวัติ รับ-จ่าย</div>
-          <button class="btn btn-success btn-sm btn-block" onclick="exportCSV('transactions')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            ดาวน์โหลด CSV
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Tab: Settings -->
-    <div id="tab-settings" class="tab-pane">
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">เปลี่ยนรหัสผ่าน Admin</div>
-          <div class="setting-desc">เปลี่ยนรหัสผ่านที่ใช้เข้า Admin Panel</div>
-        </div>
-        <button class="btn btn-outline btn-sm" onclick="openChangePwd()">เปลี่ยนรหัสผ่าน</button>
-      </div>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">ออกจากระบบ Admin</div>
-          <div class="setting-desc">สิ้นสุดสิทธิ์ Admin และกลับสู่โหมดผู้ใช้ทั่วไป</div>
-        </div>
-        <button class="btn btn-outline-danger btn-sm" onclick="adminLogout()">ออกจากระบบ</button>
-      </div>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label" style="color:var(--danger);">ล้างประวัติการทำรายการ</div>
-          <div class="setting-desc">ลบประวัติ รับ-จ่าย ทั้งหมด (ไม่สามารถกู้คืนได้)</div>
-        </div>
-        <button class="btn btn-outline-danger btn-sm" onclick="confirmClearTrans()">ล้างประวัติ</button>
-      </div>
+        <!-- Quick Stats Removed -->
 
-      <!-- App Info -->
-      <div style="padding:20px 22px;">
-        <div style="background:var(--bg-hover);border-radius:var(--r-lg);padding:16px 18px;border:1px solid var(--border-soft);">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <div style="width:36px;height:36px;border-radius:var(--r-md);background:var(--grad-brand);display:flex;align-items:center;justify-content:center;padding:6px;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #ffffff; flex-shrink: 0;">
-                <path d="M3 10L12 3l9 7" />
-                <path d="M10.5 9h3v3l3.2 5.5a1 1 0 0 1-.86 1.5H8.2a1 1 0 0 1-.86-1.5l3.2-5.5V9z" fill="rgba(255,255,255,0.15)" />
-                <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none" />
+        <!-- Tab Panel -->
+        <div class="table-card">
+
+          <!-- Tabs -->
+          <div class="admin-tabs">
+            <button class="admin-tab active" onclick="switchTab('chemicals',this)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round">
+                <path d="M9 3h6M10 3v6.6L6.1 17.2A2 2 0 0 0 8 20h8a2 2 0 0 0 1.9-2.8L14 9.6V3" />
               </svg>
+              จัดการสารเคมี
+            </button>
+            <button class="admin-tab" onclick="switchTab('transactions',this)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round">
+                <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4" />
+              </svg>
+              ประวัติรายการ
+            </button>
+            <button class="admin-tab" onclick="switchTab('export',this)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              ส่งออกข้อมูล
+            </button>
+            <button class="admin-tab" onclick="switchTab('settings',this)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+              ตั้งค่า
+            </button>
+          </div>
+
+          <!-- Tab: Chemicals -->
+          <div id="tab-chemicals" class="tab-pane active">
+            <div
+              style="padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--border-soft);">
+              <div style="position:relative;flex:1;max-width:260px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"
+                  stroke-linecap="round" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input type="text" class="form-control" id="adminSearch" placeholder="ค้นหาสารเคมี..."
+                  oninput="renderAdminChems()" style="padding-left:34px;font-size:13px;">
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="openAddChemModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                เพิ่มสารเคมี
+              </button>
             </div>
-            <div>
-              <div style="font-size:14px;font-weight:700;color:var(--text-head);">KlangSarn v2.0</div>
-              <div style="font-size:12px;color:var(--text-muted);">ระบบจัดการคลังสารเคมี (KlangSarn)</div>
-            </div>
-          </div>
-          <div style="font-size:12px;color:var(--text-muted);line-height:1.9;">
-            <div>Backend: Supabase · Frontend: Vanilla JS + CSS</div>
-            <div>Charts: Chart.js · Icons: Inline SVG</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- end table-card -->
-
-</div>
-  </div><!-- end main-content -->
-
-  <!-- BOTTOM NAV -->
-
-  <nav class="bottom-nav">
-    <div class="bottom-nav-inner">
-      <a class="bottom-nav-item" href="index.html">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-        </svg>
-        สต็อก
-      </a>
-      <a class="bottom-nav-item" href="transaction.html">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/>
-        </svg>
-        ประวัติการรับ-จ่าย
-      </a>
-      <a class="bottom-nav-item" href="dashboard.html">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-        </svg>
-        แดชบอร์ด
-      </a>
-      <a class="bottom-nav-item active" href="admin.html">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        </svg>
-        Admin
-      </a>
-    </div>
-  </nav>
-
-</div><!-- end adminPanel -->
-
-<!-- Change Password Modal -->
-
-<div class="modal-overlay" id="changePwdModal" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="modal-box modal-sm">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title">เปลี่ยนรหัสผ่าน Admin</div>
-        <div class="modal-subtitle">รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร</div>
-      </div>
-      <button class="btn-close-x" onclick="document.getElementById('changePwdModal').classList.remove('open')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">รหัสผ่านปัจจุบัน</label>
-        <input type="password" class="form-control" id="oldPwd" placeholder="">
-      </div>
-      <div class="form-group">
-        <label class="form-label">รหัสผ่านใหม่</label>
-        <input type="password" class="form-control" id="newPwd" placeholder="อย่างน้อย 6 ตัวอักษร">
-      </div>
-      <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">ยืนยันรหัสผ่านใหม่</label>
-        <input type="password" class="form-control" id="confirmPwd" placeholder="">
-      </div>
-      <div id="pwdError" style="display:none;margin-top:12px;padding:10px 14px;border-radius:var(--r-md);background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.18);color:var(--danger);font-size:13px;">
-        รหัสผ่านไม่ถูกต้อง หรือรหัสผ่านใหม่ไม่ตรงกัน
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-outline" onclick="document.getElementById('changePwdModal').classList.remove('open')">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="changePassword()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-        บันทึก
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Add/Edit Chemical Modal -->
-<div class="modal-overlay" id="chemModalOverlay" onclick="if(event.target===this)closeChemModal()">
-  <div class="modal-box modal-lg">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title" id="modalTitle">เพิ่มสารเคมีเข้าสต็อก</div>
-        <div class="modal-subtitle">กรอกข้อมูลสารเคมีให้ครบถ้วน</div>
-      </div>
-      <button class="btn-close-x" onclick="closeChemModal()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form id="chemicalForm">
-        <input type="hidden" id="chemicalId">
-        <div class="grid-2">
-          <div class="form-group" style="grid-column:1/-1;">
-            <label class="form-label">ชื่อสารเคมี <span style="color:var(--danger);">*</span></label>
-            <input type="text" class="form-control" id="chemicalName" required placeholder="เช่น Sodium Hydroxide, Hydrochloric Acid">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Material Number</label>
-            <input type="text" class="form-control" id="materialNumber" placeholder="เช่น MAT-001" style="font-family:'IBM Plex Mono',monospace;">
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">สถานที่จัดเก็บ <span style="color:var(--danger);">*</span></label>
-            <select class="form-select" id="location" required>
-              <option value="" disabled selected>— เลือกห้องจัดเก็บ —</option>
-              <option value="ห้อง 1 สารเคมีประเภทออกซิไดซ์ (Oxidizing Agent)">ห้อง 1 (ออกซิไดซ์)</option>
-              <option value="ห้อง 2 สารเคมีประเภทกรด (Acid)">ห้อง 2 (กรด)</option>
-              <option value="ห้อง 3 สารเคมีประเภทด่าง (Alkali)">ห้อง 3 (ด่าง)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">จำนวนคงเหลือ <span style="color:var(--danger);">*</span></label>
-            <input type="number" step="0.01" min="0" class="form-control" id="quantity" required placeholder="0.00">
-          </div>
-          <div class="form-group">
-            <label class="form-label">ราคาต่อหน่วย (บาท)</label>
-            <input type="number" step="0.01" min="0" class="form-control" id="pricePerUnit" placeholder="0.00">
-          </div>
-          <div class="form-group">
-            <label class="form-label">หน่วยนับ <span style="color:var(--danger);">*</span></label>
-            <input type="text" class="form-control" id="unit" required placeholder="เช่น kg, L, ขวด, กระป๋อง">
-          </div>
-          <div class="form-group" style="grid-column: 1/-1;">
-            <label class="form-label">ผู้จัดจำหน่าย (Vendor)</label>
-            <input type="text" class="form-control" id="chemicalVendor" placeholder="ระบุชื่อบริษัท, ผู้จัดจำหน่าย หรือแหล่งที่มา">
-          </div>
-          <div class="form-group">
-            <label class="form-label" style="color:var(--text-body);">จำนวนขั้นต่ำ (Min)</label>
-            <input type="number" step="0.01" min="0" class="form-control" id="minQuantity" placeholder="เช่น 5.00">
-          </div>
-          <div class="form-group">
-            <label class="form-label" style="color:var(--text-body);">จำนวนสูงสุด (Max)</label>
-            <input type="number" step="0.01" min="0" class="form-control" id="maxQuantity" placeholder="เช่น 100.00">
-          </div>
-          <div class="form-group">
-            <label class="form-label green">วันที่ผลิต (MFG)</label>
-            <input type="date" class="form-control" id="mfgDate">
-          </div>
-          <div class="form-group">
-            <label class="form-label red">วันหมดอายุ (EXP)</label>
-            <input type="date" class="form-control" id="expDate">
-            <div class="quick-exp-btns">
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(6)">+6 เดือน</button>
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(12)">+1 ปี</button>
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(24)">+2 ปี</button>
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(36)">+3 ปี</button>
-              <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(60)">+5 ปี</button>
+            <div style="overflow-x:auto;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="padding-left:22px; width:80px;">ID</th>
+                    <th>ชื่อสารเคมี</th>
+                    <th>Material No.</th>
+                    <th>จำนวนคงเหลือ</th>
+                    <th>วันผลิต / วันหมดอายุ</th>
+                    <th>สถานที่จัดเก็บ</th>
+                    <th>ราคา/หน่วย</th>
+                    <th>รูปภาพ</th>
+                    <th style="padding-right:22px; text-align:right; width:160px;">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="adminChemsTable">
+                  <tr>
+                    <td colspan="10" style="text-align:center;padding:32px;color:var(--text-muted);">กำลังโหลด...</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-          <div class="form-group" style="grid-column:1/-1;">
-            <label class="form-label">ภาพถ่ายสารเคมี (สูงสุด 3 รูป)</label>
-            
-            <input type="file" id="imageInput" accept="image/*" multiple style="display: none;" onchange="handleImageSelection(event)">
-            
-            <div id="imageUploadZone" class="upload-zone" onclick="document.getElementById('imageInput').click()">
-              <div class="upload-zone-inner">
-                <div class="upload-icon-wrap">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17 8 12 3 7 8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
+
+          <!-- Tab: Transactions -->
+          <div id="tab-transactions" class="tab-pane">
+            <div
+              style="padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--border-soft);">
+              <div style="font-size:13px;color:var(--text-muted);" id="transCount">กำลังโหลด...</div>
+              <div style="display:inline-flex;gap:8px;">
+                <button class="btn btn-primary btn-sm" onclick="openAddTransModal()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  เพิ่มประวัติธุรกรรม
+                </button>
+                <button class="btn btn-outline-danger btn-sm" onclick="confirmClearTrans()">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                    <path d="M10 11v6M14 11v6" />
+                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                  </svg>
+                  ล้างประวัติทั้งหมด
+                </button>
+              </div>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="padding-left:22px; width:80px;">ID</th>
+                    <th>Chemical ID / สารเคมี</th>
+                    <th>ประเภท</th>
+                    <th>จำนวน</th>
+                    <th>ราคา/หน่วย</th>
+                    <th>ยอดประหยัด (Saving)</th>
+                    <th>วัน-เวลา</th>
+                    <th>หมายเหตุ</th>
+                    <th style="padding-right:22px; text-align:right; width:120px;">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="adminTransTable">
+                  <tr>
+                    <td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted);">กำลังโหลด...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab: Export -->
+          <div id="tab-export" class="tab-pane">
+            <div class="export-grid">
+              <div class="export-card">
+                <div class="export-card-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"
+                    stroke-linecap="round">
+                    <path
+                      d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                   </svg>
                 </div>
-                <div style="text-align: left;">
-                  <span class="upload-title" style="display:inline-block; font-size:12px; font-weight:600;">คลิกเพื่อเลือกไฟล์ หรือลากรูปภาพมาวางที่นี่</span>
-                  <span class="upload-subtitle" style="display:block; font-size:10.5px; color:var(--text-muted); margin-top:2px;">(อัปโหลดได้สูงสุด 3 รูป ย่อขนาดและบีบอัดอัตโนมัติ)</span>
+                <div class="export-card-title">รายการสารเคมี</div>
+                <div class="export-card-desc">ส่งออกข้อมูลสต็อกทั้งหมด</div>
+                <button class="btn btn-primary btn-sm btn-block" onclick="exportCSV('chemicals')">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  ดาวน์โหลด CSV
+                </button>
+              </div>
+              <div class="export-card">
+                <div class="export-card-icon" style="background:var(--grad-green);">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"
+                    stroke-linecap="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                  </svg>
+                </div>
+                <div class="export-card-title">ประวัติรายการ</div>
+                <div class="export-card-desc">ส่งออกประวัติ รับ-จ่าย</div>
+                <button class="btn btn-success btn-sm btn-block" onclick="exportCSV('transactions')">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  ดาวน์โหลด CSV
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: Settings -->
+          <div id="tab-settings" class="tab-pane">
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">เปลี่ยนรหัสผ่าน Admin</div>
+                <div class="setting-desc">เปลี่ยนรหัสผ่านที่ใช้เข้า Admin Panel</div>
+              </div>
+              <button class="btn btn-outline btn-sm" onclick="openChangePwd()">เปลี่ยนรหัสผ่าน</button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">ออกจากระบบ Admin</div>
+                <div class="setting-desc">สิ้นสุดสิทธิ์ Admin และกลับสู่โหมดผู้ใช้ทั่วไป</div>
+              </div>
+              <button class="btn btn-outline-danger btn-sm" onclick="adminLogout()">ออกจากระบบ</button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label" style="color:var(--danger);">ล้างประวัติการทำรายการ</div>
+                <div class="setting-desc">ลบประวัติ รับ-จ่าย ทั้งหมด (ไม่สามารถกู้คืนได้)</div>
+              </div>
+              <button class="btn btn-outline-danger btn-sm" onclick="confirmClearTrans()">ล้างประวัติ</button>
+            </div>
+
+            <!-- App Info -->
+            <div style="padding:20px 22px;">
+              <div
+                style="background:var(--bg-hover);border-radius:var(--r-lg);padding:16px 18px;border:1px solid var(--border-soft);">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                  <div
+                    style="width:36px;height:36px;border-radius:var(--r-md);background:var(--grad-brand);display:flex;align-items:center;justify-content:center;padding:6px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" style="color: #ffffff; flex-shrink: 0;">
+                      <path d="M3 10L12 3l9 7" />
+                      <path d="M10.5 9h3v3l3.2 5.5a1 1 0 0 1-.86 1.5H8.2a1 1 0 0 1-.86-1.5l3.2-5.5V9z"
+                        fill="rgba(255,255,255,0.15)" />
+                      <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div style="font-size:14px;font-weight:700;color:var(--text-head);">KlangSarn v2.0</div>
+                    <div style="font-size:12px;color:var(--text-muted);">ระบบจัดการคลังสารเคมี (KlangSarn)</div>
+                  </div>
+                </div>
+                <div style="font-size:12px;color:var(--text-muted);line-height:1.9;">
+                  <div>Backend: Supabase · Frontend: Vanilla JS + CSS</div>
+                  <div>Charts: Chart.js · Icons: Inline SVG</div>
                 </div>
               </div>
             </div>
-            
-            <div id="imagePreviewContainer" class="img-preview-row" style="margin-top: 12px;"></div>
           </div>
+
+        </div><!-- end table-card -->
+
+      </div>
+    </div><!-- end main-content -->
+
+    <!-- BOTTOM NAV -->
+
+    <nav class="bottom-nav">
+      <div class="bottom-nav-inner">
+        <a class="bottom-nav-item" href="index.html">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" />
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+          </svg>
+          สต็อก
+        </a>
+        <a class="bottom-nav-item" href="transaction.html">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4" />
+          </svg>
+          ประวัติการรับ-จ่าย
+        </a>
+        <a class="bottom-nav-item" href="dashboard.html">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18" />
+            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+          </svg>
+          แดชบอร์ด
+        </a>
+        <a class="bottom-nav-item active" href="admin.html">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          Admin
+        </a>
+      </div>
+    </nav>
+
+  </div><!-- end adminPanel -->
+
+  <!-- Change Password Modal -->
+
+  <div class="modal-overlay" id="changePwdModal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal-box modal-sm">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">เปลี่ยนรหัสผ่าน Admin</div>
+          <div class="modal-subtitle">รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร</div>
         </div>
-      </form>
-    </div>
-    <div class="modal-foot">
-      <button type="button" class="btn btn-outline" onclick="closeChemModal()">ยกเลิก</button>
-      <button type="button" class="btn btn-primary" onclick="document.getElementById('chemicalForm').requestSubmit()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        บันทึกข้อมูล
-      </button>
+        <button class="btn-close-x" onclick="document.getElementById('changePwdModal').classList.remove('open')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">รหัสผ่านปัจจุบัน</label>
+          <input type="password" class="form-control" id="oldPwd" placeholder="">
+        </div>
+        <div class="form-group">
+          <label class="form-label">รหัสผ่านใหม่</label>
+          <input type="password" class="form-control" id="newPwd" placeholder="อย่างน้อย 6 ตัวอักษร">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">ยืนยันรหัสผ่านใหม่</label>
+          <input type="password" class="form-control" id="confirmPwd" placeholder="">
+        </div>
+        <div id="pwdError"
+          style="display:none;margin-top:12px;padding:10px 14px;border-radius:var(--r-md);background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.18);color:var(--danger);font-size:13px;">
+          รหัสผ่านไม่ถูกต้อง หรือรหัสผ่านใหม่ไม่ตรงกัน
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline"
+          onclick="document.getElementById('changePwdModal').classList.remove('open')">ยกเลิก</button>
+        <button class="btn btn-primary" onclick="changePassword()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          บันทึก
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Add/Edit Transaction Modal -->
-<div class="modal-overlay" id="adminTransModalOverlay" onclick="if(event.target===this)closeTransModal()">
-  <div class="modal-box modal-sm">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title" id="transModalTitle">บันทึกธุรกรรม</div>
-        <div class="modal-subtitle">กรอกข้อมูลธุรกรรมให้ครบถ้วน</div>
+  <!-- Add/Edit Chemical Modal -->
+  <div class="modal-overlay" id="chemModalOverlay" onclick="if(event.target===this)closeChemModal()">
+    <div class="modal-box modal-lg">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="modalTitle">เพิ่มสารเคมีเข้าสต็อก</div>
+          <div class="modal-subtitle">กรอกข้อมูลสารเคมีให้ครบถ้วน</div>
+        </div>
+        <button class="btn-close-x" onclick="closeChemModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
       </div>
-      <button class="btn-close-x" onclick="closeTransModal()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form id="adminTransForm">
-        <input type="hidden" id="adminTransId">
-        <div class="form-group">
-          <label class="form-label">สารเคมี (Chemical) <span style="color:var(--danger);">*</span></label>
-          <select class="form-select" id="adminTransChemId" required>
-            <option value="" disabled selected>— เลือกสารเคมี —</option>
-            <!-- Filled dynamically from admin.js -->
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">ประเภทรายการ <span style="color:var(--danger);">*</span></label>
-          <div class="trans-type-grid">
-            <div class="trans-btn sel-in" id="transBtnIN" onclick="selectTransType('IN')">
-              <div class="trans-btn-icon ico-in">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-              </div>
-              <div class="trans-btn-label" style="color:var(--success);">รับเข้า</div>
+      <div class="modal-body">
+        <form id="chemicalForm">
+          <input type="hidden" id="chemicalId">
+          <div class="grid-2">
+            <div class="form-group" style="grid-column:1/-1;">
+              <label class="form-label">ชื่อสารเคมี <span style="color:var(--danger);">*</span></label>
+              <input type="text" class="form-control" id="chemicalName" required
+                placeholder="เช่น Sodium Hydroxide, Hydrochloric Acid">
             </div>
-            <div class="trans-btn" id="transBtnOUT" onclick="selectTransType('OUT')">
-              <div class="trans-btn-icon ico-out">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
-              </div>
-              <div class="trans-btn-label" style="color:var(--text-muted);">เบิกจ่าย</div>
+            <div class="form-group">
+              <label class="form-label">Material Number</label>
+              <input type="text" class="form-control" id="materialNumber" placeholder="เช่น MAT-001"
+                style="font-family:'IBM Plex Mono',monospace;">
             </div>
-          </div>
-          <input type="hidden" id="adminTransType" value="IN">
-        </div>
-        <div class="form-group">
-          <label class="form-label">จำนวน <span style="color:var(--danger);">*</span></label>
-          <input type="number" step="0.01" min="0.01" class="form-control" id="adminTransQty" required placeholder="0.00">
-        </div>
-        <!-- Promo Fields for Receive (IN) only -->
-        <div id="adminTransPromoFields" style="display:none; margin-bottom: 16px;">
-          <!-- New Lot Toggle (Shown only for IN) -->
-          <div class="form-group" id="adminTransNewLotToggleGroup" style="margin-bottom: 12px;">
-            <label class="checkbox-container" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-head); user-select: none;">
-              <input type="checkbox" id="adminTransNewLotToggle" style="width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;">
-              รับเข้าเป็นล็อตใหม่ (เปิดล็อตใหม่)
-            </label>
-          </div>
 
-          <!-- New Lot Container (Hidden by default) -->
-          <div id="adminTransNewLotContainer" style="display:none; padding: 14px; border-radius: var(--r-md); background: rgba(14,165,233,0.04); border: 1px solid rgba(14,165,233,0.1); margin-bottom: 16px;">
-
-            <div class="form-group" style="margin-bottom: 12px;">
+            <div class="form-group">
               <label class="form-label">สถานที่จัดเก็บ <span style="color:var(--danger);">*</span></label>
-              <select class="form-select" id="adminTransLocation">
+              <select class="form-select" id="location" required>
                 <option value="" disabled selected>— เลือกห้องจัดเก็บ —</option>
                 <option value="ห้อง 1 สารเคมีประเภทออกซิไดซ์ (Oxidizing Agent)">ห้อง 1 (ออกซิไดซ์)</option>
                 <option value="ห้อง 2 สารเคมีประเภทกรด (Acid)">ห้อง 2 (กรด)</option>
                 <option value="ห้อง 3 สารเคมีประเภทด่าง (Alkali)">ห้อง 3 (ด่าง)</option>
               </select>
             </div>
-            <div class="grid-2" style="margin-bottom: 0;">
-              <div class="form-group" style="margin-bottom:0;">
-                <label class="form-label green">วันที่ผลิต (MFG)</label>
-                <input type="date" class="form-control" id="adminTransMfgDate">
+            <div class="form-group">
+              <label class="form-label">จำนวนคงเหลือ <span style="color:var(--danger);">*</span></label>
+              <input type="number" step="0.01" min="0" class="form-control" id="quantity" required placeholder="0.00">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ราคาต่อหน่วย (บาท)</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="pricePerUnit" placeholder="0.00">
+            </div>
+            <div class="form-group">
+              <label class="form-label">หน่วยนับ <span style="color:var(--danger);">*</span></label>
+              <input type="text" class="form-control" id="unit" required placeholder="เช่น kg, L, ขวด, กระป๋อง">
+            </div>
+            <div class="form-group" style="grid-column: 1/-1;">
+              <label class="form-label">ผู้จัดจำหน่าย (Vendor)</label>
+              <input type="text" class="form-control" id="chemicalVendor"
+                placeholder="ระบุชื่อบริษัท, ผู้จัดจำหน่าย หรือแหล่งที่มา">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="color:var(--text-body);">จำนวนขั้นต่ำ (Min)</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="minQuantity" placeholder="เช่น 5.00">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="color:var(--text-body);">จำนวนสูงสุด (Max)</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="maxQuantity" placeholder="เช่น 100.00">
+            </div>
+            <div class="form-group">
+              <label class="form-label green">วันที่ผลิต (MFG)</label>
+              <input type="date" class="form-control" id="mfgDate">
+            </div>
+            <div class="form-group">
+              <label class="form-label red">วันหมดอายุ (EXP)</label>
+              <input type="date" class="form-control" id="expDate">
+              <div class="quick-exp-btns">
+                <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(6)">+6 เดือน</button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(12)">+1 ปี</button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(24)">+2 ปี</button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(36)">+3 ปี</button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(60)">+5 ปี</button>
               </div>
-              <div class="form-group" style="margin-bottom:0;">
-                <label class="form-label red">วันหมดอายุ (EXP)</label>
-                <input type="date" class="form-control" id="adminTransExpDate">
-                <div class="quick-exp-btns" style="display: flex; gap: 4px; margin-top: 4px;">
-                  <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExpTransAdmin(12)">+1 ปี</button>
-                  <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExpTransAdmin(24)">+2 ปี</button>
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+              <label class="form-label">ภาพถ่ายสารเคมี (สูงสุด 3 รูป)</label>
+
+              <input type="file" id="imageInput" accept="image/*" multiple style="display: none;"
+                onchange="handleImageSelection(event)">
+
+              <div id="imageUploadZone" class="upload-zone" onclick="document.getElementById('imageInput').click()">
+                <div class="upload-zone-inner">
+                  <div class="upload-icon-wrap">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                  </div>
+                  <div style="text-align: left;">
+                    <span class="upload-title"
+                      style="display:inline-block; font-size:12px; font-weight:600;">คลิกเพื่อเลือกไฟล์
+                      หรือลากรูปภาพมาวางที่นี่</span>
+                    <span class="upload-subtitle"
+                      style="display:block; font-size:10.5px; color:var(--text-muted); margin-top:2px;">(อัปโหลดได้สูงสุด
+                      3 รูป ย่อขนาดและบีบอัดอัตโนมัติ)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div id="imagePreviewContainer" class="img-preview-row" style="margin-top: 12px;"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" onclick="closeChemModal()">ยกเลิก</button>
+        <button type="button" class="btn btn-primary" onclick="document.getElementById('chemicalForm').requestSubmit()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          บันทึกข้อมูล
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Transaction Modal -->
+  <div class="modal-overlay" id="adminTransModalOverlay" onclick="if(event.target===this)closeTransModal()">
+    <div class="modal-box modal-sm">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="transModalTitle">บันทึกธุรกรรม</div>
+          <div class="modal-subtitle">กรอกข้อมูลธุรกรรมให้ครบถ้วน</div>
+        </div>
+        <button class="btn-close-x" onclick="closeTransModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="adminTransForm">
+          <input type="hidden" id="adminTransId">
+          <div class="form-group">
+            <label class="form-label">สารเคมี (Chemical) <span style="color:var(--danger);">*</span></label>
+            <select class="form-select" id="adminTransChemId" required>
+              <option value="" disabled selected>— เลือกสารเคมี —</option>
+              <!-- Filled dynamically from admin.js -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ประเภทรายการ <span style="color:var(--danger);">*</span></label>
+            <div class="trans-type-grid">
+              <div class="trans-btn sel-in" id="transBtnIN" onclick="selectTransType('IN')">
+                <div class="trans-btn-icon ico-in">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"
+                    stroke-linecap="round">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <polyline points="19 12 12 19 5 12" />
+                  </svg>
+                </div>
+                <div class="trans-btn-label" style="color:var(--success);">รับเข้า</div>
+              </div>
+              <div class="trans-btn" id="transBtnOUT" onclick="selectTransType('OUT')">
+                <div class="trans-btn-icon ico-out">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"
+                    stroke-linecap="round">
+                    <line x1="12" y1="19" x2="12" y2="5" />
+                    <polyline points="5 12 12 5 19 12" />
+                  </svg>
+                </div>
+                <div class="trans-btn-label" style="color:var(--text-muted);">เบิกจ่าย</div>
+              </div>
+            </div>
+            <input type="hidden" id="adminTransType" value="IN">
+          </div>
+          <div class="form-group">
+            <label class="form-label">จำนวน <span style="color:var(--danger);">*</span></label>
+            <input type="number" step="0.01" min="0.01" class="form-control" id="adminTransQty" required
+              placeholder="0.00">
+          </div>
+          <!-- Promo Fields for Receive (IN) only -->
+          <div id="adminTransPromoFields" style="display:none; margin-bottom: 16px;">
+            <!-- New Lot Toggle (Shown only for IN) -->
+            <div class="form-group" id="adminTransNewLotToggleGroup" style="margin-bottom: 12px;">
+              <label class="checkbox-container"
+                style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-head); user-select: none;">
+                <input type="checkbox" id="adminTransNewLotToggle"
+                  style="width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;">
+                รับเข้าเป็นล็อตใหม่ (เปิดล็อตใหม่)
+              </label>
+            </div>
+
+            <!-- New Lot Container (Hidden by default) -->
+            <div id="adminTransNewLotContainer"
+              style="display:none; padding: 14px; border-radius: var(--r-md); background: rgba(14,165,233,0.04); border: 1px solid rgba(14,165,233,0.1); margin-bottom: 16px;">
+
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">สถานที่จัดเก็บ <span style="color:var(--danger);">*</span></label>
+                <select class="form-select" id="adminTransLocation">
+                  <option value="" disabled selected>— เลือกห้องจัดเก็บ —</option>
+                  <option value="ห้อง 1 สารเคมีประเภทออกซิไดซ์ (Oxidizing Agent)">ห้อง 1 (ออกซิไดซ์)</option>
+                  <option value="ห้อง 2 สารเคมีประเภทกรด (Acid)">ห้อง 2 (กรด)</option>
+                  <option value="ห้อง 3 สารเคมีประเภทด่าง (Alkali)">ห้อง 3 (ด่าง)</option>
+                </select>
+              </div>
+              <div class="grid-2" style="margin-bottom: 0;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label green">วันที่ผลิต (MFG)</label>
+                  <input type="date" class="form-control" id="adminTransMfgDate">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label red">วันหมดอายุ (EXP)</label>
+                  <input type="date" class="form-control" id="adminTransExpDate">
+                  <div class="quick-exp-btns" style="display: flex; gap: 4px; margin-top: 4px;">
+                    <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExpTransAdmin(12)">+1
+                      ปี</button>
+                    <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExpTransAdmin(24)">+2
+                      ปี</button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="grid-2" style="margin-bottom: 12px;">
-            <div class="form-group" style="margin-bottom:0;">
-              <label class="form-label">ราคาซื้อต่อหน่วย (บาท)</label>
-              <input type="number" step="0.01" min="0" class="form-control" id="adminTransPricePerUnit" placeholder="0.00">
+            <div class="grid-2" style="margin-bottom: 12px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">ราคาซื้อต่อหน่วย (บาท)</label>
+                <input type="number" step="0.01" min="0" class="form-control" id="adminTransPricePerUnit"
+                  placeholder="0.00">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">ผู้จัดจำหน่าย (Vendor)</label>
+                <input type="text" class="form-control" id="adminTransVendor"
+                  placeholder="ระบุชื่อบริษัท, ผู้จัดจำหน่าย หรือแหล่งที่มา">
+              </div>
             </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label class="form-label">ผู้จัดจำหน่าย (Vendor)</label>
-              <input type="text" class="form-control" id="adminTransVendor" placeholder="ระบุชื่อบริษัท, ผู้จัดจำหน่าย หรือแหล่งที่มา">
+
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="checkbox-container"
+                style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-head); user-select: none;">
+                <input type="checkbox" id="adminTransPromoToggle"
+                  style="width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;">
+                รายการนี้มีโปรโมชันของแถม (แถมฟรี)
+              </label>
+            </div>
+
+            <div class="form-group" id="adminTransFreeQtyContainer" style="display:none; margin-bottom: 12px;">
+              <label class="form-label">จำนวนของแถม (แถมฟรี)</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="adminTransFreeQty" placeholder="0.00"
+                value="0">
+            </div>
+
+            <div id="adminTransSummaryText"
+              style="padding: 12px; border-radius: 8px; background: var(--bg-hover); border: 1px dashed var(--primary); font-size: 12.5px; line-height: 1.5; color: var(--text-body); display: none; margin-bottom: 12px;">
             </div>
           </div>
-          
-          <div class="form-group" style="margin-bottom: 12px;">
-            <label class="checkbox-container" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-head); user-select: none;">
-              <input type="checkbox" id="adminTransPromoToggle" style="width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;">
-              รายการนี้มีโปรโมชันของแถม (แถมฟรี)
-            </label>
+          <div class="form-group">
+            <label class="form-label">วัน-เวลาที่ทำรายการ</label>
+            <input type="datetime-local" class="form-control" id="adminTransDate">
           </div>
-
-          <div class="form-group" id="adminTransFreeQtyContainer" style="display:none; margin-bottom: 12px;">
-            <label class="form-label">จำนวนของแถม (แถมฟรี)</label>
-            <input type="number" step="0.01" min="0" class="form-control" id="adminTransFreeQty" placeholder="0.00" value="0">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">หมายเหตุ / แผนกที่เบิก</label>
+            <input type="text" class="form-control" id="adminTransRemark" placeholder="ระบุแผนก, รายละเอียดเพิ่มเติม">
           </div>
-
-          <div id="adminTransSummaryText" style="padding: 12px; border-radius: 8px; background: var(--bg-hover); border: 1px dashed var(--primary); font-size: 12.5px; line-height: 1.5; color: var(--text-body); display: none; margin-bottom: 12px;">
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">วัน-เวลาที่ทำรายการ</label>
-          <input type="datetime-local" class="form-control" id="adminTransDate">
-        </div>
-        <div class="form-group" style="margin-bottom:0;">
-          <label class="form-label">หมายเหตุ / แผนกที่เบิก</label>
-          <input type="text" class="form-control" id="adminTransRemark" placeholder="ระบุแผนก, รายละเอียดเพิ่มเติม">
-        </div>
-      </form>
-    </div>
-    <div class="modal-foot">
-      <button type="button" class="btn btn-outline" onclick="closeTransModal()">ยกเลิก</button>
-      <button type="button" class="btn btn-primary" onclick="document.getElementById('adminTransForm').requestSubmit()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-        ยืนยัน
-      </button>
-    </div>
-  </div>
-</div>
-<!-- ===== MODAL: ยืนยันการลบ ===== -->
-<div class="modal-overlay" id="confirmDeleteModalOverlay" onclick="if(event.target===this)closeDeleteModal()">
-  <div class="modal-box modal-sm" style="border-radius: var(--r-xl); overflow: hidden;">
-    <div class="modal-head" style="background: linear-gradient(135deg, #FFF5F5, #FFEBEB); border-bottom: 1px solid rgba(239,68,68,0.1);">
-      <div>
-        <div class="modal-title" style="color: var(--danger); display: flex; align-items: center; gap: 8px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          ยืนยันการลบรายการ
-        </div>
-        <div class="modal-subtitle" style="color: #F87171;">โปรดตรวจสอบข้อมูลก่อนยืนยัน</div>
+        </form>
       </div>
-      <button class="btn-close-x" onclick="closeDeleteModal()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body" style="padding: 24px; text-align: center;">
-      <div style="font-size: 14.5px; font-weight: 500; color: var(--text-head); margin-bottom: 8px;" id="deleteItemName">คุณกำลังจะลบรายการนี้</div>
-      <div style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5;" id="deleteItemDesc">
-        การลบจะทำให้ข้อมูลนี้ถูกลบออกจากฐานข้อมูลอย่างถาวรและไม่สามารถกู้คืนได้
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" onclick="closeTransModal()">ยกเลิก</button>
+        <button type="button" class="btn btn-primary"
+          onclick="document.getElementById('adminTransForm').requestSubmit()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          ยืนยัน
+        </button>
       </div>
     </div>
-    <div class="modal-foot" style="background: #FAFCFF; border-top: 1px solid var(--border-soft); padding: 12px 22px;">
-      <button type="button" class="btn btn-outline" onclick="closeDeleteModal()">ยกเลิก</button>
-      <button type="button" class="btn btn-danger" id="confirmDeleteBtn" onclick="executeAdminDelete()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-        ยืนยันการลบ
-      </button>
+  </div>
+  <!-- ===== MODAL: ยืนยันการลบ ===== -->
+  <div class="modal-overlay" id="confirmDeleteModalOverlay" onclick="if(event.target===this)closeDeleteModal()">
+    <div class="modal-box modal-sm" style="border-radius: var(--r-xl); overflow: hidden;">
+      <div class="modal-head"
+        style="background: linear-gradient(135deg, #FFF5F5, #FFEBEB); border-bottom: 1px solid rgba(239,68,68,0.1);">
+        <div>
+          <div class="modal-title" style="color: var(--danger); display: flex; align-items: center; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            ยืนยันการลบรายการ
+          </div>
+          <div class="modal-subtitle" style="color: #F87171;">โปรดตรวจสอบข้อมูลก่อนยืนยัน</div>
+        </div>
+        <button class="btn-close-x" onclick="closeDeleteModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 24px; text-align: center;">
+        <div style="font-size: 14.5px; font-weight: 500; color: var(--text-head); margin-bottom: 8px;"
+          id="deleteItemName">คุณกำลังจะลบรายการนี้</div>
+        <div style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5;" id="deleteItemDesc">
+          การลบจะทำให้ข้อมูลนี้ถูกลบออกจากฐานข้อมูลอย่างถาวรและไม่สามารถกู้คืนได้
+        </div>
+      </div>
+      <div class="modal-foot"
+        style="background: #FAFCFF; border-top: 1px solid var(--border-soft); padding: 12px 22px;">
+        <button type="button" class="btn btn-outline" onclick="closeDeleteModal()">ยกเลิก</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn" onclick="executeAdminDelete()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+          </svg>
+          ยืนยันการลบ
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="toastContainer" class="toast-container"></div>
+  <div id="toastContainer" class="toast-container"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="js/ui.js?v=3.4"></script>
+  <script src="js/ui.js?v=3.4"></script>
 
-<script src="js/admin.js?v=3.4"></script>
+  <script src="js/admin.js?v=3.4"></script>
 
 </body>
+
 </html>
