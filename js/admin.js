@@ -167,10 +167,10 @@ function renderAdminChems() {
         </td>
         <td class="mono">${item.material_number || '—'}</td>
         <td>
-          <span class="mono" style="font-size:15px;font-weight:700;color:var(--text-head);">${item.quantity}</span>
+          <span class="mono" style="font-size:15px;font-weight:700;color:var(--text-head);">${parseFloat(item.quantity).toLocaleString('th-TH')}</span>
           <span style="font-size:12px;color:var(--text-muted);margin-left:4px;">${item.unit}</span>
           <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">
-            Min: ${item.min_quantity || '—'} | Max: ${item.max_quantity || '—'}
+            Min: ${item.min_quantity ? parseFloat(item.min_quantity).toLocaleString('th-TH') : '—'} | Max: ${item.max_quantity ? parseFloat(item.max_quantity).toLocaleString('th-TH') : '—'}
           </div>
           ${minWarning}
         </td>
@@ -244,7 +244,7 @@ function renderAdminTrans() {
         </td>
         <td>${badge}</td>
         <td>
-          <span class="mono" style="font-size:15px;font-weight:700;color:var(--text-head);">${t.quantity}</span>
+          <span class="mono" style="font-size:15px;font-weight:700;color:var(--text-head);">${parseFloat(t.quantity).toLocaleString('th-TH')}</span>
           <span style="font-size:12px;color:var(--text-muted);margin-left:3px;">${t.chemical_stock?.unit || ''}</span>
         </td>
         <td class="mono">${t.price_per_unit ? t.price_per_unit.toFixed(2) : '—'}</td>
@@ -324,6 +324,7 @@ function openEditChemModal(id) {
     document.getElementById("chemicalVendor").value = item.vendor || "";
     document.getElementById("minQuantity").value = item.min_quantity !== undefined && item.min_quantity !== null ? item.min_quantity : "";
     document.getElementById("maxQuantity").value = item.max_quantity !== undefined && item.max_quantity !== null ? item.max_quantity : "";
+    document.getElementById("packingSize").value = item.packing_size !== undefined && item.packing_size !== null ? item.packing_size : "";
 
     // Load existing images
     uploadedImagesBase64 = item.image_urls ? JSON.parse(item.image_urls) : [];
@@ -352,6 +353,7 @@ async function handleChemicalSubmit(e) {
         vendor: document.getElementById("chemicalVendor").value.trim() || null,
         min_quantity: parseFloat(document.getElementById("minQuantity").value) || 0.0,
         max_quantity: parseFloat(document.getElementById("maxQuantity").value) || 0.0,
+        packing_size: parseFloat(document.getElementById("packingSize").value) || null,
         image_urls: uploadedImagesBase64.length > 0 ? JSON.stringify(uploadedImagesBase64) : null
     };
 
@@ -373,7 +375,6 @@ async function handleChemicalSubmit(e) {
         loadAdminData();
     }
 }
-
 function adminDeleteChem(id) {
     const item = adminChems.find(c => c.id == id);
     if (!item) return;
@@ -511,6 +512,7 @@ function openAddTransModal(chemId = null, isNewLot = false) {
         const chem = adminChems.find(c => c.id == chemId);
         if (chem) {
             document.getElementById("adminTransPricePerUnit").value = chem.price_per_unit || 0.0;
+            document.getElementById("adminTransVendor").value = chem.vendor || "";
         }
     }
 
@@ -680,6 +682,7 @@ async function handleTransSubmit(e) {
             location: lotLoc,
             price_per_unit: transPrice,
             vendor: transVendor,
+            packing_size: chem.packing_size || null,
             image_urls: null
         };
 

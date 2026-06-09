@@ -210,12 +210,14 @@ function renderAll() {
                 total_quantity: 0,
                 min_quantity: c.min_quantity || 0,
                 max_quantity: c.max_quantity || 0,
+                packing_size: c.packing_size !== undefined && c.packing_size !== null ? c.packing_size : null,
                 locations: new Set(),
                 batches: []
             };
         } else {
             if (c.min_quantity > 0) groups[key].min_quantity = c.min_quantity;
             if (c.max_quantity > 0) groups[key].max_quantity = c.max_quantity;
+            if (c.packing_size !== undefined && c.packing_size !== null && c.packing_size > 0) groups[key].packing_size = c.packing_size;
         }
         groups[key].total_quantity += c.quantity;
         if (c.location) {
@@ -322,8 +324,9 @@ function renderDesktopTable(groupedList, showLoc) {
               </div>
               
               <!-- Qty -->
-              <div class="lot-qty" style="width: 140px; font-family:'IBM Plex Mono',monospace; font-weight:700;">
-                ${batch.quantity} <span style="font-size:12px;color:var(--text-muted);font-weight:normal;margin-left:2px;">${batch.unit}</span>
+              <div class="lot-qty" style="width: 160px; font-family:'IBM Plex Mono',monospace; font-weight:700;">
+                ${parseFloat(batch.quantity).toLocaleString('th-TH')} <span style="font-size:12px;color:var(--text-muted);font-weight:normal;margin-left:2px;">${batch.unit}</span>
+                <div style="font-size:11px;color:var(--primary);font-weight:500;margin-top:2px;font-family:'IBM Plex Sans Thai',sans-serif;">${getDrumConversion(batch.packing_size, batch.quantity, batch.unit)}</div>
               </div>
               
               <!-- Actions -->
@@ -362,10 +365,11 @@ function renderDesktopTable(groupedList, showLoc) {
             </div>
           </td>
           <td>
-            <span class="cell-qty" style="font-family:'IBM Plex Mono',monospace; font-size:16px; font-weight:700; color:var(--text-head);">${group.total_quantity}</span>
+            <span class="cell-qty" style="font-family:'IBM Plex Mono',monospace; font-size:16px; font-weight:700; color:var(--text-head);">${parseFloat(group.total_quantity).toLocaleString('th-TH')}</span>
             <span style="font-size:12px;color:var(--text-muted);margin-left:4px;">${group.unit}</span>
+            <div style="font-size:11px;color:var(--primary);font-weight:600;margin-top:2px;">${getDrumConversion(group.packing_size, group.total_quantity, group.unit)}</div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:2px;font-weight:normal;">
-              Min: ${group.min_quantity || '—'} | Max: ${group.max_quantity || '—'}
+              Min: ${group.min_quantity ? parseFloat(group.min_quantity).toLocaleString('th-TH') : '—'} | Max: ${group.max_quantity ? parseFloat(group.max_quantity).toLocaleString('th-TH') : '—'}
             </div>
           </td>
           <td>
@@ -375,10 +379,7 @@ function renderDesktopTable(groupedList, showLoc) {
             ${locationsText}
           </td>
           <td style="text-align:right;padding-right:22px;">
-            <button class="btn btn-add-lot" onclick="openTransactionModal(${group.batches[0].id}, true); event.stopPropagation();">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              เปิดล็อตใหม่
-            </button>
+            <!-- Actions are handled inside the nested lot rows -->
           </td>
         </tr>
         
@@ -480,7 +481,8 @@ function renderMobileCards(groupedList, showLoc) {
             return `
             <div class="nested-lot-item">
               <div class="nested-lot-item-header">
-                <span class="mono" style="color:var(--text-head); font-weight:700;">${batch.quantity} ${batch.unit}</span>
+                <span class="mono" style="color:var(--text-head); font-weight:700;">${parseFloat(batch.quantity).toLocaleString('th-TH')} ${batch.unit}</span>
+                <span style="font-size:11.5px;color:var(--primary);font-weight:600;margin-left:6px;">${getDrumConversion(batch.packing_size, batch.quantity, batch.unit)}</span>
               </div>
               <div class="nested-lot-item-details">
                 <div>
@@ -525,17 +527,14 @@ function renderMobileCards(groupedList, showLoc) {
               </div>
             </div>
             <div class="chem-card-qty" style="text-align: right;">
-              <div class="qty-val" style="font-family:'IBM Plex Mono',monospace; font-size: 24px; font-weight: 800;">${group.total_quantity}</div>
+              <div class="qty-val" style="font-family:'IBM Plex Mono',monospace; font-size: 24px; font-weight: 800;">${parseFloat(group.total_quantity).toLocaleString('th-TH')}</div>
               <div class="qty-unit" style="font-size: 11px; color: var(--text-muted); font-weight: 500;">${group.unit}</div>
+              <div style="font-size:10.5px;color:var(--primary);font-weight:600;margin-top:2px;font-family:'IBM Plex Sans Thai',sans-serif;">${getDrumConversion(group.packing_size, group.total_quantity, group.unit)}</div>
             </div>
           </div>
 
-          <div class="chem-card-foot" style="padding: 10px 18px 14px; background: linear-gradient(180deg, rgba(250,252,255,0.4), #F4F8FF); border-top: 1px solid var(--border-soft); display: flex; gap: 8px;">
-            <button class="btn btn-add-lot" style="flex:1;" onclick="openTransactionModal(${group.batches[0].id}, true); event.stopPropagation();">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              เปิดล็อตใหม่
-            </button>
-            <button class="btn btn-outline btn-sm" style="border-radius:var(--r-md); font-weight:600; display:inline-flex; align-items:center; justify-content:center; gap:5px;" onclick="toggleLotDrawer('${group.key}')">
+          <div class="chem-card-foot" style="padding: 10px 18px 14px; background: linear-gradient(180deg, rgba(250,252,255,0.4), #F4F8FF); border-top: 1px solid var(--border-soft); display: flex;">
+            <button class="btn btn-outline btn-sm" style="flex: 1; border-radius:var(--r-md); font-weight:600; display:inline-flex; align-items:center; justify-content:center; gap:5px;" onclick="toggleLotDrawer('${group.key}')">
               <span>แสดงล็อต (${group.batches.length})</span>
               <div class="chevron-icon" id="chevron-mob-${group.key}" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
@@ -765,6 +764,7 @@ function editChemical(id) {
     document.getElementById("chemicalVendor").value = item.vendor || "";
     document.getElementById("minQuantity").value = item.min_quantity !== undefined && item.min_quantity !== null ? item.min_quantity : "";
     document.getElementById("maxQuantity").value = item.max_quantity !== undefined && item.max_quantity !== null ? item.max_quantity : "";
+    document.getElementById("packingSize").value = item.packing_size !== undefined && item.packing_size !== null ? item.packing_size : "";
 
     // Load existing images
     uploadedImagesBase64 = item.image_urls ? JSON.parse(item.image_urls) : [];
@@ -789,6 +789,7 @@ async function handleChemicalSubmit(e) {
         vendor: document.getElementById("chemicalVendor").value.trim() || null,
         min_quantity: parseFloat(document.getElementById("minQuantity").value) || 0.0,
         max_quantity: parseFloat(document.getElementById("maxQuantity").value) || 0.0,
+        packing_size: parseFloat(document.getElementById("packingSize").value) || null,
         image_urls: uploadedImagesBase64.length > 0 ? JSON.stringify(uploadedImagesBase64) : null
     };
 
@@ -890,7 +891,7 @@ function openTransactionModal(id, isNewLot = false) {
     document.getElementById("transSummaryText").style.display = "none";
     document.getElementById("transSummaryText").innerHTML = "";
     document.getElementById("transSubmitBtn").disabled = false;
-    document.getElementById("transVendor").value = "";
+    document.getElementById("transVendor").value = item.vendor || "";
     document.getElementById("transRemark").value = "";
     document.getElementById("transType").value = "IN";
 
@@ -953,6 +954,7 @@ async function handleTransactionSubmit(e) {
             vendor: transVendor,
             min_quantity: item.min_quantity || 0.0,
             max_quantity: item.max_quantity || 0.0,
+            packing_size: item.packing_size || null,
             image_urls: null
         };
 
@@ -1130,3 +1132,70 @@ function updateTransSummary() {
     }
 }
 window.updateTransSummary = updateTransSummary;
+
+// ===== EXPORT STOCK TO EXCEL (CSV) =====
+function exportStockToExcel() {
+    let csv = '\uFEFF';
+    const q = v => v ? `"${String(v).replace(/"/g, '""')}"` : '';
+    const ds = () => { const d = new Date(); return `${d.getFullYear()}${(d.getMonth() + 1).toString().padStart(2, '0')}${d.getDate().toString().padStart(2, '0')}`; };
+    
+    // Header
+    csv += 'ลำดับ,ชื่อสารเคมี,Material Number,จำนวนคงเหลือ,หน่วย,สถานที่เก็บ,วันผลิต (MFG),วันหมดอายุ (EXP),ราคาต่อหน่วย,ผู้ให้บริการ (Vendor)\n';
+    
+    // Get filter values from UI to export exactly what is currently filtered
+    const qSearch = (document.getElementById('searchStock')?.value || '').toLowerCase();
+    
+    const filtered = allChemicals.filter(c => {
+        const matchesLoc = (currentFilter === 'All' || (c.location || '').includes(currentFilter));
+        const matchesSearch = c.chemical_name.toLowerCase().includes(qSearch) || (c.material_number || '').toLowerCase().includes(qSearch);
+        return matchesLoc && matchesSearch;
+    });
+
+    filtered.forEach((c, i) => {
+        csv += [
+            i + 1,
+            q(c.chemical_name),
+            q(c.material_number),
+            c.quantity,
+            q(c.unit),
+            q(c.location),
+            c.mfg_date || '',
+            c.exp_date || '',
+            c.price_per_unit || 0.0,
+            q(c.vendor || '')
+        ].join(',') + '\n';
+    });
+    
+    const filename = `klangsarn_stock_${ds()}.csv`;
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+window.exportStockToExcel = exportStockToExcel;
+
+// Helper to convert KG/L to Drums (ถัง) based on packing size in master data
+function getDrumConversion(packingSize, qty, unit) {
+    if (isNaN(qty) || qty <= 0 || !packingSize) return '';
+    
+    const lowerUnit = (unit || '').toLowerCase().trim();
+    if (['dr', 'drum', 'ถัง', 'pc', 'pcs', 'ea', 'box', 'กล่อง', 'ขวด', 'bottle', 'gal', 'gallon'].includes(lowerUnit)) {
+        return '';
+    }
+
+    const capacity = parseFloat(packingSize);
+    if (capacity > 0) {
+        const drums = qty / capacity;
+        const formattedDrums = (drums % 1 === 0) ? drums : drums.toFixed(1);
+        return ` (${parseFloat(formattedDrums).toLocaleString('th-TH')} ถัง)`;
+    }
+    return '';
+}
+window.getDrumConversion = getDrumConversion;

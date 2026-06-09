@@ -76,6 +76,33 @@ function updateAdminUI() {
   }
 }
 
+// ===== SIDEBAR DESKTOP COLLAPSE =====
+// Apply sidebar state as early as possible to prevent layout shifts
+if (localStorage.getItem('klangsarn_sidebar_collapsed') === 'true') {
+  document.body.classList.add('sidebar-collapsed');
+}
+
+function toggleSidebarDesktop() {
+  const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+  localStorage.setItem('klangsarn_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+}
+
+function initSidebarToggle() {
+  if (!document.getElementById('desktopSidebarToggle')) {
+    const toggleBtn = document.createElement('button');
+    toggleBtn.id = 'desktopSidebarToggle';
+    toggleBtn.className = 'desktop-toggle-btn';
+    toggleBtn.title = 'เปิด/ปิด Sidebar';
+    toggleBtn.innerHTML = `
+      <svg id="toggleBtnIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    `;
+    toggleBtn.addEventListener('click', toggleSidebarDesktop);
+    document.body.appendChild(toggleBtn);
+  }
+}
+
 // ===== CONFIRM DIALOG =====
 function confirmDialog(message) {
   return new Promise(resolve => {
@@ -84,10 +111,61 @@ function confirmDialog(message) {
   });
 }
 
+// ===== RESIZABLE COLUMNS (EXCEL STYLE) =====
+function makeTablesResizable() {
+  const tables = document.querySelectorAll('.data-table');
+  tables.forEach(table => {
+    const cols = table.querySelectorAll('thead th');
+    cols.forEach(col => {
+      // Prevent duplicate resizers
+      if (col.querySelector('.table-resizer')) return;
+
+      // Create resize handle
+      const resizer = document.createElement('div');
+      resizer.className = 'table-resizer';
+      col.appendChild(resizer);
+
+      let startX, startWidth;
+
+      resizer.addEventListener('mousedown', e => {
+        e.preventDefault();
+        table.style.tableLayout = 'fixed';
+        startX = e.clientX;
+        startWidth = col.offsetWidth;
+        resizer.classList.add('resizing');
+
+        // Set explicit widths on all sibling headers
+        cols.forEach(c => {
+          if (!c.style.width) {
+            c.style.width = c.offsetWidth + 'px';
+          }
+        });
+
+        const onMouseMove = ev => {
+          const newWidth = startWidth + (ev.clientX - startX);
+          col.style.width = Math.max(40, newWidth) + 'px';
+        };
+
+        const onMouseUp = () => {
+          resizer.classList.remove('resizing');
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+        };
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      });
+    });
+  });
+}
+window.makeTablesResizable = makeTablesResizable;
+
 // Init on load
 document.addEventListener('DOMContentLoaded', () => {
   initSidebar();
   updateAdminUI();
+  initSidebarToggle();
+  makeTablesResizable();
 });
 
 // ===== DATE FORMATTER =====

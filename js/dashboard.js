@@ -43,7 +43,7 @@ async function loadDashboardData() {
 
     // 2. Fetch fresh data in background from Supabase
     const [stockRes, transRes] = await Promise.all([
-        _supabase.from('chemical_stock').select('id, chemical_name, material_number, quantity, unit, exp_date, location, price_per_unit, vendor, min_quantity, max_quantity'),
+        _supabase.from('chemical_stock').select('id, chemical_name, material_number, quantity, unit, exp_date, location, price_per_unit, vendor, min_quantity, max_quantity, packing_size'),
         _supabase.from('chemical_transactions')
             .select('id, type, quantity, saving, transaction_date, price_per_unit, free_quantity, vendor, chemical_stock(chemical_name, unit)')
             .order('transaction_date', { ascending: false })
@@ -87,6 +87,15 @@ function renderSummaryCards(stockData, transData, firstDay) {
     // Count unique chemical products (by name and material number)
     const uniqueChemicals = new Set(stockData.map(c => `${c.chemical_name}::${c.material_number || ''}`));
     setEl('dashTotalItems', uniqueChemicals.size);
+
+    // Compute Total Stock Value
+    let totalStockValue = 0;
+    stockData.forEach(c => {
+        const qty = parseFloat(c.quantity) || 0;
+        const price = parseFloat(c.price_per_unit) || 0;
+        totalStockValue += qty * price;
+    });
+    setEl('dashStockValue', totalStockValue.toLocaleString('th-TH') + ' ฿');
 
     const today = new Date();
     const alerts = stockData.filter(c => {
@@ -620,6 +629,9 @@ function showStatPopup(type) {
     } else if (type === 'stock_level') {
         titleEl.textContent = "การแจ้งเตือนระดับสต็อก (Min/Max)";
         subtitleEl.textContent = "แสดงรายการสารเคมีทั้งหมดที่อยู่นอกเกณฑ์มาตรฐานความปลอดภัย (ต่ำกว่าเกณฑ์ Min หรือเกินกว่าเกณฑ์ Max)";
+    } else if (type === 'stock_value') {
+        titleEl.textContent = "มูลค่าสินค้าคงคลังแยกตามรายการ";
+        subtitleEl.textContent = "แสดงรายละเอียดปริมาณสินค้าคงเหลือ ราคาต่อหน่วย และมูลค่ารวมของสินค้าแต่ละรายการในคลัง";
     }
 
     renderStatPopupTable();
@@ -695,6 +707,43 @@ function renderStatPopupTable() {
                     <span style="font-size:12px;color:var(--text-muted);margin-left:2px;">${g.unit}</span>
                   </td>
                   <td style="padding-right:20px;">${locs}</td>
+                </tr>`;
+            }).join('');
+        }
+    }
+    else if (currentPopupType === 'stock_value') {
+        headersHtml = `
+            <tr>
+              <th style="padding-left:20px;">ชื่อสารเคมี</th>
+              <th>Material Number</th>
+              <th>จำนวนคงเหลือ</th>
+              <th>ราคาต่อหน่วย</th>
+              <th>มูลค่ารวม</th>
+              <th style="padding-right:20px;">สถานที่จัดเก็บ</th>
+            </tr>
+        `;
+
+        const filteredStock = globalStockData.filter(c => {
+            return c.chemical_name.toLowerCase().includes(q) ||
+                (c.material_number || "").toLowerCase().includes(q) ||
+                (c.location || "").toLowerCase().includes(q);
+        });
+
+        if (filteredStock.length === 0) {
+            bodyHtml = `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">ไม่พบข้อมูลสารเคมี</td></tr>`;
+        } else {
+            bodyHtml = filteredStock.map(c => {
+                const qty = c.quantity || 0;
+                const price = c.price_per_unit || 0;
+                const total = qty * price;
+                const loc = c.location ? c.location.split(' ').slice(0, 2).join(' ') : '—';
+                return `<tr>
+                  <td style="padding-left:20px;font-weight:600;color:var(--text-head);">${c.chemical_name}</td>
+                  <td class="mono">${c.material_number || '—'}</td>
+                  <td class="mono">${qty.toLocaleString('th-TH')} ${c.unit || ''}</td>
+                  <td class="mono">${price.toLocaleString('th-TH', { minimumFractionDigits: 2 })} ฿</td>
+                  <td class="mono" style="font-weight:700;color:var(--primary);">${total.toLocaleString('th-TH', { minimumFractionDigits: 2 })} ฿</td>
+                  <td style="padding-right:20px;"><span class="badge badge-loc">${loc}</span></td>
                 </tr>`;
             }).join('');
         }
@@ -929,6 +978,9 @@ function renderStatPopupTable() {
 
     thead.innerHTML = headersHtml;
     tbody.innerHTML = bodyHtml;
+    if (window.makeTablesResizable) {
+        window.makeTablesResizable();
+    }
 }
 
 function filterStatPopup() {

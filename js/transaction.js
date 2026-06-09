@@ -121,7 +121,7 @@ function renderTransactions(filtered) {
                   <td>${chemName}</td>
                   <td>${typeBadge}</td>
                   <td>
-                    <span class="mono ${qtyClass}" style="font-size:14.5px;">${qtyPrefix}${t.quantity}</span>
+                    <span class="mono ${qtyClass}" style="font-size:14.5px;">${qtyPrefix}${parseFloat(t.quantity).toLocaleString('th-TH')}</span>
                     <span style="font-size:12px;color:var(--text-muted);margin-left:3px;">${unit}</span>
                   </td>
                   <td>${vendorStr}</td>
