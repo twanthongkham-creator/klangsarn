@@ -146,6 +146,18 @@
           <div class="stat-lbl">สารเคมีทั้งหมด</div>
           <div class="stat-sub">รายการในระบบ</div>
         </div>
+        <div class="stat-card" onclick="showStatPopup('stock_value')" style="cursor: pointer; background: linear-gradient(135deg, #059669 0%, #10B981 100%);">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          </div>
+          <div class="stat-val" id="dashStockValue">—</div>
+          <div class="stat-lbl">มูลค่าคลังสินค้า</div>
+          <div class="stat-sub">คำนวณตามราคาซื้อจริงล่าสุด</div>
+        </div>
         <div class="stat-card amber" onclick="showStatPopup('expiry')" style="cursor: pointer;">
           <div class="stat-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"

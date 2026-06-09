@@ -116,14 +116,24 @@
           <div class="page-title">รายการสารเคมีในคลัง</div>
           <div class="page-subtitle">จัดการสต็อก รับ-จ่าย และข้อมูลสารเคมีทั้งหมด</div>
         </div>
-        <button class="btn btn-primary" onclick="openAddModal()" id="addBtnDesktop" style="display:none;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round">
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-          เพิ่มรายการ
-        </button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button class="btn btn-outline" onclick="exportStockToExcel()" title="Export เป็นไฟล์ Excel">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px; vertical-align:middle;">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Export Excel
+          </button>
+          <button class="btn btn-primary" onclick="openAddModal()" id="addBtnDesktop" style="display:none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            เพิ่มรายการ
+          </button>
+        </div>
       </div>
 
       <!-- Filter & Search Bar -->
@@ -311,6 +321,10 @@
               <input type="number" step="0.01" min="0" class="form-control" id="maxQuantity" placeholder="เช่น 100.00">
             </div>
             <div class="form-group">
+              <label class="form-label" style="color:var(--text-body);">ขนาดบรรจุต่อถัง (Packing Size)</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="packingSize" placeholder="เช่น 30.00 (เว้นว่างไว้หากไม่ระบุ)">
+            </div>
+            <div class="form-group">
               <label class="form-label green">วันที่ผลิต (MFG)</label>
               <input type="date" class="form-control" id="mfgDate">
             </div>
@@ -425,7 +439,7 @@
             <label class="form-label">จำนวน</label>
             <div class="input-group">
               <input type="number" step="0.01" min="0.01" class="form-control" id="transQty" required
-                placeholder="0.00">
+                placeholder="0.00" inputmode="decimal">
               <span class="input-addon" id="transUnitLabel">หน่วย</span>
             </div>
           </div>
@@ -473,7 +487,7 @@
             <div class="grid-2" style="margin-bottom: 12px;">
               <div class="form-group" style="margin-bottom:0;">
                 <label class="form-label">ราคาซื้อต่อหน่วย (บาท)</label>
-                <input type="number" step="0.01" min="0" class="form-control" id="transPricePerUnit" placeholder="0.00">
+                <input type="number" step="0.01" min="0" class="form-control" id="transPricePerUnit" placeholder="0.00" inputmode="decimal">
               </div>
               <div class="form-group" style="margin-bottom:0;">
                 <label class="form-label">ผู้จัดจำหน่าย (Vendor)</label>
@@ -494,7 +508,7 @@
             <div class="form-group" id="transFreeQtyContainer" style="display:none; margin-bottom: 12px;">
               <label class="form-label">จำนวนของแถม (แถมฟรี)</label>
               <input type="number" step="0.01" min="0" class="form-control" id="transFreeQty" placeholder="0.00"
-                value="0">
+                value="0" inputmode="decimal">
             </div>
 
             <div id="transSummaryText"
@@ -571,8 +585,8 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/ui.js?v=3.9"></script>
-  <script src="js/script.js?v=3.9"></script>
+  <script src="js/ui.js?v=4.3"></script>
+  <script src="js/script.js?v=4.4"></script>
   <script>
     // Admin UI init
     document.addEventListener('DOMContentLoaded', () => {
