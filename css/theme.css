@@ -283,6 +283,70 @@ body {
 .main-content {
   margin-left: var(--sidebar-w);
   min-height: 100vh;
+  transition: margin-left var(--t-mid);
+}
+
+/* Sidebar Collapsed State */
+body.sidebar-collapsed .sidebar {
+  transform: translateX(-100%);
+}
+
+body.sidebar-collapsed .main-content {
+  margin-left: 0;
+}
+
+/* Desktop Floating Toggle Button */
+.desktop-toggle-btn {
+  position: fixed;
+  top: 22px;
+  left: calc(var(--sidebar-w) - 15px);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--sidebar-mid);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 400;
+  box-shadow: var(--shadow-sm);
+  transition: left var(--t-mid), transform var(--t-mid), background-color var(--t-fast), border-color var(--t-fast);
+}
+
+.desktop-toggle-btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  box-shadow: var(--glow-blue);
+}
+
+body.sidebar-collapsed .desktop-toggle-btn {
+  left: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-body);
+}
+
+body.sidebar-collapsed .desktop-toggle-btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+#toggleBtnIcon {
+  transition: transform var(--t-mid);
+}
+
+body.sidebar-collapsed #toggleBtnIcon {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 768px) {
+  .desktop-toggle-btn {
+    display: none !important;
+  }
 }
 
 .page-wrapper {
@@ -593,6 +657,25 @@ body {
   letter-spacing: 0.9px;
   color: var(--text-muted);
   text-align: left;
+  position: relative; /* Required for absolute positioning of resizer */
+}
+
+/* Resizable columns styling */
+.table-resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 8px;
+  height: 100%;
+  cursor: col-resize;
+  user-select: none;
+  z-index: 10;
+  transition: background var(--t-fast);
+}
+
+.table-resizer:hover,
+.table-resizer.resizing {
+  background: rgba(14, 165, 233, 0.4); /* Light highlight of primary color */
 }
 
 .data-table td {
@@ -2305,4 +2388,70 @@ body {
   gap: 8px;
   padding-top: 8px;
   border-top: 1px dashed var(--border-soft);
+}
+
+/* ===== DESKTOP SIDEBAR COLLAPSE & TOGGLE ===== */
+.desktop-toggle-btn {
+  position: fixed;
+  left: calc(var(--sidebar-w) + 18px);
+  top: 18px;
+  z-index: 400; /* Above sidebar, below modals */
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  color: var(--text-head);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: left var(--t-mid), background var(--t-fast), border-color var(--t-fast), color var(--t-fast), transform var(--t-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.desktop-toggle-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: var(--bg-hover);
+  transform: scale(1.05);
+}
+
+body.sidebar-collapsed .desktop-toggle-btn {
+  left: 18px;
+}
+
+#toggleBtnIcon {
+  transition: transform var(--t-mid);
+}
+
+body.sidebar-collapsed #toggleBtnIcon {
+  transform: rotate(180deg);
+}
+
+@media (min-width: 769px) {
+  body.sidebar-collapsed .sidebar {
+    transform: translateX(-100%);
+  }
+
+  body.sidebar-collapsed .main-content {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-toggle-btn {
+    display: none !important;
+  }
+
+  /* Prevent auto-zooming on focus in iOS/mobile devices by enforcing min 16px font-size */
+  input,
+  select,
+  textarea,
+  .form-control,
+  .form-select,
+  .modal-box.modal-lg .form-control,
+  .modal-box.modal-lg .form-select {
+    font-size: 16px !important;
+  }
 }
