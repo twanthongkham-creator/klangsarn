@@ -245,7 +245,7 @@ function renderDesktopTable(groupedList, showLoc) {
     if (!tbody) return;
 
     if (groupedList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5">
+        tbody.innerHTML = `<tr><td colspan="4">
           <div class="empty-state" style="padding: 60px 24px;">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.2"
               stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block;">
@@ -324,9 +324,9 @@ function renderDesktopTable(groupedList, showLoc) {
               </div>
               
               <!-- Qty -->
-              <div class="lot-qty" style="width: 160px; font-family:'IBM Plex Mono',monospace; font-weight:700;">
+              <div class="lot-qty" style="width: 160px; font-family:'Prompt', monospace; font-weight:700;">
                 ${parseFloat(batch.quantity).toLocaleString('th-TH')} <span style="font-size:12px;color:var(--text-muted);font-weight:normal;margin-left:2px;">${batch.unit}</span>
-                <div style="font-size:11px;color:var(--primary);font-weight:500;margin-top:2px;font-family:'IBM Plex Sans Thai',sans-serif;">${getDrumConversion(batch.packing_size, batch.quantity, batch.unit)}</div>
+                <div style="font-size:11px;color:var(--primary);font-weight:500;margin-top:2px;font-family:'Prompt', sans-serif;">${getDrumConversion(batch.packing_size, batch.quantity, batch.unit)}</div>
               </div>
               
               <!-- Actions -->
@@ -360,12 +360,12 @@ function renderDesktopTable(groupedList, showLoc) {
               ${mainThumb}
               <div>
                 <div class="cell-name" style="font-size:14.5px; font-weight:700; color:var(--text-head);">${group.chemical_name}</div>
-                <div class="cell-cas" style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--text-muted); margin-top:2px;">Material: ${group.material_number || '—'}</div>
+                <div class="cell-cas" style="font-family:'Prompt', monospace; font-size:11.5px; color:var(--text-muted); margin-top:2px;">Material: ${group.material_number || '—'}</div>
               </div>
             </div>
           </td>
           <td>
-            <span class="cell-qty" style="font-family:'IBM Plex Mono',monospace; font-size:16px; font-weight:700; color:var(--text-head);">${parseFloat(group.total_quantity).toLocaleString('th-TH')}</span>
+            <span class="cell-qty" style="font-family:'Prompt', monospace; font-size:16px; font-weight:700; color:var(--text-head);">${parseFloat(group.total_quantity).toLocaleString('th-TH')}</span>
             <span style="font-size:12px;color:var(--text-muted);margin-left:4px;">${group.unit}</span>
             <div style="font-size:11px;color:var(--primary);font-weight:600;margin-top:2px;">${getDrumConversion(group.packing_size, group.total_quantity, group.unit)}</div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:2px;font-weight:normal;">
@@ -378,14 +378,11 @@ function renderDesktopTable(groupedList, showLoc) {
           <td style="display:${showLoc ? '' : 'none'};">
             ${locationsText}
           </td>
-          <td style="text-align:right;padding-right:22px;">
-            <!-- Actions are handled inside the nested lot rows -->
-          </td>
         </tr>
         
         <!-- Detail Row (Indented Branching Lots) -->
         <tr class="nested-lot-row" id="detail-${group.key}">
-          <td colspan="${showLoc ? 5 : 4}" style="padding:0;">
+          <td colspan="${showLoc ? 4 : 3}" style="padding:0;">
             <div class="nested-lot-container">
               ${subTableRows}
             </div>
@@ -517,7 +514,7 @@ function renderMobileCards(groupedList, showLoc) {
             ${mainImgHtml}
             <div class="chem-card-info" style="flex: 1; min-width: 0;">
               <div class="chem-name" style="font-size: 15px; font-weight: 700; color: var(--text-head);">${group.chemical_name}</div>
-              <div class="chem-cas" style="font-family:'IBM Plex Mono',monospace; font-size: 11.5px; color: var(--text-muted); margin-top: 3px;">Material: ${group.material_number || '—'}</div>
+              <div class="chem-cas" style="font-family:'Prompt', monospace; font-size: 11.5px; color: var(--text-muted); margin-top: 3px;">Material: ${group.material_number || '—'}</div>
               <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">
                 Min: ${group.min_quantity || '—'} | Max: ${group.max_quantity || '—'}
               </div>
@@ -527,9 +524,9 @@ function renderMobileCards(groupedList, showLoc) {
               </div>
             </div>
             <div class="chem-card-qty" style="text-align: right;">
-              <div class="qty-val" style="font-family:'IBM Plex Mono',monospace; font-size: 24px; font-weight: 800;">${parseFloat(group.total_quantity).toLocaleString('th-TH')}</div>
+              <div class="qty-val" style="font-family:'Prompt', monospace; font-size: 24px; font-weight: 800;">${parseFloat(group.total_quantity).toLocaleString('th-TH')}</div>
               <div class="qty-unit" style="font-size: 11px; color: var(--text-muted); font-weight: 500;">${group.unit}</div>
-              <div style="font-size:10.5px;color:var(--primary);font-weight:600;margin-top:2px;font-family:'IBM Plex Sans Thai',sans-serif;">${getDrumConversion(group.packing_size, group.total_quantity, group.unit)}</div>
+              <div style="font-size:10.5px;color:var(--primary);font-weight:600;margin-top:2px;font-family:'Prompt', sans-serif;">${getDrumConversion(group.packing_size, group.total_quantity, group.unit)}</div>
             </div>
           </div>
 

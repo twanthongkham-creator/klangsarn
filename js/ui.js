@@ -1,4 +1,4 @@
-/* ============================================
+﻿/* ============================================
    Shared UI Components
    sidebar, bottom nav, toasts
    ============================================ */
@@ -51,7 +51,7 @@ function showToast(message, type = 'success') {
   toast.className = `toast t-${type}`;
   toast.innerHTML = `
     <i class="bi ${icons[type] || icons.info}" style="color:${colors[type]}; font-size:16px;"></i>
-    <span style="flex:1; font-family:'IBM Plex Sans Thai',sans-serif;">${message}</span>
+    <span style="flex:1; font-family:'Prompt', sans-serif;">${message}</span>
     <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:#94A3B8;font-size:16px;padding:0;">×</button>
   `;
   container.appendChild(toast);

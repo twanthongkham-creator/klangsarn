@@ -1,4 +1,4 @@
-// ==========================================
+﻿// ==========================================
 // KlangSarn — Dashboard Logic v2.4
 // Fiscal Year Savings & Charts
 // ==========================================
@@ -194,7 +194,7 @@ function renderLocationChart(stockData) {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        font: { family: "'IBM Plex Sans Thai', sans-serif", size: 12 },
+                        font: { family: "'Prompt', sans-serif", size: 12 },
                         padding: 18,
                         color: '#374151',
                         usePointStyle: true,
@@ -403,7 +403,7 @@ function renderFiscalSavingChart(fiscalYear) {
                         display: false
                     },
                     ticks: {
-                        font: { family: "'IBM Plex Sans Thai', sans-serif", size: 11 },
+                        font: { family: "'Prompt', sans-serif", size: 11 },
                         color: '#64748B'
                     }
                 },
@@ -412,7 +412,7 @@ function renderFiscalSavingChart(fiscalYear) {
                         color: '#F1F5F9'
                     },
                     ticks: {
-                        font: { family: "'IBM Plex Mono', sans-serif", size: 11 },
+                        font: { family: "'Prompt', sans-serif", size: 11 },
                         color: '#64748B',
                         callback: val => val.toLocaleString('th-TH')
                     }
@@ -564,7 +564,7 @@ function renderChemTransChart(chemName) {
                     display: true,
                     position: 'top',
                     labels: {
-                        font: { family: "'IBM Plex Sans Thai', sans-serif", size: 12 },
+                        font: { family: "'Prompt', sans-serif", size: 12 },
                         color: '#64748B'
                     }
                 },
@@ -583,14 +583,14 @@ function renderChemTransChart(chemName) {
                 x: {
                     grid: { display: false },
                     ticks: {
-                        font: { family: "'IBM Plex Sans Thai', sans-serif", size: 11 },
+                        font: { family: "'Prompt', sans-serif", size: 11 },
                         color: '#64748B'
                     }
                 },
                 y: {
                     grid: { color: '#F1F5F9' },
                     ticks: {
-                        font: { family: "'IBM Plex Mono', sans-serif", size: 11 },
+                        font: { family: "'Prompt', sans-serif", size: 11 },
                         color: '#64748B',
                         callback: val => val.toLocaleString('th-TH')
                     }
