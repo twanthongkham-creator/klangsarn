@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="th">
 
 <head>
@@ -34,7 +34,7 @@
     <nav class="sidebar-nav">
       <div class="nav-section-label">เมนูหลัก</div>
 
-      <a class="nav-link active" href="index.html">
+      <a class="nav-link active" href="index.html" data-label="เธเธฑเธ”เธเธฒเธฃเธชเธ•เนเธญเธ">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
           stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="7" width="20" height="14" rx="2" />
@@ -43,7 +43,7 @@
         จัดการสต็อก
       </a>
 
-      <a class="nav-link" href="transaction.html">
+      <a class="nav-link" href="transaction.html" data-label="เธเธฃเธฐเธงเธฑเธ•เธด เธฃเธฑเธ-เธเนเธฒเธข">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
           stroke-linecap="round" stroke-linejoin="round">
           <path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4" />
@@ -51,7 +51,7 @@
         ประวัติ รับ-จ่าย
       </a>
 
-      <a class="nav-link" href="dashboard.html">
+      <a class="nav-link" href="dashboard.html" data-label="เนเธ”เธเธเธญเธฃเนเธ”">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
           stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 3v18h18" />
@@ -62,7 +62,7 @@
 
       <div class="nav-section-label">ระบบ</div>
 
-      <a class="nav-link" href="admin.html">
+      <a class="nav-link" href="admin.html" data-label="Admin Panel">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
           stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -191,12 +191,11 @@
                 <th>จำนวนคงเหลือ</th>
                 <th>สถานะวันหมดอายุ</th>
                 <th id="th-location">สถานที่เก็บ</th>
-                <th style="text-align:right; padding-right:22px;">จัดการ</th>
               </tr>
             </thead>
             <tbody id="chemicalTableBody">
               <tr>
-                <td colspan="5">
+                <td colspan="4">
                   <div class="empty-state" style="padding:40px 24px;">
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.4"
                       stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px; display:block;">
@@ -256,7 +255,7 @@
   </nav>
 
   <!-- ===== MODAL: เพิ่ม/แก้ไข ===== -->
-  <div class="modal-overlay" id="chemModalOverlay" onclick="if(event.target===this)closeChemModal()">
+  <div class="modal-overlay" id="chemModalOverlay">
     <div class="modal-box modal-lg">
       <div class="modal-head">
         <div>
@@ -274,18 +273,21 @@
       <div class="modal-body">
         <form id="chemicalForm">
           <input type="hidden" id="chemicalId">
-          <div class="grid-2">
-            <div class="form-group" style="grid-column:1/-1;">
-              <label class="form-label">ชื่อสารเคมี <span style="color:var(--danger);">*</span></label>
-              <input type="text" class="form-control" id="chemicalName" required
-                placeholder="เช่น Sodium Hydroxide, Hydrochloric Acid">
-            </div>
+
+          <!-- ชื่อสารเคมี -->
+          <div class="form-group">
+            <label class="form-label">ชื่อสารเคมี <span style="color:var(--danger);">*</span></label>
+            <input type="text" class="form-control" id="chemicalName" required
+              placeholder="เช่น Sodium Hydroxide, Hydrochloric Acid">
+          </div>
+
+          <!-- Material Number | สถานที่จัดเก็บ -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;">
             <div class="form-group">
               <label class="form-label">Material Number</label>
-              <input type="text" class="form-control" id="materialNumber" placeholder="เช่น MAT-001"
-                style="font-family:'IBM Plex Mono',monospace;">
+              <input type="text" class="form-control" id="materialNumber" placeholder="MAT-001"
+                style="font-family:'Prompt', monospace;">
             </div>
-
             <div class="form-group">
               <label class="form-label">สถานที่จัดเก็บ <span style="color:var(--danger);">*</span></label>
               <select class="form-select" id="location" required>
@@ -295,35 +297,51 @@
                 <option value="ห้อง 3 สารเคมีประเภทด่าง (Alkali)">ห้อง 3 (ด่าง)</option>
               </select>
             </div>
+          </div>
+
+          <!-- จำนวนคงเหลือ | หน่วยนับ -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;">
             <div class="form-group">
               <label class="form-label">จำนวนคงเหลือ <span style="color:var(--danger);">*</span></label>
               <input type="number" step="0.01" min="0" class="form-control" id="quantity" required placeholder="0.00">
             </div>
             <div class="form-group">
+              <label class="form-label">หน่วยนับ <span style="color:var(--danger);">*</span></label>
+              <input type="text" class="form-control" id="unit" required placeholder="เช่น kg, L, ขวด, กระป๋อง">
+            </div>
+          </div>
+
+          <!-- ราคาต่อหน่วย | ผู้จัดจำหน่าย -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;">
+            <div class="form-group">
               <label class="form-label">ราคาต่อหน่วย (บาท)</label>
               <input type="number" step="0.01" min="0" class="form-control" id="pricePerUnit" placeholder="0.00">
             </div>
             <div class="form-group">
-              <label class="form-label">หน่วยนับ <span style="color:var(--danger);">*</span></label>
-              <input type="text" class="form-control" id="unit" required placeholder="เช่น kg, L, ขวด, กระป๋อง">
-            </div>
-            <div class="form-group" style="grid-column: 1/-1;">
               <label class="form-label">ผู้จัดจำหน่าย (Vendor)</label>
               <input type="text" class="form-control" id="chemicalVendor"
-                placeholder="ระบุชื่อบริษัท, ผู้จัดจำหน่าย หรือแหล่งที่มา">
+                placeholder="ชื่อบริษัท / ผู้จัดจำหน่าย">
+            </div>
+          </div>
+
+          <!-- Min | Max | Packing Size -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 12px;">
+            <div class="form-group">
+              <label class="form-label" style="color:var(--text-body);">Min</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="minQuantity" placeholder="5.00">
             </div>
             <div class="form-group">
-              <label class="form-label" style="color:var(--text-body);">จำนวนขั้นต่ำ (Min)</label>
-              <input type="number" step="0.01" min="0" class="form-control" id="minQuantity" placeholder="เช่น 5.00">
+              <label class="form-label" style="color:var(--text-body);">Max</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="maxQuantity" placeholder="100.00">
             </div>
             <div class="form-group">
-              <label class="form-label" style="color:var(--text-body);">จำนวนสูงสุด (Max)</label>
-              <input type="number" step="0.01" min="0" class="form-control" id="maxQuantity" placeholder="เช่น 100.00">
+              <label class="form-label" style="color:var(--text-body);">Packing Size</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="packingSize" placeholder="30.00">
             </div>
-            <div class="form-group">
-              <label class="form-label" style="color:var(--text-body);">ขนาดบรรจุต่อถัง (Packing Size)</label>
-              <input type="number" step="0.01" min="0" class="form-control" id="packingSize" placeholder="เช่น 30.00 (เว้นว่างไว้หากไม่ระบุ)">
-            </div>
+          </div>
+
+          <!-- วันที่ผลิต (MFG) ซ้าย | วันหมดอายุ (EXP) ขวา — แถวเดียวกันเสมอ -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;">
             <div class="form-group">
               <label class="form-label green">วันที่ผลิต (MFG)</label>
               <input type="date" class="form-control" id="mfgDate">
@@ -332,45 +350,46 @@
               <label class="form-label red">วันหมดอายุ (EXP)</label>
               <input type="date" class="form-control" id="expDate">
               <div class="quick-exp-btns">
-                <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(6)">+6 เดือน</button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(6)">+6 ด.</button>
                 <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(12)">+1 ปี</button>
                 <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(24)">+2 ปี</button>
                 <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(36)">+3 ปี</button>
                 <button type="button" class="btn btn-outline btn-xs" onclick="setQuickExp(60)">+5 ปี</button>
               </div>
             </div>
-            <div class="form-group" style="grid-column:1/-1;">
-              <label class="form-label">ภาพถ่ายสารเคมี (สูงสุด 3 รูป)</label>
+          </div>
 
-              <input type="file" id="imageInput" accept="image/*" multiple style="display: none;"
-                onchange="handleImageSelection(event)">
+          <!-- ภาพถ่ายสารเคมี -->
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">ภาพถ่ายสารเคมี (สูงสุด 3 รูป)</label>
 
-              <div id="imageUploadZone" class="upload-zone" onclick="document.getElementById('imageInput').click()">
-                <div class="upload-zone-inner">
-                  <div class="upload-icon-wrap">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                      stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="17 8 12 3 7 8" />
-                      <line x1="12" y1="3" x2="12" y2="15" />
-                    </svg>
-                  </div>
-                  <div style="text-align: left;">
-                    <span class="upload-title"
-                      style="display:inline-block; font-size:12px; font-weight:600;">คลิกเพื่อเลือกไฟล์
-                      หรือลากรูปภาพมาวางที่นี่</span>
-                    <span class="upload-subtitle"
-                      style="display:block; font-size:10.5px; color:var(--text-muted); margin-top:2px;">(อัปโหลดได้สูงสุด
-                      3 รูป ย่อขนาดและบีบอัดอัตโนมัติ)</span>
-                  </div>
+            <input type="file" id="imageInput" accept="image/*" multiple style="display: none;"
+              onchange="handleImageSelection(event)">
+
+            <div id="imageUploadZone" class="upload-zone" onclick="document.getElementById('imageInput').click()">
+              <div class="upload-zone-inner">
+                <div class="upload-icon-wrap">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                </div>
+                <div style="text-align: left;">
+                  <span class="upload-title"
+                    style="display:inline-block; font-size:12px; font-weight:600;">คลิกเพื่อเลือกไฟล์ หรือลากมาวาง</span>
+                  <span class="upload-subtitle"
+                    style="display:block; font-size:10.5px; color:var(--text-muted); margin-top:2px;">(สูงสุด 3 รูป — บีบอัดอัตโนมัติ)</span>
                 </div>
               </div>
-
-              <div id="imagePreviewContainer" class="img-preview-row" style="margin-top: 12px;"></div>
             </div>
+
+            <div id="imagePreviewContainer" class="img-preview-row" style="margin-top: 10px;"></div>
           </div>
         </form>
       </div>
+
       <div class="modal-foot">
         <button type="button" class="btn btn-outline" onclick="closeChemModal()">ยกเลิก</button>
         <button type="button" class="btn btn-primary" onclick="document.getElementById('chemicalForm').requestSubmit()">
@@ -387,7 +406,7 @@
   </div>
 
   <!-- ===== MODAL: รับ-จ่าย ===== -->
-  <div class="modal-overlay" id="transModalOverlay" onclick="if(event.target===this)closeTransModal()">
+  <div class="modal-overlay" id="transModalOverlay">
     <div class="modal-box modal-sm">
       <div class="modal-head">
         <div>
@@ -536,7 +555,7 @@
     </div>
   </div>
   <!-- ===== MODAL: ยืนยันการลบ ===== -->
-  <div class="modal-overlay" id="confirmDeleteModalOverlay" onclick="if(event.target===this)closeDeleteModal()">
+  <div class="modal-overlay" id="confirmDeleteModalOverlay">
     <div class="modal-box modal-sm" style="border-radius: var(--r-xl); overflow: hidden;">
       <div class="modal-head"
         style="background: linear-gradient(135deg, #FFF5F5, #FFEBEB); border-bottom: 1px solid rgba(239,68,68,0.1);">
